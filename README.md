@@ -5,6 +5,7 @@
 
 ## ToDo
 - Game loop
+  - Threads
 - Input
 - Graphics
   - Open-gl
