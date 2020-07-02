@@ -1,3 +1,5 @@
+package utils
+
 object Vars {
 
     final val WIDTH: Int = 1280
