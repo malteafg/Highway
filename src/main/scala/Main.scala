@@ -1,7 +1,7 @@
-import org.lwjgl.glfw.GLFW.{GLFW_BLUE_BITS, GLFW_GREEN_BITS, GLFW_RED_BITS, GLFW_REFRESH_RATE, glfwCreateWindow, glfwGetPrimaryMonitor, glfwGetVideoMode, glfwInit, glfwMakeContextCurrent, glfwSetWindowPos, glfwShowWindow, glfwWindowHint}
+import org.lwjgl.glfw.GLFW.{GLFW_BLUE_BITS, GLFW_GREEN_BITS, GLFW_RED_BITS, GLFW_REFRESH_RATE, glfwCreateWindow, glfwGetPrimaryMonitor, glfwGetVideoMode, glfwInit, glfwMakeContextCurrent, glfwPollEvents, glfwSetWindowPos, glfwShowWindow, glfwSwapBuffers, glfwWindowHint, glfwWindowShouldClose}
 import org.lwjgl.glfw.GLFWVidMode
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11.{GL_DEPTH_TEST, GL_VERSION, glClearColor, glEnable, glGetString}
+import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_VERSION, glClear, glClearColor, glEnable, glGetString}
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
 import org.lwjgl.system.MemoryUtil.NULL
 
@@ -43,10 +43,45 @@ object Main {
         System.out.println("OpenGL: " + glGetString(GL_VERSION))
     }
 
+    private def gameUpdate(): Unit = {
+        glfwPollEvents()
+    }
+
+    private def gameRender(): Unit = {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glfwSwapBuffers(window)
+    }
+
     def main(args: Array[String]): Unit = {
         val thread = new Thread {
             override def run(): Unit = {
                 init()
+
+                var lastTime = System.nanoTime
+                var timer = System.currentTimeMillis
+                val ns = 1000000000.0 / 60.0
+                var delta = 0.0
+                var u = 0
+                var f = 0
+                while (running) {
+                    val now = System.nanoTime
+                    delta += (now - lastTime) / ns
+                    lastTime = now
+                    while (delta >= 1) {
+                        gameUpdate
+                        u += 1
+                        delta -= 1
+                    }
+                    gameRender
+                    f += 1
+                    if (System.currentTimeMillis - timer > 1000) {
+                        timer += 1000
+                        System.out.println("UPS: " + u + "  FPS: " + f)
+                        u = 0
+                        f = 0
+                    }
+                    if (glfwWindowShouldClose(window)) running = false
+                }
             }
         }
         thread.start()
