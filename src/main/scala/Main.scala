@@ -1,20 +1,13 @@
-import org.lwjgl.glfw.GLFW._
-import org.lwjgl.glfw.GLFWVidMode
-import org.lwjgl.opengl.{GL}
 import org.lwjgl.opengl.GL11._
-import java.nio.DoubleBuffer
-
 import input.InputHandler
-import input.InputHandler.{keyPressed, mousePressed}
 import org.lwjgl.glfw.GLFW._
-import org.lwjgl.glfw.{GLFWKeyCallback, GLFWVidMode}
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_VERSION, glClear, glClearColor, glEnable, glGetString}
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.system.MemoryUtil.NULL
-import utils.Vars
+import utils.{Options, Vars}
 
 object Main {
 
@@ -71,6 +64,8 @@ object Main {
     }
 
     def main(args: Array[String]): Unit = {
+        Options.setLogging(args)
+
         val thread = new Thread {
             override def run(): Unit = {
                 init

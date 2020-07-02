@@ -1,25 +1,24 @@
 package input
 
-import org.lwjgl.glfw.GLFW.glfwGetCursorPos
+import utils.Options
 
 object InputHandler {
 
-    val printEvents: Boolean = false
     var x: Int = 0
     var y: Int = 0
 
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
-        if(printEvents) print(s"Key \'${key.toChar}\' was pressed \n")
+        Options.log(s"Key \'${key.toChar}\' was pressed", Options.Keys)
     }
 
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
-        if(printEvents) print(s"Button ${button} was pressed on (${x}, ${y}) \n")
+        Options.log(s"Button ${button} was pressed on (${x}, ${y})", Options.Mouse)
     }
 
     def mouseMoved(window: Long, xpos: Double, ypos: Double): Unit = {
         x = xpos.toInt
         y = ypos.toInt
-        if(printEvents) print(s"Mouse was moved to (${x}, ${y}) \n")
+        Options.log(s"Mouse was moved to (${x}, ${y})", Options.Mouse)
     }
 
 }
