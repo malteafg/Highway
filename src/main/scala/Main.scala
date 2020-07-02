@@ -1,7 +1,15 @@
-import org.lwjgl.glfw.GLFW.{GLFW_BLUE_BITS, GLFW_GREEN_BITS, GLFW_RED_BITS, GLFW_REFRESH_RATE, glfwCreateWindow, glfwGetPrimaryMonitor, glfwGetVideoMode, glfwInit, glfwMakeContextCurrent, glfwPollEvents, glfwSetWindowPos, glfwShowWindow, glfwSwapBuffers, glfwWindowHint, glfwWindowShouldClose}
+import org.lwjgl.glfw.GLFW._
 import org.lwjgl.glfw.GLFWVidMode
 import org.lwjgl.opengl.{GL}
 import org.lwjgl.opengl.GL11._
+import java.nio.DoubleBuffer
+
+import input.InputHandler
+import input.InputHandler.{keyPressed, mousePressed}
+import org.lwjgl.glfw.GLFW._
+import org.lwjgl.glfw.{GLFWKeyCallback, GLFWVidMode}
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_VERSION, glClear, glClearColor, glEnable, glGetString}
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20._
@@ -34,6 +42,10 @@ object Main {
         }
         glfwSetWindowPos(window, vidmode.width / 2 - Vars.WIDTH.toInt / 2, vidmode.height / 2 - Vars.HEIGHT.toInt / 2)
 
+        glfwSetKeyCallback(window, InputHandler.keyPressed)
+        glfwSetMouseButtonCallback(window, InputHandler.mousePressed)
+        glfwSetCursorPosCallback(window, InputHandler.mouseMoved)
+
         glfwMakeContextCurrent(window)
         glfwShowWindow(window)
 
@@ -61,7 +73,7 @@ object Main {
     def main(args: Array[String]): Unit = {
         val thread = new Thread {
             override def run(): Unit = {
-                init()
+                init
 
                 val buffer: Int = glGenBuffers()
                 glBindBuffer(GL_ARRAY_BUFFER, buffer)
