@@ -11,7 +11,7 @@ class Test extends AnyFunSuite {
         assert(Syntax.func(10, 20.0f) == 200)
     }
 
-    test("1 times 20 should be 200") {
-        assert(Syntax.func(1, 20.0f) == 0)
+    test("1 times 20 should be 20") {
+        assert(Syntax.func(1, 20.0f) == 20)
     }
 }
