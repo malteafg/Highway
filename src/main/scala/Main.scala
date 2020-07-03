@@ -97,7 +97,7 @@ object Main {
                     f += 1
                     if (System.currentTimeMillis - timer > 1000) {
                         timer += 1000
-                        System.out.println("UPS: " + u + "  FPS: " + f)
+                        Options.log("UPS: " + u + "  FPS: " + f, Options.FPS)
                         u = 0
                         f = 0
                     }

@@ -14,10 +14,13 @@ object Options {
 
     case object Log extends Log
     case object Input extends Log { parent = Log; name = "Input" }
+    case object FPS extends Log { parent = Log; name = "FPS" }
     case object Mouse extends Log { parent = Input; name = "Mouse" }
+    case object MouseMoved extends Log { parent = Mouse; name = "MouseMoved" }
+    case object MousePressed extends Log { parent = Mouse; name = "MousePressed" }
     case object Keys extends Log { parent = Input; name = "Keys" }
 
-    var commands = List(Log, Input, Mouse, Keys)
+    var commands = List(Log, Input, Mouse, Keys, FPS, MousePressed, MouseMoved)
 
     def setLogging(args: Array[String]): Unit = {
         for (a <- args; c <- commands) if (a == c.name) c.logging = true
