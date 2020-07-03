@@ -2,7 +2,8 @@ package utils
 
 object Vars {
 
-    final val WIDTH: Int = 1280
-    final val HEIGHT: Int = 720
+    final val UNIT: Int = 80
+    final val WIDTH: Int = 16 * UNIT
+    final val HEIGHT: Int = 9 * UNIT
 
 }
