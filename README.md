@@ -10,8 +10,11 @@
 - Game loop √
   - Threads √
 - Input     √
+  - Ctrl, alt and shift
+  - Pressed or released
 - Graphics
   - Open-gl
+  - Shaders
   - 3D math √
 
 
