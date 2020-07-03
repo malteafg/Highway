@@ -1,3 +1,4 @@
+import graphics.Shader
 import org.lwjgl.opengl.GL11._
 import input.InputHandler
 import org.lwjgl.glfw.GLFW._
@@ -16,7 +17,7 @@ object Main {
 
     private def init(): Unit = {
         // initting opengl
-        if (glfwInit != true) {
+        if (!glfwInit) {
             System.err.println("Could not initialize GLFW!")
             return
         }
@@ -58,7 +59,10 @@ object Main {
     private def gameRender(): Unit = {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+        Shader.get("Basic").bind()
+        Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
         glDrawArrays(GL_TRIANGLES, 0, 3)
+        Shader.get("Basic").unbind()
 
         glfwSwapBuffers(window)
     }
@@ -68,7 +72,7 @@ object Main {
 
         val thread = new Thread {
             override def run(): Unit = {
-                init
+                init()
 
                 val buffer: Int = glGenBuffers()
                 glBindBuffer(GL_ARRAY_BUFFER, buffer)
@@ -77,6 +81,8 @@ object Main {
                                                      0.5f, -0.5f), GL_STATIC_DRAW)
                 glEnableVertexAttribArray(0)
                 glVertexAttribPointer(0, 2, GL_FLOAT, false, 8, 0)
+
+                Shader.loadShader("Basic")
 
                 var lastTime = System.nanoTime
                 var timer = System.currentTimeMillis
@@ -89,11 +95,11 @@ object Main {
                     delta += (now - lastTime) / ns
                     lastTime = now
                     while (delta >= 1) {
-                        gameUpdate
+                        gameUpdate()
                         u += 1
                         delta -= 1
                     }
-                    gameRender
+                    gameRender()
                     f += 1
                     if (System.currentTimeMillis - timer > 1000) {
                         timer += 1000
@@ -106,34 +112,6 @@ object Main {
             }
         }
         thread.start()
-    }
-
-    def compileShader(source: String, shaderType: Int): Int = {
-        val id = glCreateShader(shaderType)
-        glShaderSource(id, source)
-        glCompileShader(id)
-
-        if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE) {
-            System.out.println(glGetShaderInfoLog(id, 500))
-            println("Could not compile shader: ")
-            System.exit(-1)
-        }
-
-        id
-    }
-
-    def createShader(vertexShader: String, fragmentShader: String): Int = {
-        val program = glCreateProgram()
-        val vs = compileShader(vertexShader, GL_VERTEX_SHADER)
-        val fs = compileShader(fragmentShader, GL_FRAGMENT_SHADER)
-
-        glAttachShader(program, vs)
-        glAttachShader(program, fs)
-        glLinkProgram(program)
-        glValidateProgram(program)
-
-        glDeleteShader(vs)
-        program
     }
 
 }

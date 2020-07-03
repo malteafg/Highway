@@ -1,4 +1,5 @@
-#Version 330 core
+#vertex
+#version 330 core
 
 layout(location = 0) in vec4 position;
 
@@ -6,10 +7,13 @@ void main() {
     gl_Position = position;
 }
 
-#Version 330 core
+#fragment
+#version 330 core
 
 layout(location = 0) out vec4 color;
 
+uniform vec2 mousePos;
+
 void main() {
-    color = vec4(1.0, 1.0, 0.0, 1.0);
+    color = vec4(1.0 * mousePos.x / 1280, 0.0, 1.0 * mousePos.y / 720, 1.0);
 }
