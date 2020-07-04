@@ -1,6 +1,7 @@
 package input
 
 import math.Vector2f
+import ui.Interface
 import utils.Options
 
 object InputHandler {
@@ -10,7 +11,7 @@ object InputHandler {
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = (key, action, mods)
         Options.log(s"Key \'${if(key.toChar.isLetterOrDigit) key.toChar else key}\' was ${if(isPressed(event)) "pressed" else if(isReleased(event)) "released" else if(isContinued(event)) "held down" else "interacted with"}", Options.Keys)
-        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
+//        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.Keys)
         Options.log("", Options.Keys)
     }
@@ -18,9 +19,12 @@ object InputHandler {
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
         val event = (button, action, mods)
         Options.log(s"Button ${button} was ${if(isPressed(event)) "pressed" else if(isReleased(event)) "released" else if(isContinued(event)) "held down" else "interacted with"} on (${mousePos.x}, ${mousePos.y})", Options.MousePressed)
-        Options.log(s"Action: ${action} and mods: ${mods}", Options.MousePressed)
+//        Options.log(s"Action: ${action} and mods: ${mods}", Options.MousePressed)
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.MousePressed)
         Options.log("", Options.MousePressed)
+
+        Interface.mousePressed(mousePos, event)
+
     }
 
     def mouseMoved(window: Long, xpos: Double, ypos: Double): Unit = {
