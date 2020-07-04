@@ -114,4 +114,8 @@ class Vector2f(var x: Float, var y: Float) {
         this.y = y
     }
 
+    override def toString = {
+        s"($x, $y)"
+    }
+
 }

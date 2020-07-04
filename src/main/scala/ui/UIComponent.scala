@@ -8,7 +8,7 @@ class UIComponent(val children: Array[UIComponent], protected val _pos: Vector2f
     var parent: UIComponent = null
     for (child <- children) child.parent = this
 
-    def pos: Vector2f = if(parent != null) parent.pos.add(_pos) else new Vector2f()
+    def pos: Vector2f = if(parent != null) parent.pos.add(_pos) else _pos
 
     def this(children: Array[UIComponent], p: Vector2f, s: Vector2f, scale: Float, color: Vector3f) {
         this(children, p.scale(scale), s.scale(scale), color)

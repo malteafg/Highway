@@ -5,24 +5,26 @@ import math.{Vector2f, Vector3f}
 import utils.{Options, Vars}
 
 class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
-             val horizontal: Boolean, val func: Float => Unit) extends UIComponent(p, s, c) {
+             val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(p, s, c) {
 
     var bar: UIComponent = null
-    var value: Float = 0.0f
     var sliding: Boolean = false
 
-    def this(_pos: Vector2f, size: Vector2f, color: Vector3f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, func: Float => Unit) {
-        this(_pos, size, color, horizontal, func)
-        val t = thickness * Vars.UNIT
-        bar = new UIComponent(if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, size.y - t) else new Vector2f(size.x - t, 0),
-                              new Vector2f(if(horizontal) size.x else t, if(horizontal) t else size.y), color)
+    def this(p: Vector2f, s: Vector2f, color: Vector3f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, value: Float, func: Float => Unit) {
+        this(p, s, color, horizontal, value, func)
+        bar = new UIComponent(if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, p.y + s.y - thickness) else new Vector2f(p.x + s.x - thickness, 0),
+                              if(horizontal) new Vector2f(s.x, thickness) else new Vector2f(thickness, s.y), color)
+
+        Options.log(_pos.toString + " " + size.toString, Options.Button)
+        Options.log(bar.pos.toString + " " + bar.size.toString, Options.Button)
     }
 
     override def click(vec: Vector2f, event: (Int, Int, Int)): Boolean = {
         if(bar.isInside(vec) && InputHandler.isPressed(event)) {
             InputHandler.addMousePressSub((event: (Int, Int, Int)) => { val b = InputHandler.isReleased(event); sliding = !b; b})
             InputHandler.addMouseMoveSub(slide)
-            calcValue(new Vector2f(event._2, event._3))
+            Options.log("Slider", Options.Button)
+            calcValue(InputHandler.mousePos)
             true
         } else false
     }
@@ -31,7 +33,6 @@ class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
         val p = pos
         value = if(horizontal) restrain((vec.x - p.x) / size.x, 0, 1) else restrain((vec.y - p.y) / size.y, 0, 1)
         func(value)
-        Options.log(s"Value is set to $value", Options.Button)
     }
 
     def restrain(value: Float, min: Float, max: Float): Float = {

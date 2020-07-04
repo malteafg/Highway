@@ -8,9 +8,9 @@ object InputHandler {
 
     var mousePos: Vector2f = new Vector2f()
 
-    var keyPressSubs: Subscriber = new Subscriber(_ => false, null)
-    var mousePressSubs: Subscriber = new Subscriber(_ => false, null)
-    var mouseMoveSubs: Subscriber = new Subscriber(_ => false, null)
+    val keyPressSubs: Subscriber = new Subscriber(_ => false, null)
+    val mousePressSubs: Subscriber = new Subscriber(_ => false, null)
+    val mouseMoveSubs: Subscriber = new Subscriber(_ => false, null)
 
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = (key, action, mods)
@@ -23,7 +23,7 @@ object InputHandler {
     }
 
     def addKeyPressSub(func: ((Int, Int, Int)) => Boolean) = {
-        keyPressSubs = new Subscriber(func, keyPressSubs)
+        new Subscriber(func, keyPressSubs)
     }
 
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
@@ -38,7 +38,7 @@ object InputHandler {
     }
 
     def addMousePressSub(func: ((Int, Int, Int)) => Boolean) = {
-        mousePressSubs = new Subscriber(func, mousePressSubs)
+        new Subscriber(func, mousePressSubs)
     }
 
     def mouseMoved(window: Long, xpos: Double, ypos: Double): Unit = {
@@ -49,7 +49,7 @@ object InputHandler {
     }
 
     def addMouseMoveSub(func: ((Int, Int, Int)) => Boolean) = {
-        mouseMoveSubs = new Subscriber(func, mouseMoveSubs)
+        new Subscriber(func, mouseMoveSubs)
     }
 
     def isControlDown(event: (Int, Int, Int)) = event._3 == 2
@@ -66,19 +66,19 @@ object InputHandler {
 
     def isReleased(event: (Int, Int, Int)) = event._2 == 0
 
-}
+    class Subscriber(func: ((Int, Int, Int)) => Boolean, var prev: Subscriber) {
 
-class Subscriber(func: ((Int, Int, Int)) => Boolean, var next: Subscriber) {
+        var next: Subscriber = null
+        if(prev != null) prev.next = this
 
-    var prev: Subscriber = null
-    if(next != null) next.prev = this
-
-    def iterate(event: (Int, Int, Int)): Unit = {
-        if(func(event)) {
-            if(prev != null) prev.next = next
-            if(next != null) next.prev = prev
+        def iterate(event: (Int, Int, Int)): Unit = {
+            if(func(event)) {
+                if(prev != null) prev.next = next
+                if(next != null) next.prev = prev
+            }
+            if(next != null) next.iterate(event)
         }
-        if(next != null) next.iterate(event)
+
     }
 
 }
