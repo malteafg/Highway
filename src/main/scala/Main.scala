@@ -1,11 +1,11 @@
-import graphics.Shader
+import graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import org.lwjgl.opengl.GL11._
 import input.InputHandler
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_VERSION, glClear, glClearColor, glEnable, glGetString}
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
-import org.lwjgl.opengl.GL15._
+import org.lwjgl.opengl.GL30._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.system.MemoryUtil.NULL
 import utils.{Options, Vars}
@@ -57,14 +57,6 @@ object Main {
     }
 
     private def gameRender(): Unit = {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-        Shader.get("Basic").bind()
-        Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
-        glDrawArrays(GL_TRIANGLES, 0, 3)
-        Shader.get("Basic").unbind()
-
-        glfwSwapBuffers(window)
     }
 
     def main(args: Array[String]): Unit = {
@@ -74,13 +66,13 @@ object Main {
             override def run(): Unit = {
                 init()
 
-                val buffer: Int = glGenBuffers()
-                glBindBuffer(GL_ARRAY_BUFFER, buffer)
-                glBufferData(GL_ARRAY_BUFFER, Array(-0.5f, -0.5f,
-                                                     0.0f,  0.5f,
-                                                     0.5f, -0.5f), GL_STATIC_DRAW)
-                glEnableVertexAttribArray(0)
-                glVertexAttribPointer(0, 2, GL_FLOAT, false, 8, 0)
+                val va = new VertexArray
+                val vb = new VertexBuffer(Array(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f))
+                val layout = new VertexBufferLayout
+                val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0), 6)
+
+                layout.pushFloat(2)
+                va.addBuffer(vb, layout)
 
                 Shader.loadShader("Basic")
 
@@ -100,6 +92,18 @@ object Main {
                         delta -= 1
                     }
                     gameRender()
+
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+                    va.bind()
+                    ib.bind()
+                    Shader.get("Basic").bind()
+                    Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0)
+                    Shader.get("Basic").unbind()
+
+                    glfwSwapBuffers(window)
+
                     f += 1
                     if (System.currentTimeMillis - timer > 1000) {
                         timer += 1000
