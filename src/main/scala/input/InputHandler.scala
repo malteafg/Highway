@@ -8,9 +8,10 @@ object InputHandler {
 
     var mousePos: Vector2f = new Vector2f()
 
-    val keyPressSubs: Subscriber = new Subscriber(_ => false, null)
-    val mousePressSubs: Subscriber = new Subscriber(_ => false, null)
-    val mouseMoveSubs: Subscriber = new Subscriber(_ => false, null)
+    val keyPressSubs: Subscriber    = new Subscriber(_ => false, null)
+    val mousePressSubs: Subscriber  = new Subscriber(_ => false, null)
+    val mouseMoveSubs: Subscriber   = new Subscriber(_ => false, null)
+    val mouseScrollSubs: Subscriber = new Subscriber(_ => false, null)
 
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = (key, action, mods)
@@ -33,7 +34,6 @@ object InputHandler {
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.MousePressed)
         Options.log("", Options.MousePressed)
 
-        Interface.mousePressed(mousePos, event)
         mousePressSubs.iterate(event)
     }
 
@@ -52,24 +52,40 @@ object InputHandler {
         new Subscriber(func, mouseMoveSubs)
     }
 
-    def isControlDown(event: (Int, Int, Int)) = event._3 == 2
+    def mouseScrolled(window: Long, xScroll: Double, yScroll: Double): Unit = {
+        val event = (-1, xScroll.toInt, yScroll.toInt)
+        Options.log(s"Mouse was scrolled to (${xScroll.toInt}, ${yScroll.toInt})", Options.MouseScrolled)
 
-    def isShiftDown(event: (Int, Int, Int)) = event._3 == 1
+        mouseScrollSubs.iterate(event)
+    }
 
-    def isAltDown(event: (Int, Int, Int)) = event._3 == 3
+    def addMouseScrollSub(func: ((Int, Int, Int)) => Boolean) = {
+        new Subscriber(func, mouseScrollSubs)
+    }
 
-    def isUnAltered(event: (Int, Int, Int)) = event._3 == 0
+    def isControlDown(event: (Int, Int, Int))   = event._3 == 2
 
-    def isPressed(event: (Int, Int, Int)) = event._2 == 1
+    def isShiftDown(event: (Int, Int, Int))     = event._3 == 1
 
-    def isContinued(event: (Int, Int, Int)) = event._2 == 2
+    def isAltDown(event: (Int, Int, Int))       = event._3 == 3
 
-    def isReleased(event: (Int, Int, Int)) = event._2 == 0
+    def isUnAltered(event: (Int, Int, Int))     = event._3 == 0
+
+    def isContinued(event: (Int, Int, Int))     = event._2 == 2
+
+    def isPressed(event: (Int, Int, Int))       = event._1 != -1 && event._2 == 1
+
+    def isReleased(event: (Int, Int, Int))      = event._1 != -1 && event._2 == 0
+
+    def isScrolling(event: (Int, Int, Int))     = event._1 == -1
 
     class Subscriber(func: ((Int, Int, Int)) => Boolean, var prev: Subscriber) {
 
         var next: Subscriber = null
-        if(prev != null) prev.next = this
+        if(prev != null) {
+            if(prev.next != null) next = prev.next
+            prev.next = this
+        }
 
         def iterate(event: (Int, Int, Int)): Unit = {
             if(func(event)) {

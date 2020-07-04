@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
 import org.lwjgl.system.MemoryUtil.NULL
 import utils.{Options, Vars}
+import ui.Interface
 
 object Main {
 
@@ -36,7 +37,10 @@ object Main {
 
         glfwSetKeyCallback(window, InputHandler.keyPressed)
         glfwSetMouseButtonCallback(window, InputHandler.mousePressed)
+        glfwSetScrollCallback(window, InputHandler.mouseScrolled)
         glfwSetCursorPosCallback(window, InputHandler.mouseMoved)
+
+        Interface.init
 
         glfwMakeContextCurrent(window)
         glfwShowWindow(window)

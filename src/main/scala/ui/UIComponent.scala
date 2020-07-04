@@ -1,5 +1,6 @@
 package ui
 
+import input.InputHandler
 import math.{Vector2f, Vector3f}
 import utils.{Options, Vars}
 
@@ -23,9 +24,9 @@ class UIComponent(val children: Array[UIComponent], protected val _pos: Vector2f
         vec.x > p.x && vec.y > p.y && vec.x < p.x + size.x && vec.y < p.y + size.y
     }
 
-    def click(vec: Vector2f, event: (Int, Int, Int)): Boolean = {
+    def click(event: (Int, Int, Int)): Boolean = {
         var b = false
-        if(isInside(vec)) for (child <- children) b = b || child.click(vec, event)
+        if(isInside(InputHandler.mousePos)) for (child <- children) b = b || child.click(event)
         b
     }
 

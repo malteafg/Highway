@@ -1,10 +1,10 @@
 package ui
 
+import input.InputHandler
 import math.{Vector2f, Vector3f}
 import utils.{Options, Vars}
 
 object Interface {
-
 
     val button1: Button = new Button(new Vector2f(0.5f, 0.5f), new Vector2f(2, 2), new Vector3f(),
         () => "Top button", () => Options.log(s"Top button says click!", Options.Button))
@@ -17,8 +17,14 @@ object Interface {
     val panel: UIComponent = new UIComponent(Array(button1, button2, button3), new Vector2f(), new Vector2f(3, 9), Vars.UNIT, new Vector3f())
     val screen: UIComponent = new UIComponent(Array(panel, slider), new Vector2f(), new Vector2f(16, 9), Vars.UNIT, new Vector3f())
 
-    def mousePressed(vec: Vector2f, event: (Int, Int, Int)) = {
-        screen.click(vec, event)
+    def init: Unit = {
+        InputHandler.addMousePressSub(mousePressed)
+        InputHandler.addMouseScrollSub(mousePressed)
+    }
+
+    def mousePressed(event: (Int, Int, Int)) = {
+        screen.click(event)
+        false
     }
 
 }

@@ -1,6 +1,7 @@
 package ui
 
 import input.InputHandler
+import input.InputHandler.mouseMoveSubs
 import math.{Vector2f, Vector3f}
 import utils.{Options, Vars}
 
@@ -15,16 +16,18 @@ class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
         bar = new UIComponent(if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, p.y + s.y - thickness) else new Vector2f(p.x + s.x - thickness, 0),
                               if(horizontal) new Vector2f(s.x, thickness) else new Vector2f(thickness, s.y), color)
 
-        Options.log(_pos.toString + " " + size.toString, Options.Button)
-        Options.log(bar.pos.toString + " " + bar.size.toString, Options.Button)
     }
 
-    override def click(vec: Vector2f, event: (Int, Int, Int)): Boolean = {
-        if(bar.isInside(vec) && InputHandler.isPressed(event)) {
+    override def click(event: (Int, Int, Int)): Boolean = {
+        if(bar.isInside(InputHandler.mousePos) && InputHandler.isPressed(event)) {
             InputHandler.addMousePressSub((event: (Int, Int, Int)) => { val b = InputHandler.isReleased(event); sliding = !b; b})
             InputHandler.addMouseMoveSub(slide)
-            Options.log("Slider", Options.Button)
+            sliding = true
             calcValue(InputHandler.mousePos)
+            true
+        } else if(isInside(InputHandler.mousePos) && InputHandler.isScrolling(event)) {
+            value = restrain(value - event._3 * 0.1f, 0, 1)
+            func(value)
             true
         } else false
     }
