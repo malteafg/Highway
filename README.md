@@ -12,8 +12,12 @@
 - Input     √
   - Ctrl, alt and shift √
   - Pressed or released √
+  - MouseWheel
 - Graphics
   - UI
+    - Basic component √
+    - Button √
+    - Slider
   - Open-gl
   - Buffer stuff
   - Shaders √

@@ -21,6 +21,7 @@ class Shader(programID: Int, vertID: Int, fragID: Int) {
     })
 
     def loadUniformFloat(name: String, value: Float): Unit = glUniform1f(getUniform(name), value)
+    def loadUniformInt(name: String, value: Int): Unit = glUniform1i(getUniform(name), value)
 
     def loadUniformBoolean(name: String, value: Boolean): Unit = {
         var toLoad = 0
@@ -88,10 +89,6 @@ class Shader(programID: Int, vertID: Int, fragID: Int) {
 }
 
 object Shader {
-
-    val VERTEX_ATTRIB = 0
-    val TCOORD_ATTRIB = 1
-    val NORMAL_ATTRIB = 2
 
     private val shaders = mutable.Map.empty[String, Shader]
 
