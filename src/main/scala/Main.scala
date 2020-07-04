@@ -1,12 +1,10 @@
-import graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
+import graphics.{IndexBuffer, Renderer, Shader, Texture, VertexArray, VertexBuffer, VertexBufferLayout}
 import org.lwjgl.opengl.GL11._
 import input.InputHandler
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_VERSION, glClear, glClearColor, glEnable, glGetString}
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
-import org.lwjgl.opengl.GL30._
-import org.lwjgl.opengl.GL20._
 import org.lwjgl.system.MemoryUtil.NULL
 import utils.{Options, Vars}
 
@@ -49,6 +47,8 @@ object Main {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         glEnable(GL_DEPTH_TEST)
         glActiveTexture(GL_TEXTURE1)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_BLEND)
         System.out.println("OpenGL: " + glGetString(GL_VERSION))
     }
 
@@ -67,14 +67,21 @@ object Main {
                 init()
 
                 val va = new VertexArray
-                val vb = new VertexBuffer(Array(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f))
+                val vb = new VertexBuffer(Array(-0.5f, -0.5f, 0.0f, 1.0f,
+                                                 0.5f, -0.5f, 1.0f, 1.0f,
+                                                 0.5f,  0.5f, 1.0f, 0.0f,
+                                                -0.5f,  0.5f, 0.0f, 0.0f))
                 val layout = new VertexBufferLayout
                 val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0), 6)
 
                 layout.pushFloat(2)
+                layout.pushFloat(2)
                 va.addBuffer(vb, layout)
 
                 Shader.loadShader("Basic")
+                val tex = new Texture("logo")
+
+                val renderer = new Renderer
 
                 var lastTime = System.nanoTime
                 var timer = System.currentTimeMillis
@@ -93,21 +100,19 @@ object Main {
                     }
                     gameRender()
 
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-                    va.bind()
-                    ib.bind()
+                    renderer.clear()
                     Shader.get("Basic").bind()
                     Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
-                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0)
-                    Shader.get("Basic").unbind()
+                    tex.bind()
+                    Shader.get("Basic").loadUniformInt("u_Texture", 0)
+                    renderer.draw(va, ib)
 
                     glfwSwapBuffers(window)
 
                     f += 1
                     if (System.currentTimeMillis - timer > 1000) {
                         timer += 1000
-                        Options.log("UPS: " + u + "  FPS: " + f, Options.FPS)
+                        Options.log("UPS: " + u + " FPS: " + f, Options.FPS)
                         u = 0
                         f = 0
                     }
