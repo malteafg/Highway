@@ -2,7 +2,7 @@ package utils
 
 import org.lwjgl.opengl.GL11._
 
-object Vars {
+object Vals {
 
     final val UNIT: Int = 80
     final val WIDTH: Int = 16 * UNIT

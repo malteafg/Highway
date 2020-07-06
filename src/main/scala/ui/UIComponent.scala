@@ -2,7 +2,7 @@ package ui
 
 import input.InputHandler
 import math.{Vector2f, Vector3f}
-import utils.{Options, Vars}
+import utils.{Options, Vals}
 
 class UIComponent(val children: Array[UIComponent], protected val _pos: Vector2f, val size: Vector2f, val color: Vector3f) {
 
@@ -16,7 +16,7 @@ class UIComponent(val children: Array[UIComponent], protected val _pos: Vector2f
     }
 
     def this(p: Vector2f, s: Vector2f, color: Vector3f) {
-        this(Array(), p, s, Vars.UNIT, color)
+        this(Array(), p, s, Vals.UNIT, color)
     }
 
     def isInside(vec: Vector2f): Boolean = {

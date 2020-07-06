@@ -2,7 +2,7 @@ package graphics
 
 import scala.collection.mutable.ListBuffer
 import org.lwjgl.opengl.GL11._
-import utils.Vars
+import utils.Vals
 
 class VertexBufferLayout {
 
@@ -13,17 +13,17 @@ class VertexBufferLayout {
 
     def pushFloat(count: Int): Unit = {
         elements.addOne(VertexBufferElement(GL_FLOAT, count, false))
-        stride += Vars.getSizeOf(GL_FLOAT) * count
+        stride += Vals.getSizeOf(GL_FLOAT) * count
     }
 
     def pushInt(count: Int): Unit = {
         elements.addOne(VertexBufferElement(GL_UNSIGNED_INT, count, false))
-        stride += Vars.getSizeOf(GL_UNSIGNED_INT) * count
+        stride += Vals.getSizeOf(GL_UNSIGNED_INT) * count
     }
 
     def pushChar(count: Int): Unit = {
         elements.addOne(VertexBufferElement(GL_UNSIGNED_BYTE, count, true))
-        stride += Vars.getSizeOf(GL_UNSIGNED_BYTE) * count
+        stride += Vals.getSizeOf(GL_UNSIGNED_BYTE) * count
     }
 
     def getElements(): List[VertexBufferElement] = elements.toList

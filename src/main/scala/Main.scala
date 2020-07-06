@@ -1,12 +1,13 @@
 import graphics.{IndexBuffer, Renderer, Shader, Texture, VertexArray, VertexBuffer, VertexBufferLayout}
 import org.lwjgl.opengl.GL11._
 import input.InputHandler
+import math.Matrix4f
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_VERSION, glClear, glClearColor, glEnable, glGetString}
 import org.lwjgl.opengl.GL13.{GL_TEXTURE1, glActiveTexture}
 import org.lwjgl.system.MemoryUtil.NULL
-import utils.{Options, Vars}
+import utils.{Options, Vals}
 import ui.Interface
 
 object Main {
@@ -28,12 +29,12 @@ object Main {
         glfwWindowHint(GLFW_GREEN_BITS, vidmode.greenBits)
         glfwWindowHint(GLFW_BLUE_BITS, vidmode.blueBits)
         glfwWindowHint(GLFW_REFRESH_RATE, vidmode.refreshRate)
-        window = glfwCreateWindow(Vars.WIDTH.toInt, Vars.HEIGHT.toInt, "Highway Architect", NULL, NULL)
+        window = glfwCreateWindow(Vals.WIDTH.toInt, Vals.HEIGHT.toInt, "Highway Architect", NULL, NULL)
         if (window == NULL) {
             System.err.println("Could not create GLFW window!")
             return
         }
-        glfwSetWindowPos(window, vidmode.width / 2 - Vars.WIDTH.toInt / 2, vidmode.height / 2 - Vars.HEIGHT.toInt / 2)
+        glfwSetWindowPos(window, vidmode.width / 2 - Vals.WIDTH.toInt / 2, vidmode.height / 2 - Vals.HEIGHT.toInt / 2)
 
         glfwSetKeyCallback(window, InputHandler.keyPressed)
         glfwSetMouseButtonCallback(window, InputHandler.mousePressed)
@@ -51,8 +52,8 @@ object Main {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         glEnable(GL_DEPTH_TEST)
         glActiveTexture(GL_TEXTURE1)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         System.out.println("OpenGL: " + glGetString(GL_VERSION))
     }
 
@@ -70,11 +71,14 @@ object Main {
             override def run(): Unit = {
                 init()
 
+                val projMatrix = new Matrix4f().orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
+                val viewMatrix = new Matrix4f().translate(0, 0, 0)
+
                 val va = new VertexArray
-                val vb = new VertexBuffer(Array(-0.5f, -0.5f, 0.0f, 1.0f,
-                                                 0.5f, -0.5f, 1.0f, 1.0f,
-                                                 0.5f,  0.5f, 1.0f, 0.0f,
-                                                -0.5f,  0.5f, 0.0f, 0.0f))
+                val vb = new VertexBuffer(Array(100f, 100f, 0.0f, 0.0f,
+                                                200f, 100f, 1.0f, 0.0f,
+                                                200f,  200f, 1.0f, 1.0f,
+                                                100f,  200f, 0.0f, 1.0f))
                 val layout = new VertexBufferLayout
                 val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0), 6)
 
@@ -107,8 +111,11 @@ object Main {
                     renderer.clear()
                     Shader.get("Basic").bind()
                     Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
+                    Shader.get("Basic").loadUniformMat4f("u_MVP", projMatrix.multiply(viewMatrix))
                     tex.bind()
                     Shader.get("Basic").loadUniformInt("u_Texture", 0)
+                    renderer.draw(va, ib)
+                    Shader.get("Basic").loadUniformMat4f("u_MVP", projMatrix.multiply(new Matrix4f().translate(200, 0, 0)))
                     renderer.draw(va, ib)
 
                     glfwSwapBuffers(window)

@@ -3,7 +3,7 @@ package ui
 import input.InputHandler
 import input.InputHandler.mouseMoveSubs
 import math.{Vector2f, Vector3f}
-import utils.{Options, Vars}
+import utils.{Options, Vals}
 
 class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
              val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(p, s, c) {
