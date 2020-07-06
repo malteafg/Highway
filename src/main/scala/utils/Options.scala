@@ -20,11 +20,12 @@ object Options {
     case object MousePressed extends Log { parent = Mouse; name = "MousePressed" }
     case object MouseScrolled extends Log { parent = Mouse; name = "MouseScrolled" }
     case object Keys extends Log { parent = Input; name = "Keys" }
+    case object Characters extends Log { parent = Input; name = "Characters" }
     case object Interface extends Log { parent = Log; name = "Interface" }
     case object Button extends Log { parent = Interface; name = "Button" }
 
     // Remember to add new objects to list
-    var commands = List(Log, Input, Mouse, Keys, FPS, MousePressed, MouseMoved, MouseScrolled, Interface, Button)
+    var commands = List(Log, Input, Mouse, Keys, Characters, FPS, MousePressed, MouseMoved, MouseScrolled, Interface, Button)
 
     def setLogging(args: Array[String]): Unit = {
         for (a <- args; c <- commands) if (a == c.name) c.logging = true

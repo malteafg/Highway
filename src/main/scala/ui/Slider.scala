@@ -20,7 +20,7 @@ class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
 
     override def click(event: (Int, Int, Int)): Boolean = {
         if(bar.isInside(InputHandler.mousePos) && InputHandler.isPressed(event)) {
-            InputHandler.addMousePressSub((event: (Int, Int, Int)) => { val b = InputHandler.isReleased(event); sliding = !b; b})
+            InputHandler.addMousePressSub((event: (Int, Int, Int)) => { val b = InputHandler.isReleased(event); sliding = !b; (b, b)})
             InputHandler.addMouseMoveSub(slide)
             sliding = true
             calcValue(InputHandler.mousePos)
@@ -42,9 +42,9 @@ class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
         if(value < min) min else if(value > max) max else value
     }
 
-    def slide(event: (Int, Int, Int)): Boolean = {
+    def slide(event: (Int, Int, Int)) = {
         if(sliding) calcValue(new Vector2f(event._2, event._3))
-        !sliding
+        (!sliding, false)
     }
 
 }

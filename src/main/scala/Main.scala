@@ -37,6 +37,7 @@ object Main {
         glfwSetWindowPos(window, vidmode.width / 2 - Vals.WIDTH.toInt / 2, vidmode.height / 2 - Vals.HEIGHT.toInt / 2)
 
         glfwSetKeyCallback(window, InputHandler.keyPressed)
+        glfwSetCharCallback(window, InputHandler.charEntered)
         glfwSetMouseButtonCallback(window, InputHandler.mousePressed)
         glfwSetScrollCallback(window, InputHandler.mouseScrolled)
         glfwSetCursorPosCallback(window, InputHandler.mouseMoved)
