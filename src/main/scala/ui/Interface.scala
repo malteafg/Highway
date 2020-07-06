@@ -23,8 +23,7 @@ object Interface {
     }
 
     def mousePressed(event: (Int, Int, Int)) = {
-        screen.click(event)
-        false
+        (false, screen.click(event))
     }
 
 }

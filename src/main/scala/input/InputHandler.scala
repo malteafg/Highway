@@ -8,24 +8,29 @@ object InputHandler {
 
     var mousePos: Vector2f = new Vector2f()
 
-    val keyPressSubs: Subscriber    = new Subscriber(_ => false, null)
-    val mousePressSubs: Subscriber  = new Subscriber(_ => false, null)
-    val mouseMoveSubs: Subscriber   = new Subscriber(_ => false, null)
-    val mouseScrollSubs: Subscriber = new Subscriber(_ => false, null)
+    val keyPressSubs: Subscriber    = new Subscriber(_ => (false, false), null)
+    val mousePressSubs: Subscriber  = new Subscriber(_ => (false, false), null)
+    val mouseMoveSubs: Subscriber   = new Subscriber(_ => (false, false), null)
+    val mouseScrollSubs: Subscriber = new Subscriber(_ => (false, false), null)
 
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = (key, action, mods)
-        Options.log(s"Key \'${if(key.toChar.isLetterOrDigit) key.toChar else key}\' was ${if(isPressed(event)) "pressed" else if(isReleased(event)) "released" else if(isContinued(event)) "held down" else "interacted with"}", Options.Keys)
-//        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
+        Options.log(s"Key '${key.toChar}'/$key was ${if(isPressed(event)) "pressed" else if(isReleased(event)) "released" else if(isContinued(event)) "held down" else "interacted with"}", Options.Keys)
+        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.Keys)
         Options.log("", Options.Keys)
 
         keyPressSubs.iterate(event)
     }
 
-    def addKeyPressSub(func: ((Int, Int, Int)) => Boolean) = {
-        new Subscriber(func, keyPressSubs)
+    def addKeyPressSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, keyPressSubs)
+
+    def charEntered(window: Long, codePoint: Int): Unit = {
+        val event = (codePoint, 0, -1)
+        Options.log(s"'${codePoint.toChar}' has a value of $codePoint \n", Options.Characters)
     }
+
+    def addCharSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, keyPressSubs)
 
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
         val event = (button, action, mods)
@@ -37,9 +42,7 @@ object InputHandler {
         mousePressSubs.iterate(event)
     }
 
-    def addMousePressSub(func: ((Int, Int, Int)) => Boolean) = {
-        new Subscriber(func, mousePressSubs)
-    }
+    def addMousePressSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, mousePressSubs)
 
     def mouseMoved(window: Long, xpos: Double, ypos: Double): Unit = {
         val event = (0, xpos.toInt, ypos.toInt)
@@ -48,9 +51,7 @@ object InputHandler {
         mouseMoveSubs.iterate(event)
     }
 
-    def addMouseMoveSub(func: ((Int, Int, Int)) => Boolean) = {
-        new Subscriber(func, mouseMoveSubs)
-    }
+    def addMouseMoveSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, mouseMoveSubs)
 
     def mouseScrolled(window: Long, xScroll: Double, yScroll: Double): Unit = {
         val event = (-1, xScroll.toInt, yScroll.toInt)
@@ -59,15 +60,15 @@ object InputHandler {
         mouseScrollSubs.iterate(event)
     }
 
-    def addMouseScrollSub(func: ((Int, Int, Int)) => Boolean) = {
-        new Subscriber(func, mouseScrollSubs)
-    }
+    def addMouseScrollSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, mouseScrollSubs)
 
     def isControlDown(event: (Int, Int, Int))   = event._3 == 2
 
     def isShiftDown(event: (Int, Int, Int))     = event._3 == 1
 
     def isAltDown(event: (Int, Int, Int))       = event._3 == 3
+
+    def isCodePoint(event: (Int, Int, Int))     = event._3 == -1
 
     def isUnAltered(event: (Int, Int, Int))     = event._3 == 0
 
@@ -79,7 +80,14 @@ object InputHandler {
 
     def isScrolling(event: (Int, Int, Int))     = event._1 == -1
 
-    class Subscriber(func: ((Int, Int, Int)) => Boolean, var prev: Subscriber) {
+    /**
+     * An object storing a function to be executed and references to two other Subscriber objects
+     *
+     * @param func A function that returns two booleans, the first unsubscribes the object if true and the second blocks the call
+     *             to the next subscriber if true
+     * @param prev A reference to another subscriber object usually the head of the list
+     */
+    class Subscriber(func: ((Int, Int, Int)) => (Boolean, Boolean), var prev: Subscriber) {
 
         var next: Subscriber = null
         if(prev != null) {
@@ -88,11 +96,12 @@ object InputHandler {
         }
 
         def iterate(event: (Int, Int, Int)): Unit = {
-            if(func(event)) {
+            val t = func(event)
+            if(t._1) {
                 if(prev != null) prev.next = next
                 if(next != null) next.prev = prev
             }
-            if(next != null) next.iterate(event)
+            if(next != null && !t._2) next.iterate(event)
         }
 
     }
