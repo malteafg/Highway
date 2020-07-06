@@ -1,7 +1,7 @@
 package math
 
 import java.nio.FloatBuffer
-import utils.Vars
+import utils.Vals
 
 class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
                var m10: Float, var m11: Float, var m12: Float, var m13: Float,
@@ -297,7 +297,7 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      */
     def perspective(fovy: Float, aspect: Float, near: Float, far: Float): Matrix4f = {
         val perspective = new Matrix4f
-        val aspectRatio = Vars.WIDTH / Vars.HEIGHT
+        val aspectRatio = Vals.WIDTH / Vals.HEIGHT
         val y_scale = (1f / Math.tan(Math.toRadians(fovy) / 2f) * aspectRatio).toFloat
         val x_scale = y_scale / aspectRatio
         val frustum_length = far - near
