@@ -16,7 +16,7 @@ object InputHandler {
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = (key, action, mods)
         Options.log(s"Key '${key.toChar}'/$key was ${if(isPressed(event)) "pressed" else if(isReleased(event)) "released" else if(isContinued(event)) "held down" else "interacted with"}", Options.Keys)
-        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
+//        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.Keys)
         Options.log("", Options.Keys)
 
@@ -28,6 +28,8 @@ object InputHandler {
     def charEntered(window: Long, codePoint: Int): Unit = {
         val event = (codePoint, 0, -1)
         Options.log(s"'${codePoint.toChar}' has a value of $codePoint \n", Options.Characters)
+
+        keyPressSubs.iterate(event)
     }
 
     def addCharSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, keyPressSubs)
