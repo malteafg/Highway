@@ -17,7 +17,7 @@
   - MouseWheel √
 - Graphics
   - UI
-    - Qol rework for panels
+    - Qol rework for panels √
     - Basic component √
     - Button √
     - Slider √
