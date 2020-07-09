@@ -4,7 +4,9 @@
 ## Project about highways
 
 ## Milestone
+- Usable and visible UI
 - Green plane on white background, movable camera by mouse input with restrictions
+
 
 ### ToDo
 - Game loop √
@@ -12,12 +14,12 @@
 - Input     √
   - Ctrl, alt and shift √
   - Pressed or released √
-  - MouseWheel
+  - MouseWheel √
 - Graphics
   - UI
     - Basic component √
     - Button √
-    - Slider
+    - Slider √
   - Open-gl
   - Buffer stuff
   - Shaders √
