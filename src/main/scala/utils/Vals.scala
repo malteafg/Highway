@@ -1,5 +1,6 @@
 package utils
 
+import math.Vector3f
 import org.lwjgl.opengl.GL11._
 
 object Vals {
@@ -7,6 +8,8 @@ object Vals {
     final val UNIT: Int = 80
     final val WIDTH: Int = 16 * UNIT
     final val HEIGHT: Int = 9 * UNIT
+
+    final val UI_COLOR: Vector3f = new Vector3f(50, 80, 110)
 
     def getSizeOf(t: Int): Int = t match {
         case GL_UNSIGNED_INT => 4

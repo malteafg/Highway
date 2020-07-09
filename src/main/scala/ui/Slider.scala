@@ -5,17 +5,16 @@ import input.InputHandler.mouseMoveSubs
 import math.{Vector2f, Vector3f}
 import utils.{Options, Vals}
 
-class Slider(p: Vector2f, s: Vector2f, c: Vector3f,
-             val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(p, s, c) {
+class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector3f,
+             val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(par, p, s, c) {
 
     var bar: UIComponent = null
     var sliding: Boolean = false
 
-    def this(p: Vector2f, s: Vector2f, color: Vector3f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, value: Float, func: Float => Unit) {
-        this(p, s, color, horizontal, value, func)
-        bar = new UIComponent(if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, p.y + s.y - thickness) else new Vector2f(p.x + s.x - thickness, 0),
+    def this(par: UIComponent, p: Vector2f, s: Vector2f, color: Vector3f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, value: Float, func: Float => Unit) {
+        this(par, p, s, color, horizontal, value, func)
+        bar = new UIComponent(this, if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, s.y - thickness) else new Vector2f(s.x - thickness, 0),
                               if(horizontal) new Vector2f(s.x, thickness) else new Vector2f(thickness, s.y), color)
-
     }
 
     override def click(event: (Int, Int, Int)): Boolean = {
