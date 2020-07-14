@@ -15,14 +15,15 @@
   - Ctrl, alt and shift √
   - Pressed or released √
   - MouseWheel √
+- UI
+  - Qol rework for panels √
+  - Basic component √
+  - Button √
+  - Slider √
 - Graphics
-  - UI
-    - Qol rework for panels √
-    - Basic component √
-    - Button √
-    - Slider √
   - Open-gl
   - Buffer stuff
+  - UI
   - Shaders √
   - 3D math √
 
