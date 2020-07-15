@@ -230,150 +230,6 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
     }
 
     /**
-     * Creates a orthographic projection matrix. Similar to
-     * <code>glOrtho(left, right, bottom, top, near, far)</code>.
-     *
-     * @param left   Coordinate for the left vertical clipping pane
-     * @param right  Coordinate for the right vertical clipping pane
-     * @param bottom Coordinate for the bottom horizontal clipping pane
-     * @param top    Coordinate for the bottom horizontal clipping pane
-     * @param near   Coordinate for the near depth clipping pane
-     * @param far    Coordinate for the far depth clipping pane
-     * @return Orthographic matrix
-     */
-    def orthographic(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
-        val ortho = new Matrix4f
-        ortho.m00 = 2.0f / (right - left)
-        ortho.m11 = 2.0f / (top - bottom)
-        ortho.m22 = 2.0f / (near - far)
-        ortho.m03 = (left + right) / (left - right)
-        ortho.m13 = (bottom + top) / (bottom - top)
-        ortho.m23 = (far + near) / (far - near)
-        ortho
-    }
-
-    /**
-     * Creates a perspective projection matrix. Similar to
-     * <code>glFrustum(left, right, bottom, top, near, far)</code>.
-     *
-     * @param left   Coordinate for the left vertical clipping pane
-     * @param right  Coordinate for the right vertical clipping pane
-     * @param bottom Coordinate for the bottom horizontal clipping pane
-     * @param top    Coordinate for the bottom horizontal clipping pane
-     * @param near   Coordinate for the near depth clipping pane, must be
-     *               positive
-     * @param far    Coordinate for the far depth clipping pane, must be
-     *               positive
-     * @return Perspective matrix
-     */
-    def frustum(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
-        val frustum = new Matrix4f
-        val a = (right + left) / (right - left)
-        val b = (top + bottom) / (top - bottom)
-        val c = -(far + near) / (far - near)
-        val d = -(2f * far * near) / (far - near)
-        frustum.m00 = (2f * near) / (right - left)
-        frustum.m11 = (2f * near) / (top - bottom)
-        frustum.m02 = a
-        frustum.m12 = b
-        frustum.m22 = c
-        frustum.m32 = -1f
-        frustum.m23 = d
-        frustum.m33 = 0f
-        frustum
-    }
-
-    /**
-     * Creates a perspective projection matrix. Similar to
-     * <code>gluPerspective(fovy, aspec, zNear, zFar)</code>.
-     *
-     * @param fovy   Field of view angle in degrees
-     * @param aspect The aspect ratio is the ratio of width to height
-     * @param near   Distance from the viewer to the near clipping plane, must
-     *               be positive
-     * @param far    Distance from the viewer to the far clipping plane, must be
-     *               positive
-     * @return Perspective matrix
-     */
-    def perspective(fovy: Float, aspect: Float, near: Float, far: Float): Matrix4f = {
-        val perspective = new Matrix4f
-        val aspectRatio = Vals.WIDTH / Vals.HEIGHT
-        val y_scale = (1f / Math.tan(Math.toRadians(fovy) / 2f) * aspectRatio).toFloat
-        val x_scale = y_scale / aspectRatio
-        val frustum_length = far - near
-        perspective.m00 = x_scale
-        perspective.m11 = y_scale
-        perspective.m22 = -(far + near) / frustum_length
-        perspective.m32 = -1f
-        perspective.m23 = -((2f * near * far) / frustum_length)
-        perspective.m33 = 0f
-        perspective
-    }
-
-    /**
-     * Creates a translation matrix. Similar to
-     * <code>glTranslate(x, y, z)</code>.
-     *
-     * @param x x coordinate of translation vector
-     * @param y y coordinate of translation vector
-     * @param z z coordinate of translation vector
-     * @return Translation matrix
-     */
-    def translate(x: Float, y: Float, z: Float): Matrix4f = {
-        val translation = new Matrix4f
-        translation.m03 = x
-        translation.m13 = y
-        translation.m23 = z
-        translation
-    }
-
-    /**
-     * Creates a rotation matrix. Similar to
-     * <code>glRotate(angle, x, y, z)</code>.
-     *
-     * @param angle Angle of rotation in degrees
-     * @param nx     x coordinate of the rotation vector
-     * @param ny     y coordinate of the rotation vector
-     * @param nz     z coordinate of the rotation vector
-     * @return Rotation matrix
-     */
-    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Matrix4f = {
-        val rotation = new Matrix4f
-        val c = Math.cos(angle).toFloat
-        val s = Math.sin(angle).toFloat
-        val vec = new Vector3f(nx, ny, nz).normalize
-        val x = vec.x
-        val y = vec.y
-        val z = vec.z
-        rotation.m00 = x * x * (1f - c) + c
-        rotation.m10 = y * x * (1f - c) + z * s
-        rotation.m20 = x * z * (1f - c) - y * s
-        rotation.m01 = x * y * (1f - c) - z * s
-        rotation.m11 = y * y * (1f - c) + c
-        rotation.m21 = y * z * (1f - c) + x * s
-        rotation.m02 = x * z * (1f - c) + y * s
-        rotation.m12 = y * z * (1f - c) - x * s
-        rotation.m22 = z * z * (1f - c) + c
-        rotation
-    }
-
-    /**
-     * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
-     *
-     * @param x Scale factor along the x coordinate
-     * @param y Scale factor along the y coordinate
-     * @param z Scale factor along the z coordinate
-     * @return Scaling matrix
-     */
-    def scale(x: Float, y: Float, z: Float): Matrix4f = {
-        val scaling = new Matrix4f
-        scaling.m00 = x
-        scaling.m11 = y
-        scaling.m22 = z
-        scaling
-    }
-
-    /**
      * Invert this 4x4 matrix.
      */
     def invert: Matrix4f = {
@@ -479,6 +335,193 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
         invert.m32 = dst(14) * det
         invert.m33 = dst(15) * det
         invert
+    }
+
+    /**
+     * Multiplies this matrix with a translation matrix. Similar to
+     * <code>glTranslate(x, y, z)</code>.
+     *
+     * @param x x coordinate of translation vector
+     * @param y y coordinate of translation vector
+     * @param z z coordinate of translation vector
+     * @return Translation matrix
+     */
+    def translate(x: Float, y: Float, z: Float): Matrix4f = {
+        this.multiply(Matrix4f.translate(x, y, z))
+    }
+
+    /**
+     * Multiplies this matrix with a rotation matrix. Similar to
+     * <code>glRotate(angle, x, y, z)</code>.
+     *
+     * @param angle Angle of rotation in degrees
+     * @param nx     x coordinate of the rotation vector
+     * @param ny     y coordinate of the rotation vector
+     * @param nz     z coordinate of the rotation vector
+     * @return Rotation matrix
+     */
+    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Matrix4f = {
+        this.multiply(Matrix4f.rotate(angle, nx, ny, nz))
+    }
+
+    /**
+     * Multiplies this matrix with a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
+     *
+     * @param x Scale factor along the x coordinate
+     * @param y Scale factor along the y coordinate
+     * @param z Scale factor along the z coordinate
+     * @return Scaling matrix
+     */
+    def scale(x: Float, y: Float, z: Float): Matrix4f = {
+        this.multiply(Matrix4f.scale(x, y, z))
+    }
+
+}
+
+object Matrix4f {
+
+    /**
+     * Creates a orthographic projection matrix. Similar to
+     * <code>glOrtho(left, right, bottom, top, near, far)</code>.
+     *
+     * @param left   Coordinate for the left vertical clipping pane
+     * @param right  Coordinate for the right vertical clipping pane
+     * @param bottom Coordinate for the bottom horizontal clipping pane
+     * @param top    Coordinate for the bottom horizontal clipping pane
+     * @param near   Coordinate for the near depth clipping pane
+     * @param far    Coordinate for the far depth clipping pane
+     * @return Orthographic matrix
+     */
+    def orthographic(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
+        val ortho = new Matrix4f
+        ortho.m00 = 2.0f / (right - left)
+        ortho.m11 = 2.0f / (top - bottom)
+        ortho.m22 = 2.0f / (near - far)
+        ortho.m03 = (left + right) / (left - right)
+        ortho.m13 = (bottom + top) / (bottom - top)
+        ortho.m23 = (far + near) / (far - near)
+        ortho
+    }
+
+    /**
+     * Creates a perspective projection matrix. Similar to
+     * <code>glFrustum(left, right, bottom, top, near, far)</code>.
+     *
+     * @param left   Coordinate for the left vertical clipping pane
+     * @param right  Coordinate for the right vertical clipping pane
+     * @param bottom Coordinate for the bottom horizontal clipping pane
+     * @param top    Coordinate for the bottom horizontal clipping pane
+     * @param near   Coordinate for the near depth clipping pane, must be
+     *               positive
+     * @param far    Coordinate for the far depth clipping pane, must be
+     *               positive
+     * @return Perspective matrix
+     */
+    def frustum(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
+        val frustum = new Matrix4f
+        val a = (right + left) / (right - left)
+        val b = (top + bottom) / (top - bottom)
+        val c = -(far + near) / (far - near)
+        val d = -(2f * far * near) / (far - near)
+        frustum.m00 = (2f * near) / (right - left)
+        frustum.m11 = (2f * near) / (top - bottom)
+        frustum.m02 = a
+        frustum.m12 = b
+        frustum.m22 = c
+        frustum.m32 = -1f
+        frustum.m23 = d
+        frustum.m33 = 0f
+        frustum
+    }
+
+    /**
+     * Creates a perspective projection matrix. Similar to
+     * <code>gluPerspective(fovy, aspec, zNear, zFar)</code>.
+     *
+     * @param fovy   Field of view angle in degrees
+     * @param near   Distance from the viewer to the near clipping plane, must
+     *               be positive
+     * @param far    Distance from the viewer to the far clipping plane, must be
+     *               positive
+     * @return Perspective matrix
+     */
+    def perspective(fovy: Float, near: Float, far: Float): Matrix4f = {
+        val result = new Matrix4f()
+        val ar = Vals.WIDTH / Vals.HEIGHT
+        val range = near - far
+        val tanHalfFOV = Math.tan(Math.toRadians(fovy / 2)).toFloat
+
+        result.m00 = 1.0f / (tanHalfFOV * ar)
+        result.m11 = 1.0f / tanHalfFOV
+        result.m22 = (-near - far) / range
+        result.m23 = 2.0f * far * near / range
+        result.m32 = 1f
+        result.m33 = 0.0f
+
+        result
+    }
+
+    /**
+     * Creates a translation matrix. Similar to
+     * <code>glTranslate(x, y, z)</code>.
+     *
+     * @param x x coordinate of translation vector
+     * @param y y coordinate of translation vector
+     * @param z z coordinate of translation vector
+     * @return Translation matrix
+     */
+    def translate(x: Float, y: Float, z: Float): Matrix4f = {
+        val translation = new Matrix4f
+        translation.m03 = x
+        translation.m13 = y
+        translation.m23 = z
+        translation
+    }
+
+    /**
+     * Creates a rotation matrix. Similar to
+     * <code>glRotate(angle, x, y, z)</code>.
+     *
+     * @param angle  Angle of rotation in radians
+     * @param nx     x coordinate of the rotation vector
+     * @param ny     y coordinate of the rotation vector
+     * @param nz     z coordinate of the rotation vector
+     * @return Rotation matrix
+     */
+    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Matrix4f = {
+        val rotation = new Matrix4f
+        val c = Math.cos(angle).toFloat
+        val s = Math.sin(angle).toFloat
+        val vec = new Vector3f(nx, ny, nz).normalize
+        val x = vec.x
+        val y = vec.y
+        val z = vec.z
+        rotation.m00 = x * x * (1f - c) + c
+        rotation.m10 = y * x * (1f - c) + z * s
+        rotation.m20 = x * z * (1f - c) - y * s
+        rotation.m01 = x * y * (1f - c) - z * s
+        rotation.m11 = y * y * (1f - c) + c
+        rotation.m21 = y * z * (1f - c) + x * s
+        rotation.m02 = x * z * (1f - c) + y * s
+        rotation.m12 = y * z * (1f - c) - x * s
+        rotation.m22 = z * z * (1f - c) + c
+        rotation
+    }
+
+    /**
+     * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
+     *
+     * @param x Scale factor along the x coordinate
+     * @param y Scale factor along the y coordinate
+     * @param z Scale factor along the z coordinate
+     * @return Scaling matrix
+     */
+    def scale(x: Float, y: Float, z: Float): Matrix4f = {
+        val scaling = new Matrix4f
+        scaling.m00 = x
+        scaling.m11 = y
+        scaling.m22 = z
+        scaling
     }
 
 }

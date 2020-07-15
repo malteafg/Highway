@@ -68,6 +68,9 @@ final object UIRenderer {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIB)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
 
+        glBindVertexArray(0)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
+
         val whiteTex = glCreateTextures(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, whiteTex)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
@@ -88,6 +91,9 @@ final object UIRenderer {
 
         glBindVertexArray(quadVA)
         glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, 0)
+
+        glBindVertexArray(0)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
 
         quadCount = 0
     }

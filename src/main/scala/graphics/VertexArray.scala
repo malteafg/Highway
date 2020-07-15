@@ -18,6 +18,7 @@ class VertexArray {
             glVertexAttribPointer(i._1, e.count, e.layoutType, e.normalized, layout.getStride(), i._2)
             (i._1 + 1, i._2 + e.count * Vals.getSizeOf(e.layoutType))
         }
+        unbind()
     }
 
     def bind(): Unit = glBindVertexArray(renderID)
