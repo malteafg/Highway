@@ -131,7 +131,7 @@ object Main {
                     //transformationMatrix = transformationMatrix.translate(0, 0, -0.01f)
                     //transformationMatrix = transformationMatrix.rotate(0.001f, 0, 1, 0)
 
-                    //Interface.render()
+                    Interface.render()
 
                     glfwSwapBuffers(window)
 

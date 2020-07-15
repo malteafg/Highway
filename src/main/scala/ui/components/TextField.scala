@@ -28,6 +28,7 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
     def unfocus(event: (Int, Int, Int)) = {
         if(InputHandler.isPressed(event) && !isInside(InputHandler.mousePos) ) {
             typingPos = -1
+            func(text)
             (true, false)
         } else (false, false)
     }
