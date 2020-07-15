@@ -32,8 +32,6 @@ object InputHandler {
         keyPressSubs.iterate(event)
     }
 
-    def addCharSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, keyPressSubs)
-
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
         val event = (button, action, mods)
         Options.log(s"Button ${button} was ${if(isPressed(event)) "pressed" else if(isReleased(event)) "released" else if(isContinued(event)) "held down" else "interacted with"} on (${mousePos.x}, ${mousePos.y})", Options.MousePressed)
