@@ -42,8 +42,6 @@ object Main {
         glfwSetScrollCallback(window, InputHandler.mouseScrolled)
         glfwSetCursorPosCallback(window, InputHandler.mouseMoved)
 
-        Interface.init
-
         glfwMakeContextCurrent(window)
         glfwShowWindow(window)
 
@@ -71,6 +69,7 @@ object Main {
         val thread = new Thread {
             override def run(): Unit = {
                 init()
+                Interface.init
 
                 val projMatrix = new Matrix4f().orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
                 val viewMatrix = new Matrix4f().translate(0, 0, 0)
@@ -78,16 +77,21 @@ object Main {
                 val va = new VertexArray
                 val vb = new VertexBuffer(Array(100f, 100f, 0.0f, 0.0f,
                                                 200f, 100f, 1.0f, 0.0f,
-                                                200f,  200f, 1.0f, 1.0f,
-                                                100f,  200f, 0.0f, 1.0f))
+                                                200f, 200f, 1.0f, 1.0f,
+                                                100f, 200f, 0.0f, 1.0f,
+                                                100f, 400f, 0.0f, 1.0f,
+                                                200f, 400f, 1.0f, 1.0f,
+                                                200f, 500f, 1.0f, 0.0f,
+                                                100f, 500f, 0.0f, 0.0f))
                 val layout = new VertexBufferLayout
-                val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0), 6)
+                val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4), 12)
 
                 layout.pushFloat(2)
                 layout.pushFloat(2)
                 va.addBuffer(vb, layout)
 
                 Shader.loadShader("Basic")
+                Shader.loadShader("UI")
                 val tex = new Texture("logo")
 
                 val renderer = new Renderer
@@ -110,14 +114,15 @@ object Main {
                     gameRender()
 
                     renderer.clear()
-                    Shader.get("Basic").bind()
-                    Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
-                    Shader.get("Basic").loadUniformMat4f("u_MVP", projMatrix.multiply(viewMatrix))
-                    tex.bind()
-                    Shader.get("Basic").loadUniformInt("u_Texture", 0)
-                    renderer.draw(va, ib)
-                    Shader.get("Basic").loadUniformMat4f("u_MVP", projMatrix.multiply(new Matrix4f().translate(200, 0, 0)))
-                    renderer.draw(va, ib)
+                    Shader.get("UI").bind()
+                    //Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
+                    Shader.get("UI").loadUniformMat4f("u_MVP", projMatrix.multiply(viewMatrix))
+                    //tex.bind()
+                    //Shader.get("Basic").loadUniformInt("u_Texture", 0)
+                    //renderer.draw(va, ib)
+                    //Shader.get("UI").loadUniformMat4f("u_MVP", projMatrix.multiply(new Matrix4f().translate(200, 0, 0)))
+                    //renderer.draw(va, ib)
+                    Interface.render()
 
                     glfwSwapBuffers(window)
 

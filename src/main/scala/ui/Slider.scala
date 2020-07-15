@@ -2,16 +2,16 @@ package ui
 
 import input.InputHandler
 import input.InputHandler.mouseMoveSubs
-import math.{Vector2f, Vector3f}
+import math.{Vector2f, Vector3f, Vector4f}
 import utils.{Options, Vals}
 
-class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector3f,
+class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
              val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(par, p, s, c) {
 
     var bar: UIComponent = null
     var sliding: Boolean = false
 
-    def this(par: UIComponent, p: Vector2f, s: Vector2f, color: Vector3f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, value: Float, func: Float => Unit) {
+    def this(par: UIComponent, p: Vector2f, s: Vector2f, color: Vector4f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, value: Float, func: Float => Unit) {
         this(par, p, s, color, horizontal, value, func)
         bar = new UIComponent(this, if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, s.y - thickness) else new Vector2f(s.x - thickness, 0),
                               if(horizontal) new Vector2f(s.x, thickness) else new Vector2f(thickness, s.y), color)

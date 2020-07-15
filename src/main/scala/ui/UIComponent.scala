@@ -1,17 +1,17 @@
 package ui
 
 import input.InputHandler
-import math.{Vector2f, Vector3f}
-import utils.{Vals}
+import math.{Vector2f, Vector3f, Vector4f}
+import utils.Vals
 
-class UIComponent private(val parent: UIComponent, var active: Boolean, protected val _pos: Vector2f, val size: Vector2f, val color: Vector3f,
+class UIComponent private(val parent: UIComponent, var active: Boolean, protected val _pos: Vector2f, val size: Vector2f, val color: Vector4f,
                           val children: scala.collection.mutable.ListBuffer[UIComponent]) {
 
     if(parent != null) parent.children.addOne(this)
 
     def pos: Vector2f = if(parent != null) parent.pos.add(_pos) else _pos
 
-    def this(parent: UIComponent, active: Boolean, p: Vector2f, s: Vector2f, scale: Float, color: Vector3f) {
+    def this(parent: UIComponent, active: Boolean, p: Vector2f, s: Vector2f, scale: Float, color: Vector4f) {
         this(parent, active, p.scale(scale), s.scale(scale), color, scala.collection.mutable.ListBuffer.empty[UIComponent])
     }
 
@@ -22,11 +22,11 @@ class UIComponent private(val parent: UIComponent, var active: Boolean, protecte
      * @param s Size
      * @param c Color
      */
-    def this(par: UIComponent, active: Boolean, p: Vector2f, s: Vector2f, c: Vector3f) {
+    def this(par: UIComponent, active: Boolean, p: Vector2f, s: Vector2f, c: Vector4f) {
         this(par, active, p, s, Vals.UNIT, c)
     }
 
-    def this(par: UIComponent, p: Vector2f, s: Vector2f, c: Vector3f) {
+    def this(par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f) {
         this(par, true, p, s, Vals.UNIT, c)
     }
 
@@ -44,5 +44,7 @@ class UIComponent private(val parent: UIComponent, var active: Boolean, protecte
         if(isInside(InputHandler.mousePos)) for (child <- children) b = b || (active && child.click(event))
         b
     }
+
+    def getChildren() = children
 
 }

@@ -1,10 +1,11 @@
 package graphics
 
-import org.lwjgl.opengl.GL15.{GL_ARRAY_BUFFER, GL_STATIC_DRAW, glBindBuffer, glBufferData, glGenBuffers}
+import org.lwjgl.opengl.GL15.{GL_ARRAY_BUFFER, GL_STATIC_DRAW, glBindBuffer, glBufferData}
+import org.lwjgl.opengl.GL45._
 
 class VertexBuffer(data: Array[Float]) {
 
-    val renderID = glGenBuffers()
+    val renderID = glCreateBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, renderID)
     glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW)
 

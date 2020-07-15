@@ -1,6 +1,5 @@
 package graphics
 
-import input.InputHandler
 import org.lwjgl.opengl.GL11._
 
 class Renderer {
