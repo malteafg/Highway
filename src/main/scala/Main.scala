@@ -1,4 +1,4 @@
-import graphics.{IndexBuffer, Renderer, Shader, Texture, VertexArray, VertexBuffer, VertexBufferLayout}
+import graphics.{Camera, IndexBuffer, Renderer, Shader, Texture, VertexArray, VertexBuffer, VertexBufferLayout}
 import org.lwjgl.opengl.GL11._
 import input.InputHandler
 import math.{Matrix4f, Vector4f}
@@ -72,6 +72,7 @@ object Main {
         val thread = new Thread {
             override def run(): Unit = {
                 init()
+                val camera = new Camera()
                 Interface.init
 
                 val va = new VertexArray
@@ -81,10 +82,9 @@ object Main {
                                                        0f, -0.5f,   -1f, 0.0f, 1.0f, 1.0f, 1.0f))
                 val layout = new VertexBufferLayout
                 val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0, 0, 1, 3, 3, 2, 1), 12)
-                var transformationMatrix = new Matrix4f().translate(0, 0, 5).rotate(Math.PI.toFloat, 0, 1, 0)
-                transformationMatrix = transformationMatrix.translate(0, 0, -2)
+                var transformationMatrix = new Matrix4f()
 
-                val perspectiveMatrix = Matrix4f.perspective(70, 0.1f, 20f)
+                val perspectiveMatrix = Matrix4f.perspective(30, 0.1f, 20f)
 
                 layout.pushFloat(3)
                 layout.pushFloat(4)
@@ -123,12 +123,13 @@ object Main {
 
                     Shader.get("Pyramid").bind()
                     Shader.get("Pyramid").loadUniformMat4f("transformationMatrix", transformationMatrix)
+                    Shader.get("Pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
                     Shader.get("Pyramid").loadUniformMat4f("perspectiveMatrix", perspectiveMatrix)
                     renderer.draw(va, ib)
                     Shader.get("Pyramid").unbind()
 
-                    transformationMatrix = transformationMatrix.translate(0, 0, -0.01f)
-                    transformationMatrix = transformationMatrix.rotate(0.01f, 0, 1, 0)
+                    //transformationMatrix = transformationMatrix.translate(0, 0, -0.01f)
+                    //transformationMatrix = transformationMatrix.rotate(0.001f, 0, 1, 0)
 
                     //Interface.render()
 

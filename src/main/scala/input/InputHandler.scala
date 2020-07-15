@@ -80,6 +80,12 @@ object InputHandler {
 
     def isReleased(event: (Int, Int, Int))      = event._1 != -1 && event._2 == 0
 
+    def isLefClick(event: (Int, Int, Int))      = event._1 == 1
+
+    def isWheelClick(event: (Int, Int, Int))    = event._1 == 2
+
+    def isRightClick(event: (Int, Int, Int))    = event._1 == 3
+
     def isScrolling(event: (Int, Int, Int))     = event._1 == -1
 
     /**

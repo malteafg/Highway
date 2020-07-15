@@ -121,11 +121,6 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
     }
 
     /**
-     * Prints the vector to the console.
-     */
-    def printVec(): Unit = System.out.println(x + " " + y + " " + z)
-
-    /**
      * Returns a vector with the remainders of the old vector.
      */
     def mod(mod: Float) = new Vector3f(x % mod, y % mod, z % mod)
@@ -156,5 +151,7 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
         this.y = y
         this.z = z
     }
+
+    override def toString = s"$x, $y, $z"
 
 }

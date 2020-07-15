@@ -351,6 +351,17 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
     }
 
     /**
+     * Multiplies this matrix with a translation matrix. Similar to
+     * <code>glTranslate(x, y, z)</code>.
+     *
+     * @param v Vector3f
+     * @return Translation matrix
+     */
+    def translate(v: Vector3f): Matrix4f = {
+        this.multiply(Matrix4f.translate(v.x, v.y, v.z))
+    }
+
+    /**
      * Multiplies this matrix with a rotation matrix. Similar to
      * <code>glRotate(angle, x, y, z)</code>.
      *
@@ -447,11 +458,11 @@ object Matrix4f {
      */
     def perspective(fovy: Float, near: Float, far: Float): Matrix4f = {
         val result = new Matrix4f()
-        val ar = Vals.WIDTH / Vals.HEIGHT
+        val ar = 1.0f * Vals.WIDTH / Vals.HEIGHT
         val range = near - far
         val tanHalfFOV = Math.tan(Math.toRadians(fovy / 2)).toFloat
 
-        result.m00 = 1.0f / (tanHalfFOV * ar)
+        result.m00 = 1.0f / tanHalfFOV / ar
         result.m11 = 1.0f / tanHalfFOV
         result.m22 = (-near - far) / range
         result.m23 = 2.0f * far * near / range
@@ -460,6 +471,15 @@ object Matrix4f {
 
         result
     }
+
+    /**
+     * Creates a translation matrix. Similar to
+     * <code>glTranslate(x, y, z)</code>.
+     *
+     * @param v: Vector to translate
+     * @return Translation matrix
+     */
+    def translate(v: Vector3f): Matrix4f = translate(v.x, v.y, v.z)
 
     /**
      * Creates a translation matrix. Similar to

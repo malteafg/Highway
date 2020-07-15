@@ -17,4 +17,6 @@ object Vals {
         case GL_UNSIGNED_BYTE => 1
     }
 
+    def restrain(value: Float, min: Float, max: Float): Float = if(value < min) min else if(value > max) max else value
+
 }

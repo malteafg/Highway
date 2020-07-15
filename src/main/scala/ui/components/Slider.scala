@@ -2,6 +2,7 @@ package ui.components
 
 import input.InputHandler
 import math.{Vector2f, Vector4f}
+import utils.Vals
 
 class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
              val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(par, p, s, c) {
@@ -29,7 +30,7 @@ class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
             calcValue(InputHandler.mousePos)
             true
         } else if(isInside(InputHandler.mousePos) && InputHandler.isScrolling(event)) {
-            value = restrain(value - event._3 * 0.1f, 0, 1)
+            value = Vals.restrain(value - event._3 * 0.1f, 0, 1)
             func(value)
             true
         } else false
@@ -37,12 +38,8 @@ class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
 
     def calcValue(vec: Vector2f): Unit = {
         val p = getPos
-        value = if(horizontal) restrain((vec.x - p.x) / size.x, 0, 1) else restrain((vec.y - p.y) / size.y, 0, 1)
+        value = if(horizontal) Vals.restrain((vec.x - p.x) / size.x, 0, 1) else Vals.restrain((vec.y - p.y) / size.y, 0, 1)
         func(value)
-    }
-
-    def restrain(value: Float, min: Float, max: Float): Float = {
-        if(value < min) min else if(value > max) max else value
     }
 
     def slide(event: (Int, Int, Int)) = {
