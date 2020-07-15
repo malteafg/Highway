@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 object Interface {
 
-    val screen: UIComponent = new UIComponent(null, new Vector2f(), new Vector2f(16, 9), new Vector4f(1, 0, 1, 1))
+    val screen: UIComponent = new UIComponent(null, new Vector2f(), new Vector2f(16, 9), new Vector4f(1, 0, 1, 0))
     val panel: UIComponent = new UIComponent(screen, new Vector2f(), new Vector2f(3, 9), Vals.UI_COLOR)
 
     val button1: Button = new Button(panel, new Vector2f(0.5f, 0.5f), new Vector2f(2, 2), new Vector4f(1, 0, 1, 1),

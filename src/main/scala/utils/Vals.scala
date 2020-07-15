@@ -9,7 +9,7 @@ object Vals {
     final val WIDTH: Int = 16 * UNIT
     final val HEIGHT: Int = 9 * UNIT
 
-    final val UI_COLOR: Vector4f = new Vector4f(0.5f, 0.3f, 0.8f, 1.0f)
+    final val UI_COLOR: Vector4f = new Vector4f(0.3f, 0.4f, 0.5f, 1.0f)
 
     def getSizeOf(t: Int): Int = t match {
         case GL_UNSIGNED_INT => 4
