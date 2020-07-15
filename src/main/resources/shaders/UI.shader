@@ -31,6 +31,9 @@ in float v_TexIndex;
 uniform sampler2D u_Textures[32];
 
 void main() {
-    o_Color = v_Color;
-    //texture(u_Textures[int(v_TexIndex)], v_TexCoord) *
+    if (v_TexIndex != 0) {
+        o_Color = texture(u_Textures[int(v_TexIndex)], v_TexCoord);
+    } else {
+        o_Color = v_Color;
+    }
 }

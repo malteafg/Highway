@@ -92,6 +92,11 @@ object Main {
 
                 Shader.loadShader("Basic")
                 Shader.loadShader("UI")
+                Shader.get("UI").bind()
+                Shader.get("UI").loadUniformMat4f("u_MVP", new Matrix4f().orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f))
+                val samplers = new Array[Int](32)
+                for (i <- 0 until 32) samplers(i) = i
+                Shader.get("UI").loadUniformIntV("u_Textures", samplers)
                 val tex = new Texture("logo")
 
                 val renderer = new Renderer
@@ -114,9 +119,9 @@ object Main {
                     gameRender()
 
                     renderer.clear()
-                    Shader.get("UI").bind()
+                    //Shader.get("UI").bind()
                     //Shader.get("Basic").loadUniformVec2f("mousePos", InputHandler.mousePos)
-                    Shader.get("UI").loadUniformMat4f("u_MVP", projMatrix.multiply(viewMatrix))
+                    //Shader.get("UI").loadUniformMat4f("u_MVP", projMatrix.multiply(viewMatrix))
                     //tex.bind()
                     //Shader.get("Basic").loadUniformInt("u_Texture", 0)
                     //renderer.draw(va, ib)

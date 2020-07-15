@@ -1,6 +1,7 @@
 package ui
 
-import graphics.{VertexArray, VertexBuffer}
+import java.nio.{ByteBuffer, ByteOrder}
+
 import math.{Vector2f, Vector4f}
 import org.lwjgl.opengl.GL45._
 import org.lwjgl.opengl.GL30._
@@ -8,6 +9,7 @@ import org.lwjgl.opengl.GL20._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
+import org.lwjgl.opengl.GL13.{GL_TEXTURE0, glActiveTexture}
 
 final object UIRenderer {
 
@@ -27,6 +29,7 @@ final object UIRenderer {
     val bufferData = new Array[Float](maxVertexCount * vertexSize)
 
     var quadCount = 0
+    var texSlotIndex = 1
 
     def init(): Unit = {
         quadVA = glCreateVertexArrays()
@@ -64,7 +67,6 @@ final object UIRenderer {
         quadIB = glCreateBuffers()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIB)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
-        /*
 
         val whiteTex = glCreateTextures(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, whiteTex)
@@ -72,22 +74,17 @@ final object UIRenderer {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0xffffffff)
+        val buffer = ByteBuffer.allocateDirect(1 << 2).order(ByteOrder.nativeOrder).asIntBuffer
+        buffer.put(Array(0xffffffff)).flip
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer)
 
         textures(0) = whiteTex
-        for(i <- 1 to maxTextures) textures(i) = 0
-
-         */
+        for(i <- 1 until maxTextures) textures(i) = 0
     }
 
     def flush(): Unit = {
         glBindBuffer(GL_ARRAY_BUFFER, quadVB)
         glBufferSubData(GL_ARRAY_BUFFER, 0, bufferData)
-
-        println(bufferData(3))
-        println(bufferData(4))
-        println(bufferData(5))
-        println(bufferData(6))
 
         glBindVertexArray(quadVA)
         glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, 0)
@@ -145,6 +142,68 @@ final object UIRenderer {
         quadCount += 1
     }
 
-    def drawQuad(pos: Vector2f, size: Vector2f, textureID: Int): Unit = ???
+    def drawQuad(pos: Vector2f, size: Vector2f, textureID: Int): Unit = {
+        if (quadCount >= maxQuadCount || texSlotIndex >= maxTextures) flush()
+
+        var texIndex = 0.0f
+        for (i <- 1 until texSlotIndex) if (textures(i) == textureID) texIndex = i
+
+        if (texIndex == 0.0f) {
+            texIndex = texSlotIndex
+            textures(texSlotIndex) = textureID
+            texSlotIndex += 1
+
+            glActiveTexture(texIndex.toInt)
+            glBindTexture(GL_TEXTURE_2D, textureID)
+        }
+
+        val color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
+
+        bufferData(quadCount * vertexSize * 4 + 0) = pos.x
+        bufferData(quadCount * vertexSize * 4 + 1) = pos.y
+        bufferData(quadCount * vertexSize * 4 + 2) = 0
+        bufferData(quadCount * vertexSize * 4 + 3) = color.x
+        bufferData(quadCount * vertexSize * 4 + 4) = color.y
+        bufferData(quadCount * vertexSize * 4 + 5) = color.z
+        bufferData(quadCount * vertexSize * 4 + 6) = color.w
+        bufferData(quadCount * vertexSize * 4 + 7) = 0.0f
+        bufferData(quadCount * vertexSize * 4 + 8) = 0.0f
+        bufferData(quadCount * vertexSize * 4 + 9) = texIndex
+
+        bufferData(quadCount * vertexSize * 4 + 10) = pos.x + size.x
+        bufferData(quadCount * vertexSize * 4 + 11) = pos.y
+        bufferData(quadCount * vertexSize * 4 + 12) = 0
+        bufferData(quadCount * vertexSize * 4 + 13) = color.x
+        bufferData(quadCount * vertexSize * 4 + 14) = color.y
+        bufferData(quadCount * vertexSize * 4 + 15) = color.z
+        bufferData(quadCount * vertexSize * 4 + 16) = color.w
+        bufferData(quadCount * vertexSize * 4 + 17) = 1.0f
+        bufferData(quadCount * vertexSize * 4 + 18) = 0.0f
+        bufferData(quadCount * vertexSize * 4 + 19) = texIndex
+
+        bufferData(quadCount * vertexSize * 4 + 20) = pos.x + size.x
+        bufferData(quadCount * vertexSize * 4 + 21) = pos.y + size.y
+        bufferData(quadCount * vertexSize * 4 + 22) = 0
+        bufferData(quadCount * vertexSize * 4 + 23) = color.x
+        bufferData(quadCount * vertexSize * 4 + 24) = color.y
+        bufferData(quadCount * vertexSize * 4 + 25) = color.z
+        bufferData(quadCount * vertexSize * 4 + 26) = color.w
+        bufferData(quadCount * vertexSize * 4 + 27) = 1.0f
+        bufferData(quadCount * vertexSize * 4 + 28) = 1.0f
+        bufferData(quadCount * vertexSize * 4 + 29) = texIndex
+
+        bufferData(quadCount * vertexSize * 4 + 30) = pos.x
+        bufferData(quadCount * vertexSize * 4 + 31) = pos.y + size.y
+        bufferData(quadCount * vertexSize * 4 + 32) = 0
+        bufferData(quadCount * vertexSize * 4 + 33) = color.x
+        bufferData(quadCount * vertexSize * 4 + 34) = color.y
+        bufferData(quadCount * vertexSize * 4 + 35) = color.z
+        bufferData(quadCount * vertexSize * 4 + 36) = color.w
+        bufferData(quadCount * vertexSize * 4 + 37) = 0.0f
+        bufferData(quadCount * vertexSize * 4 + 38) = 1.0f
+        bufferData(quadCount * vertexSize * 4 + 39) = texIndex
+
+        quadCount += 1
+    }
 
 }

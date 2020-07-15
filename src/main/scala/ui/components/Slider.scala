@@ -1,9 +1,7 @@
-package ui
+package ui.components
 
 import input.InputHandler
-import input.InputHandler.mouseMoveSubs
-import math.{Vector2f, Vector3f, Vector4f}
-import utils.{Options, Vals}
+import math.{Vector2f, Vector4f}
 
 class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
              val horizontal: Boolean, var value: Float, val func: Float => Unit) extends UIComponent(par, p, s, c) {
@@ -11,12 +9,18 @@ class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
     var bar: UIComponent = null
     var sliding: Boolean = false
 
+    /*
+     * Constructors
+     */
     def this(par: UIComponent, p: Vector2f, s: Vector2f, color: Vector4f, horizontal: Boolean, topOrLeft: Boolean, thickness: Float, value: Float, func: Float => Unit) {
         this(par, p, s, color, horizontal, value, func)
         bar = new UIComponent(this, if(topOrLeft) new Vector2f() else if(horizontal) new Vector2f(0, s.y - thickness) else new Vector2f(s.x - thickness, 0),
                               if(horizontal) new Vector2f(s.x, thickness) else new Vector2f(thickness, s.y), color)
     }
 
+    /*
+     * Functions
+     */
     override def click(event: (Int, Int, Int)): Boolean = {
         if(bar.isInside(InputHandler.mousePos) && InputHandler.isPressed(event)) {
             InputHandler.addMousePressSub((event: (Int, Int, Int)) => { val b = InputHandler.isReleased(event); sliding = !b; (b, b)})
@@ -32,7 +36,7 @@ class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
     }
 
     def calcValue(vec: Vector2f): Unit = {
-        val p = pos
+        val p = getPos
         value = if(horizontal) restrain((vec.x - p.x) / size.x, 0, 1) else restrain((vec.y - p.y) / size.y, 0, 1)
         func(value)
     }

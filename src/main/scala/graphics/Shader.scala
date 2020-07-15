@@ -22,6 +22,7 @@ class Shader(programID: Int, vertID: Int, fragID: Int) {
 
     def loadUniformFloat(name: String, value: Float): Unit = glUniform1f(getUniform(name), value)
     def loadUniformInt(name: String, value: Int): Unit = glUniform1i(getUniform(name), value)
+    def loadUniformIntV(name: String, value: Array[Int]): Unit = glUniform1iv(getUniform(name), value)
 
     def loadUniformBoolean(name: String, value: Boolean): Unit = {
         var toLoad = 0

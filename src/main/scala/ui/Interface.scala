@@ -1,9 +1,10 @@
 package ui
 
-import graphics.Shader
+import graphics.{Shader, Texture}
 import input.InputHandler
 import math.{Matrix4f, Vector2f, Vector3f, Vector4f}
 import org.lwjgl.opengl.GL11._
+import ui.components.{Button, Slider, TextField, UIComponent}
 import utils.{Options, Vals}
 
 import scala.collection.mutable
@@ -15,12 +16,15 @@ object Interface {
 
     val button1: Button = new Button(panel, new Vector2f(0.5f, 0.5f), new Vector2f(2, 2), new Vector4f(1, 0, 1, 1),
         () => "Top button", () => Options.log(s"Top button says click!", Options.Button))
+
+    button1.addTexture(new Texture("logo"))
+
     val button2: Button = new Button(panel, new Vector2f(0.5f, 3), new Vector2f(2, 2), new Vector4f(1, 1, 0, 1),
         () => "Middle button", () => Options.log(s"Middle button says click!", Options.Button))
     val button3: Button = new Button(panel, new Vector2f(0.5f, 5.5f), new Vector2f(2, 2), new Vector4f(0, 1, 1, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
-            panel.active = false
+            panel.deactivate
         })
 
     val slider = new Slider(screen, new Vector2f(14, 0), new Vector2f(2, 9), Vals.UI_COLOR, false, false, 1, 0.5f,
@@ -29,7 +33,7 @@ object Interface {
     val textField = new TextField(screen, new Vector2f(4, 0), new Vector2f(8, 2), Vals.UI_COLOR, "",
         (text: String) => {
             Options.log(s"You entered: '$text'", Options.TextField)
-            if(text.toLowerCase() == "open panel") panel.active = true
+            if(text.toLowerCase() == "open panel") panel.activate
         })
 
     def init: Unit = {
@@ -41,12 +45,15 @@ object Interface {
     def render(): Unit = {
         glDisable(GL_DEPTH_TEST)
 
+        Shader.get("UI").bind()
+
         val elements = new mutable.Queue[UIComponent]()
         elements.enqueue(screen)
         while (!elements.isEmpty) {
             val e = elements.dequeue()
             if (e.isActive()) {
-                UIRenderer.drawQuad(e.pos, e.size, e.color)
+                if (e.tex == null) UIRenderer.drawQuad(e.getPos, e.getSize, e.getColor)
+                else UIRenderer.drawQuad(e.getPos, e.getSize, e.tex.getTextureID)
                 elements.enqueueAll(e.getChildren())
             }
         }
