@@ -1,14 +1,17 @@
-package ui
+package ui.components
 
 import input.InputHandler
-import math.{Vector2f, Vector3f, Vector4f}
+import math.{Vector2f, Vector4f}
 import utils.Options
 
 class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: Vector4f,
                 var text: String, val func: String => Unit) extends UIComponent(par, p, s, c) {
 
-    var typingPos: Int = -1;
+    var typingPos: Int = -1
 
+    /*
+     * Functions
+     */
     override def click(event: (Int, Int, Int)): Boolean = {
         if(InputHandler.isPressed(event) && isInside(InputHandler.mousePos) ) {
             Options.log(s"Writing!", Options.TextField)
@@ -57,7 +60,6 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
             }
             (typingPos == -1, b)
         } else (true, false)
-
     }
 
 }
