@@ -63,12 +63,13 @@ object Main {
         Shader.loadShader("Terrain", Vals.perspectiveMatrix)
 
         // initialization
-        Interface.init
         GameHandler.init
+        Interface.init
     }
 
     private def gameUpdate(): Unit = {
         glfwPollEvents()
+        GameHandler.update()
     }
 
     private def gameRender(): Unit = {

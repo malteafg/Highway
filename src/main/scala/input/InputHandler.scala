@@ -9,6 +9,7 @@ object InputHandler {
     var mousePos: Vector2f = new Vector2f()
 
     val keyPressSubs: Subscriber    = new Subscriber(_ => (false, false), null)
+    val charSubs: Subscriber        = new Subscriber(_ => (false, false), null)
     val mousePressSubs: Subscriber  = new Subscriber(_ => (false, false), null)
     val mouseMoveSubs: Subscriber   = new Subscriber(_ => (false, false), null)
     val mouseScrollSubs: Subscriber = new Subscriber(_ => (false, false), null)
@@ -20,7 +21,8 @@ object InputHandler {
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.Keys)
         Options.log("", Options.Keys)
 
-        keyPressSubs.iterate(event)
+        if(charSubs.next == null) keyPressSubs.iterate(event)
+        else charSubs.iterate(event)
     }
 
     def addKeyPressSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, keyPressSubs)
@@ -28,9 +30,11 @@ object InputHandler {
     def charEntered(window: Long, codePoint: Int): Unit = {
         val event = (codePoint, 0, -1)
         Options.log(s"'${codePoint.toChar}' has a value of $codePoint \n", Options.Characters)
-
-        keyPressSubs.iterate(event)
+    
+        charSubs.iterate(event)
     }
+    
+    def addCharSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, charSubs)
 
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
         val event = (button, action, mods)
@@ -46,9 +50,11 @@ object InputHandler {
 
     def mouseMoved(window: Long, xpos: Double, ypos: Double): Unit = {
         val event = (0, xpos.toInt, ypos.toInt)
-        mousePos.set(xpos.toInt, ypos.toInt)
+        
         Options.log(s"Mouse was moved to (${mousePos.x}, ${mousePos.y})", Options.MouseMoved)
         mouseMoveSubs.iterate(event)
+
+        mousePos.set(xpos.toInt, ypos.toInt)
     }
 
     def addMouseMoveSub(func: ((Int, Int, Int)) => (Boolean, Boolean)) = new Subscriber(func, mouseMoveSubs)

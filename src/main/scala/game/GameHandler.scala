@@ -15,6 +15,10 @@ object GameHandler {
         game = new Game()
     }
 
+    def update() = {
+        camera.update
+    }
+    
     def render() = {
         if(game != null) GameRenderer.render(game, camera)
     }

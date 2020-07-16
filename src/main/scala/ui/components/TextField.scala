@@ -16,7 +16,7 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
         if(InputHandler.isPressed(event) && isInside(InputHandler.mousePos) ) {
             Options.log(s"Writing!", Options.TextField)
             if(typingPos == -1) {
-                InputHandler.addKeyPressSub(write)
+                InputHandler.addCharSub(write)
                 InputHandler.addMousePressSub(unfocus)
             }
 
@@ -40,7 +40,7 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
                 text = text.substring(0, typingPos) + event._1.toChar + text.substring(typingPos, text.length)
                 typingPos += 1
                 b = true
-            } else if(InputHandler.isUnAltered(event) && InputHandler.isPressed(event)) {
+            } else if(InputHandler.isUnAltered(event) && (InputHandler.isPressed(event) || InputHandler.isContinued(event))) {
                 b = true
                 event._1 match {
                     case 257 => {
