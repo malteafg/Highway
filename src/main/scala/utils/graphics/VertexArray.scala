@@ -1,6 +1,5 @@
-package graphics
+package utils.graphics
 
-import org.lwjgl.opengl.GL11.GL_FLOAT
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.opengl.GL30._
 import org.lwjgl.opengl.GL45._

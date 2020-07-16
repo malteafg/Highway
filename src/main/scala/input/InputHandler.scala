@@ -1,6 +1,6 @@
 package input
 
-import math.Vector2f
+import utils.math.Vector2f
 import ui.Interface
 import utils.Options
 

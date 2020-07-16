@@ -1,8 +1,8 @@
-package graphics
+package utils.graphics
 
 import java.io.{BufferedReader, FileReader, IOException}
 
-import math.{Matrix2f, Matrix3f, Matrix4f, Vector2f, Vector3f, Vector4f}
+import utils.math._
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.system.MemoryStack
@@ -95,7 +95,7 @@ object Shader {
 
     def get(shader: String): Shader = shaders.getOrElse(shader, throw new ShaderError(s"Shader $shader not loaded"))
 
-    def loadShader(file: String): Unit = {
+    def loadShader(file: String, projMatrix: Matrix4f = null): Unit = {
         val program = glCreateProgram()
         val shaderProgam = readShaderProgram(file)
 
@@ -107,7 +107,12 @@ object Shader {
         glDeleteShader(shaderProgam._1)
         glDeleteShader(shaderProgam._2)
 
-        shaders.put(file, new Shader(program, shaderProgam._1, shaderProgam._2))
+        val shader = new Shader(program, shaderProgam._1, shaderProgam._2)
+        shaders.put(file, shader)
+        if(projMatrix != null) {
+            shader.bind()
+            shader.loadUniformMat4f("projMatrix", projMatrix)
+        }
     }
 
     private def readShaderProgram(file: String): (Int, Int) = {
@@ -143,7 +148,7 @@ object Shader {
 
         if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE) {
             System.out.println(glGetShaderInfoLog(id, 500))
-            println("Could not compile shader: ")
+            println(s"Could not compile shader: $source")
             System.exit(-1)
         }
         id

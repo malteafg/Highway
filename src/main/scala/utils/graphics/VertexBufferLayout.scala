@@ -1,8 +1,9 @@
-package graphics
+package utils.graphics
 
-import scala.collection.mutable.ListBuffer
 import org.lwjgl.opengl.GL11._
 import utils.Vals
+
+import scala.collection.mutable.ListBuffer
 
 class VertexBufferLayout {
 

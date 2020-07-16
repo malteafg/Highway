@@ -1,7 +1,7 @@
 package ui.components
 
 import input.InputHandler
-import math.{Vector2f, Vector4f}
+import utils.math.{Vector2f, Vector4f}
 import utils.Vals
 
 class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,

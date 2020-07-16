@@ -1,4 +1,4 @@
-package math
+package utils.math
 
 import java.nio.FloatBuffer
 import utils.Vals

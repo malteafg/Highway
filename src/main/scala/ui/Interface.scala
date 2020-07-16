@@ -1,13 +1,11 @@
 package ui
 
-import graphics.{Shader, Texture}
+import rendering.{UIRenderer}
 import input.InputHandler
-import math.{Matrix4f, Vector2f, Vector3f, Vector4f}
-import org.lwjgl.opengl.GL11._
+import utils.math.{Vector2f, Vector4f}
 import ui.components.{Button, Slider, TextField, UIComponent}
+import utils.graphics.{Texture}
 import utils.{Options, Vals}
-
-import scala.collection.mutable
 
 object Interface {
 
@@ -43,23 +41,7 @@ object Interface {
     }
 
     def render(): Unit = {
-        glDisable(GL_DEPTH_TEST)
-
-        Shader.get("UI").bind()
-
-        val elements = new mutable.Queue[UIComponent]()
-        elements.enqueue(screen)
-        while (!elements.isEmpty) {
-            val e = elements.dequeue()
-            if (e.isActive()) {
-                if (e.tex == null) UIRenderer.drawQuad(e.getPos, e.getSize, e.getColor)
-                else UIRenderer.drawQuad(e.getPos, e.getSize, e.tex.getTextureID)
-                elements.enqueueAll(e.getChildren())
-            }
-        }
-        UIRenderer.flush()
-
-        glEnable(GL_DEPTH_TEST)
+        UIRenderer.render(screen)
     }
 
     def mousePressed(event: (Int, Int, Int)) = {

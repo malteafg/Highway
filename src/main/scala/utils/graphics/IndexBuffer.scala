@@ -1,4 +1,4 @@
-package graphics
+package utils.graphics
 
 import org.lwjgl.opengl.GL15.{GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, glBindBuffer, glBufferData}
 import org.lwjgl.opengl.GL45._

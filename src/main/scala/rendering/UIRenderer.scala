@@ -1,15 +1,19 @@
-package ui
+package rendering
 
 import java.nio.{ByteBuffer, ByteOrder}
 
-import math.{Vector2f, Vector4f}
-import org.lwjgl.opengl.GL45._
-import org.lwjgl.opengl.GL30._
-import org.lwjgl.opengl.GL20._
-import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
-import org.lwjgl.opengl.GL13.{GL_TEXTURE0, glActiveTexture}
+import org.lwjgl.opengl.GL13.glActiveTexture
+import org.lwjgl.opengl.GL15._
+import org.lwjgl.opengl.GL20.glVertexAttribPointer
+import org.lwjgl.opengl.GL30.glBindVertexArray
+import org.lwjgl.opengl.GL45.{glCreateBuffers, glCreateTextures, glCreateVertexArrays, glEnableVertexArrayAttrib}
+import ui.components.UIComponent
+import utils.graphics.Shader
+import utils.math.{Vector2f, Vector4f}
+
+import scala.collection.mutable
 
 final object UIRenderer {
 
@@ -83,6 +87,11 @@ final object UIRenderer {
 
         textures(0) = whiteTex
         for(i <- 1 until maxTextures) textures(i) = 0
+
+        val samplers = new Array[Int](32)
+        for (i <- 0 until 32) samplers(i) = i
+        Shader.get("UI").bind()
+        Shader.get("UI").loadUniformIntV("u_Textures", samplers)
     }
 
     def flush(): Unit = {
@@ -210,6 +219,26 @@ final object UIRenderer {
         bufferData(quadCount * vertexSize * 4 + 39) = texIndex
 
         quadCount += 1
+    }
+
+    def render(screen: UIComponent) = {
+        glDisable(GL_DEPTH_TEST)
+
+        Shader.get("UI").bind()
+
+        val elements = new mutable.Queue[UIComponent]()
+        elements.enqueue(screen)
+        while (!elements.isEmpty) {
+            val e = elements.dequeue()
+            if (e.isActive()) {
+                if (e.tex == null) UIRenderer.drawQuad(e.getPos, e.getSize, e.getColor)
+                else UIRenderer.drawQuad(e.getPos, e.getSize, e.tex.getTextureID)
+                elements.enqueueAll(e.getChildren())
+            }
+        }
+        UIRenderer.flush()
+
+        glEnable(GL_DEPTH_TEST)
     }
 
 }

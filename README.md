@@ -25,6 +25,6 @@
   - Buffer stuff
   - UI
   - Shaders √
-  - 3D math √
+  - 3D utils.math √
 
 

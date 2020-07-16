@@ -1,6 +1,6 @@
 package utils
 
-import math.{Vector3f, Vector4f}
+import utils.math.{Matrix4f, Vector3f, Vector4f}
 import org.lwjgl.opengl.GL11._
 
 object Vals {
@@ -18,5 +18,8 @@ object Vals {
     }
 
     def restrain(value: Float, min: Float, max: Float): Float = if(value < min) min else if(value > max) max else value
+
+    val perspectiveMatrix = Matrix4f.perspective(30, 0.1f, 10000f)
+    val UIProjMatrix = Matrix4f.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
 
 }

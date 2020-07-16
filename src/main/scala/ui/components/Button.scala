@@ -1,7 +1,7 @@
 package ui.components
 
 import input.InputHandler
-import math.{Vector2f, Vector4f}
+import utils.math.{Vector2f, Vector4f}
 
 class Button(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: Vector4f,
              val name: () => String, val func: () => Unit) extends UIComponent(par, p, s, c) {

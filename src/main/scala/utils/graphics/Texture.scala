@@ -1,4 +1,4 @@
-package graphics
+package utils.graphics
 
 import java.io.{FileInputStream, IOException}
 import java.nio.{ByteBuffer, ByteOrder}

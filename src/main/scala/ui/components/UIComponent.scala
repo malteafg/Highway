@@ -1,9 +1,9 @@
 package ui.components
 
-import graphics.Texture
 import input.InputHandler
-import math.{Vector2f, Vector4f}
+import utils.math.{Vector2f, Vector4f}
 import utils.Vals
+import utils.graphics.Texture
 
 import scala.collection.mutable
 
