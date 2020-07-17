@@ -42,8 +42,8 @@ class Camera {
             if(input(1)) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed))
             if(input(2)) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed))
             if(input(3)) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed))
-            if(input(4)) orientation.y = Vals.center(orientation.y - 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat)
-            if(input(5)) orientation.y = Vals.center(orientation.y + 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat)
+            if(input(4)) orientation.y = Vals.center(orientation.y + 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat)
+            if(input(5)) orientation.y = Vals.center(orientation.y - 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat)
         }
     }
     
