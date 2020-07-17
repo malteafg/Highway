@@ -1,7 +1,8 @@
 package rendering
 
-import game.{Game}
+import game.Game
 import org.lwjgl.opengl.GL11.{GL_TRIANGLES, GL_UNSIGNED_INT, glDrawElements}
+import utils.Vals
 import utils.graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import utils.math.Matrix4f
 
@@ -14,15 +15,16 @@ object GameRenderer {
         0f, 0f,   -1f, 0.0f, 1.0f, 1.0f, 1.0f))
     val layout = new VertexBufferLayout
     val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0, 0, 1, 3, 3, 2, 1), 12)
-    var transformationMatrix = new Matrix4f()
+    var transformationMatrix = Matrix4f.place(10, 10, 0, Vals.toRadians(90))
 
     layout.pushFloat(3)
     layout.pushFloat(4)
     va.addBuffer(vb, layout)
 
     def render(game: Game, camera: Camera) = {
-
-
+    
+        transformationMatrix
+        transformationMatrix
         Shader.get("Pyramid").bind()
         Shader.get("Pyramid").loadUniformMat4f("transformationMatrix", transformationMatrix)
         Shader.get("Pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)

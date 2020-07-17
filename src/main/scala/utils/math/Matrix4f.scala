@@ -480,7 +480,20 @@ object Matrix4f {
      * @return Translation matrix
      */
     def translate(v: Vector3f): Matrix4f = translate(v.x, v.y, v.z)
-
+    
+    /**
+     * Creates a translation matrix with rotation around the vertical y axis.
+     *
+     * @param x x coordinate of translation vector
+     * @param y y coordinate of translation vector
+     * @param z z coordinate of translation vector
+     * @param a angle of rotation
+     * @return Translation matrix
+     */
+    def place(x: Float, y: Float, z: Float, a: Float) = {
+        translate(x, y, z).rotate(a, 0, 1, 0)
+    }
+    
     /**
      * Creates a translation matrix. Similar to
      * <code>glTranslate(x, y, z)</code>.

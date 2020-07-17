@@ -33,6 +33,8 @@ object Vals {
         if(f > r) f - 2 * r else if(f < -r) f + 2 * r else f
     }
     
+    def toRadians(deg: Float) = deg * Math.PI.toFloat / 180
+    
     val perspectiveMatrix = Matrix4f.perspective(30, 0.1f, 10000f)
     val UIProjMatrix = Matrix4f.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
 
