@@ -35,6 +35,7 @@ object GameRenderer {
         Shader.get("sphere").bind()
         Shader.get("sphere").loadUniformMat4f("transformationMatrix", transformationMatrix.translate(5, 0, 0))
         Shader.get("sphere").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
+        Shader.get("sphere").loadUniformVec3f("cameraPos", camera.getCameraPos)
         draw(mesh.va, mesh.ib)
 
         game.terrain.render(camera.getViewMatrix)
