@@ -4,6 +4,8 @@ import rendering.{Camera, GameRenderer}
 import utils.graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import utils.math.Matrix4f
 
+import scala.collection.mutable.ListBuffer
+
 class TerrainMesh {
 
     // in meters
@@ -18,10 +20,8 @@ class TerrainMesh {
     val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0), 6)
     va.addBuffer(vb, layout)
 
-    def render(viewMatrix: Matrix4f) = {
-        terrainShader.bind()
-        terrainShader.loadUniformMat4f("viewMatrix", viewMatrix)
-        GameRenderer.draw(va, ib)
-    }
+    val lines = ListBuffer[TerrainLine]()
+
+    def addLine(line: TerrainLine): Unit = lines.addOne(line)
 
 }
