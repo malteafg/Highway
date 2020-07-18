@@ -30,12 +30,12 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f
      */
     def isInside(vec: Vector2f): Boolean = {
         val p = getPos
-        vec.x > p.x && vec.y > p.y && vec.x < p.x + size.x && vec.y < p.y + size.y
+        active && vec.x > p.x && vec.y > p.y && vec.x < p.x + size.x && vec.y < p.y + size.y
     }
 
     def click(event: (Int, Int, Int)): Boolean = {
         var b = false
-        if(isInside(InputHandler.mousePos)) for (child <- children) b = b || (active && child.click(event))
+        if(isInside(InputHandler.mousePos)) for (child <- children) b = b || child.click(event)
         b
     }
 

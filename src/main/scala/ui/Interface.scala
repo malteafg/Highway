@@ -1,10 +1,10 @@
 package ui
 
 import game.GameHandler
-import rendering.UIRenderer
+import rendering.{GameRenderer, UIRenderer}
 import input.InputHandler
 import utils.math.{Vector2f, Vector4f}
-import ui.components.{Button, Slider, TextField, UIComponent}
+import ui.components.{Button, RadioButton, Slider, TextField, UIComponent}
 import utils.graphics.Texture
 import utils.{Options, Vals}
 
@@ -13,8 +13,11 @@ object Interface {
     val screen: UIComponent = new UIComponent(null, new Vector2f(), new Vector2f(16, 9), new Vector4f(1, 0, 1, 0))
     val panel: UIComponent = new UIComponent(screen, new Vector2f(), new Vector2f(2, 9), Vals.UI_COLOR)
 
-    val button1: Button = new Button(panel, new Vector2f(0.5f, 1.0f), new Vector2f(1, 1), new Vector4f(1, 0, 1, 1),
-        () => "Top button", () => Options.log(s"Top button says click!", Options.Button))
+    val button1: RadioButton = new RadioButton(panel, new Vector2f(0.5f, 1.0f), new Vector2f(1, 1), new Vector4f(1, 0, 1, 1),
+        () => "Top button", (b: Boolean) => {
+            Options.log(s"Top button says click!", Options.Button)
+            GameRenderer.darkEdges = b
+        }, false, 0)
 
     button1.addTexture(new Texture("logo"))
 

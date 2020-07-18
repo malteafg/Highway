@@ -27,44 +27,57 @@ in vec3 worldPosition[];
 out vec3 faceNormal;
 out vec3 cameraDirection;
 out vec3 lightDirection;
+out float borderValue;
+
+float calcBorder(vec3 n, vec3 c, float a) {
+    if(a > 0.6) return 1.0f;
+    return (1.0f - 3 * pow(1.0f - pow(dot(n, c), 4) / pow(a, 3), 5));
+}
 
 void main() {
     vec3 normal = normalize(cross(worldPosition[1] - worldPosition[0], worldPosition[2] - worldPosition[0]));
+    float avgDot = dot(normal, normalize(cameraPos - (worldPosition[0] + worldPosition[1] + worldPosition[2]) / 3.0f));
 
     faceNormal = normal;
     gl_Position = gl_in[0].gl_Position;
     cameraDirection = normalize(cameraPos - worldPosition[0]);
     lightDirection = normalize(vec3(0, 30, 0) - worldPosition[0]);
+    borderValue = calcBorder(normal, cameraDirection, avgDot);
     EmitVertex();
 
     faceNormal = normal;
     gl_Position = gl_in[1].gl_Position;
     cameraDirection = normalize(cameraPos - worldPosition[1]);
     lightDirection = normalize(vec3(0, 30, 0) - worldPosition[1]);
+    borderValue = calcBorder(normal, cameraDirection, avgDot);
     EmitVertex();
 
     faceNormal = normal;
     gl_Position = gl_in[2].gl_Position;
     cameraDirection = normalize(cameraPos - worldPosition[2]);
     lightDirection = normalize(vec3(0, 30, 0) - worldPosition[2]);
+    borderValue = calcBorder(normal, cameraDirection, avgDot);
     EmitVertex();
 
 }
-
 
 #fragment
 #version 450 core
 
 layout(location = 0) out vec4 o_Color;
 
+uniform bool darkEdge;
+
 in vec3 faceNormal;
 in vec3 cameraDirection;
 in vec3 lightDirection;
+in float borderValue;
 
 void main() {
     float highLight = pow(dot(cameraDirection, reflect(-lightDirection, faceNormal)) / 2 + 0.5f, 20);
     float light = (dot(faceNormal, lightDirection) / 2 + 0.5f) * 0.4f;
-    vec3 color = max(min(vec3(1.0 + light + highLight, light + highLight, light + highLight), 1), 0);
+    int alternate = dot(cameraDirection, faceNormal) < 0.3 ? 0 : 1;
+    vec3 color = max(min(vec3(1.0 + light + highLight, light + highLight, light + highLight), 1), 0) * (darkEdge ? borderValue : alternate);
 
     o_Color = vec4(color, 1);
 }

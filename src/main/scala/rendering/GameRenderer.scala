@@ -19,6 +19,7 @@ object GameRenderer {
     val layout = new VertexBufferLayout
     val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0, 0, 1, 3, 3, 2, 1), 12)
     var transformationMatrix = Matrix4f.place(0, 0, 0, Vals.toRadians(90))
+    var darkEdges = false;
 
     layout.pushFloat(3)
     layout.pushFloat(4)
@@ -33,6 +34,7 @@ object GameRenderer {
         Shader.get("sphere").bind()
         Shader.get("sphere").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("sphere").loadUniformVec3f("cameraPos", camera.getCameraPos)
+        Shader.get("sphere").loadUniformBoolean("darkEdge", darkEdges)
         game.spheres.foreach(s => {
             Shader.get("sphere").loadUniformMat4f("transformationMatrix", Matrix4f.translate(s.position))
             draw(Sphere.mesh.va, Sphere.mesh.ib)
