@@ -47,7 +47,6 @@ object GameHandler {
                 game.spheres.addOne(new Sphere(array(3), Vals.CONTROL_POINT_COLOR))
                 val n = 20
                 for(b <- boundaries._1) {
-                    println(b)
                     game.spheres.addOne(new Sphere(b))
                 }
 

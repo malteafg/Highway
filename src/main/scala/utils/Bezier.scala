@@ -28,11 +28,11 @@ object Bezier {
         var r = Math.pow(1 - t, points.length - 1).toFloat
         var l = 1.0f
         var i = 0
-        for (p <- 0 until points.length - 1) {
+        for (p <- 0 to (points.length - 2)) {
             val f = l * r
             v = v.add(points(p + 1).subtract(points(p)).scale(f))
             if (t == 1.0f) {
-                if (i == points.length - 2) r = 1
+                if (i == points.length - 3) r = 1
                 else r = 0
             }
             else r *= t / (1 - t)
@@ -68,6 +68,7 @@ object Bezier {
             val d = getDirection(t, array).normalize
             points(p)       = v.add(d.leftHand.scale(roadWidth / 2.0f))
             points(p + 1)   = v.add(d.rightHand.scale(roadWidth / 2.0f))
+
             if(p < points.length / 2) {
                 indices(p * 3 + 0) = p
                 indices(p * 3 + 1) = p + 1
