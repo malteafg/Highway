@@ -42,7 +42,7 @@ object GameHandler {
         } else (false, false)
     }
 
-    def placeRoad(v1: Vector3f, r: Vector3f, v2: Vector3f): Unit = {
+    def placeRoad(v1: Vector3f, r: Vector3f, v2: Vector3f) = {
         val points = new Array[Vector3f](4)
 
         val ab = v2.subtract(v1)
@@ -55,6 +55,8 @@ object GameHandler {
         points(1) = v1.add(R)
         points(2) = v2.add(R).subtract(ab.scale(2.0f * ab.dot(R) / ab.dot(ab)))
         points(3) = v2
+
+        points
     }
 
     def init() = {
