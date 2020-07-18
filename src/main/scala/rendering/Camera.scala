@@ -82,7 +82,6 @@ class Camera {
         if(!InputHandler.isContinued(event) && InputHandler.isUnAltered(event)) {
             var a = !InputHandler.isReleased(event)
             var b = true
-            
             event._1 match {
                 case 87 => input(0) = a
                 case 65 => input(1) = a
@@ -94,6 +93,7 @@ class Camera {
                         move(new Vector3f(), Vals.CAMERA_STANDARD_ORIENTATION, Vals.CAMERA_MOVE_SPEED, smoothMove)
                         a = false
                 }
+                case 90 => orientation.x = Math.PI.toFloat / 2
                 case _ => b = false
             }
             

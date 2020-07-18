@@ -2,6 +2,8 @@ package utils.math
 
 import java.nio.FloatBuffer
 
+import utils.Vals
+
 class Vector2f(var x: Float, var y: Float) {
 
     /**
@@ -57,6 +59,8 @@ class Vector2f(var x: Float, var y: Float) {
      */
     def subtract(other: Vector2f): Vector2f = this.add(other.negate)
 
+    def subtract(f: Float) = new Vector2f(x - f, y - f)
+    
     /**
      * Multiplies a vector by a scalar.
      *
@@ -114,8 +118,10 @@ class Vector2f(var x: Float, var y: Float) {
         this.y = y
     }
 
-    override def toString = {
-        s"($x, $y)"
-    }
+    def toScreenVector() = new Vector2f(1.0f - 2.0f * x / Vals.WIDTH, 2.0f * y / Vals.HEIGHT - 1.0f)
+    
+    def fill(z: Float, w: Float) = new Vector4f(x, y, z, w)
+    
+    override def toString = s"($x, $y)"
 
 }

@@ -1,8 +1,9 @@
 package input
 
+import game.GameHandler
 import utils.math.Vector2f
 import ui.Interface
-import utils.Options
+import utils.{Options, Vals}
 
 object InputHandler {
 
@@ -42,7 +43,7 @@ object InputHandler {
 //        Options.log(s"Action: ${action} and mods: ${mods}", Options.MousePressed)
         Options.log(s"Ctrl: ${isControlDown(event)}, Alt: ${isAltDown(event)}, Shift: ${isShiftDown(event)}, none: ${isUnAltered(event)}", Options.MousePressed)
         Options.log("", Options.MousePressed)
-
+    
         mousePressSubs.iterate(event)
     }
 

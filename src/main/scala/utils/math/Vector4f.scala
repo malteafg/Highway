@@ -126,6 +126,8 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
         this.w = w
     }
 
+    def xyz = new Vector3f(x, y, z)
+    
     @Override
     override def toString: String = s"$x, $y, $z, $w"
 

@@ -166,5 +166,5 @@ class Matrix3f(var m00: Float, var m01: Float, var m02: Float,
         buffer.put(m02).put(m12).put(m22)
         buffer.flip
     }
-
+    
 }
