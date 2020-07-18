@@ -1,11 +1,13 @@
 package rendering
 
-import game.Game
+import game.{Game, Sphere}
 import org.lwjgl.opengl.GL11.{GL_TRIANGLES, GL_UNSIGNED_INT, glDrawElements}
 import utils.Vals
 import utils.graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import utils.loader.OBJLoader
 import utils.math.Matrix4f
+
+import scala.collection.mutable._
 
 object GameRenderer {
 
@@ -22,8 +24,6 @@ object GameRenderer {
     layout.pushFloat(4)
     va.addBuffer(vb, layout)
 
-    val mesh = OBJLoader.loadModel("sphere")
-
     def render(game: Game, camera: Camera) = {
     
         Shader.get("Pyramid").bind()
@@ -31,10 +31,12 @@ object GameRenderer {
         Shader.get("Pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
         draw(va, ib)
         Shader.get("sphere").bind()
-        Shader.get("sphere").loadUniformMat4f("transformationMatrix", transformationMatrix.translate(5, 0, 0))
         Shader.get("sphere").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("sphere").loadUniformVec3f("cameraPos", camera.getCameraPos)
-        draw(mesh.va, mesh.ib)
+        game.spheres.foreach(s => {
+            Shader.get("sphere").loadUniformMat4f("transformationMatrix", Matrix4f.translate(s.position))
+            draw(Sphere.mesh.va, Sphere.mesh.ib)
+        })
 
         game.terrain.render(camera.getViewMatrix)
 
