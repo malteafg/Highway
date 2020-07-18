@@ -22,7 +22,10 @@ object Interface {
     button1.addTexture(new Texture("logo"))
 
     val button2: Button = new Button(panel, new Vector2f(0.5f, 3.5f), new Vector2f(1, 1), new Vector4f(1, 1, 0, 1),
-        () => "Middle button", () => Options.log(s"Middle button says click!", Options.Button))
+        () => "Middle button", () => {
+            Options.log(s"Middle button says click!", Options.Button)
+            GameHandler.game.spheres.clear()
+        })
     val button3: Button = new Button(panel, new Vector2f(0.5f, 6.0f), new Vector2f(1, 1), new Vector4f(0, 1, 1, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)

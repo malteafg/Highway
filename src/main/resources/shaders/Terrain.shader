@@ -38,7 +38,9 @@ vec4 addColors(vec4 v1, vec4 v2, float a) {
 }
 
 float smoothEdge(float f) {
-    return 4 * pow(f , 12.5) - 5 * pow(f, 10) + 1.0f;
+    float x = f;
+    for(int i = 0; i < 5; i++, x = x * x){}
+    return 32 * f * x - 33 * x + 1.0f;
 }
 
 void main() {

@@ -14,8 +14,8 @@ class Camera {
     
     var dragging: Boolean = false
 
-    var nextOrientation:  Vector3f = new Vector3f(0.4f, 0, 60.0f)
-    var nextTargetPos:    Vector3f = new Vector3f(0, 0f, -10.0f)
+    var nextOrientation:  Vector3f = new Vector3f(0.4f, 0, 10.0f)
+    var nextTargetPos:    Vector3f = new Vector3f(0, 0f, 0.0f)
 
     var progress = 0.0f
     var progressionSpeed = Vals.CAMERA_MOVE_SPEED
@@ -104,7 +104,7 @@ class Camera {
     }
 
     def scroll(event: (Int, Int, Int)) = {
-        orientation.z = Vals.restrain(orientation.z * Math.pow(1.1f, -event._3).toFloat, 3, 100)
+        orientation.z = Vals.restrain(orientation.z * Math.pow(1.1f, -event._3).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT)
         stop
         (false, true)
     }

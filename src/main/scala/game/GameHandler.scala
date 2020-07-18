@@ -2,8 +2,8 @@ package game
 
 import input.InputHandler
 import rendering.{Camera, GameRenderer}
-import utils.Vals
-import utils.math.Vector3f
+import utils.{Bezier, Vals}
+import utils.math.{Vector3f, Vector4f}
 
 object GameHandler {
 
@@ -23,10 +23,10 @@ object GameHandler {
             game.spheres.addOne(new Sphere(terrainCollisionFunc()))
             (false, true)
         } else if (event._1 == 0 && InputHandler.isPressed(event)) {
-            if(selectedPos == null && selectedDirection == null) {
+            if(selectedPos == null || selectedDirection == null) {
                 selectedPos = terrainCollisionFunc()
-                game.spheres.addOne(new Sphere(selectedPos))
-                tempSphere = new Sphere(selectedPos)
+                game.spheres.addOne(new Sphere(selectedPos, Vals.CONTROL_POINT_COLOR))
+                tempSphere = new Sphere(selectedPos, Vals.CONTROL_POINT_COLOR)
                 game.spheres.addOne(tempSphere)
                 dragging = true
                 InputHandler.addMouseMoveSub( _ => {
@@ -38,12 +38,19 @@ object GameHandler {
                     } else (true, false)
                 })
             } else {
-                val array = placeRoad(selectedPos, selectedDirection, terrainCollisionFunc())
+                val array = Bezier.curveRoad(selectedPos, selectedDirection, terrainCollisionFunc())
+                val boundaries = Bezier.triangulate(array, 3f * Vals.LARGE_LANE_WIDTH)
                 selectedPos = null
                 selectedDirection = null
                 tempSphere.position = array(1)
-                game.spheres.addOne(new Sphere(array(2)))
-                game.spheres.addOne(new Sphere(array(3)))
+                game.spheres.addOne(new Sphere(array(2), Vals.CONTROL_POINT_COLOR))
+                game.spheres.addOne(new Sphere(array(3), Vals.CONTROL_POINT_COLOR))
+                val n = 20
+                for(b <- boundaries._1) {
+                    println(b)
+                    game.spheres.addOne(new Sphere(b))
+                }
+
             }
 
             (false, true)
@@ -51,23 +58,6 @@ object GameHandler {
             dragging = false
             (false, true)
         } else (false, false)
-    }
-
-    def placeRoad(v1: Vector3f, r: Vector3f, v2: Vector3f) = {
-        val points = new Array[Vector3f](4)
-
-        val ab = v2.subtract(v1)
-        val d = ab.normalize.dot(r.normalize)
-        val f = (2.0f / 3.0f * ab.length * (1.0f - d) / (r.length * (1.0f - d * d)))
-        val R = r.scale(f)
-        //val u = ab.normalize.add(r.normalize).divide(2.0f)
-
-        points(0) = v1
-        points(1) = v1.add(R)
-        points(2) = v2.add(R).subtract(ab.scale(2.0f * ab.dot(R) / ab.dot(ab)))
-        points(3) = v2
-
-        points
     }
 
     def init() = {

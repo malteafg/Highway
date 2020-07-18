@@ -67,6 +67,7 @@ void main() {
 layout(location = 0) out vec4 o_Color;
 
 uniform bool darkEdge;
+uniform vec4 color;
 
 in vec3 faceNormal;
 in vec3 cameraDirection;
@@ -76,8 +77,7 @@ in float borderValue;
 void main() {
     float highLight = pow(dot(cameraDirection, reflect(-lightDirection, faceNormal)) / 2 + 0.5f, 20);
     float light = (dot(faceNormal, lightDirection) / 2 + 0.5f) * 0.4f;
-    int alternate = dot(cameraDirection, faceNormal) < 0.3 ? 0 : 1;
-    vec3 color = max(min(vec3(1.0 + light + highLight, light + highLight, light + highLight), 1), 0) * (darkEdge ? borderValue : alternate);
-
-    o_Color = vec4(color, 1);
+    int alternate = 1;
+    vec3 c = max(min(vec3(color.x + light + highLight, color.y + light + highLight, color.z + light + highLight), 1), 0) * (darkEdge ? borderValue : alternate);
+    o_Color = vec4(c.xyz, color.w);
 }

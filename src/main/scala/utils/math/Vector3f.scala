@@ -152,6 +152,10 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
         this.z = z
     }
 
+    def rightHand() = new Vector3f(z, y, -x)
+
+    def leftHand() = new Vector3f(-z, y, x)
+
     override def toString = s"$x, $y, $z"
 
 }

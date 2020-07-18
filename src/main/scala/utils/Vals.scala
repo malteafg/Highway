@@ -14,12 +14,20 @@ object Vals {
 
     final val MIN_CAMERA_PITCH: Float = 0.1f
     final val MAX_CAMERA_PITCH: Float = 1.5f
+    final val MIN_CAMERA_HEIGHT: Float = 10
+    final val MAX_CAMERA_HEIGHT: Float = 1000
     final val CAMERA_MOVE_SPEED: Float = 0.005f
     final val CAMERA_MOVE_SMOOTH_FACTOR: Int = 10
     
     final val MAX_RAY_DISTANCE: Float = 500
     
-    final val CAMERA_STANDARD_ORIENTATION: Vector3f = new Vector3f(Vals.MIN_CAMERA_PITCH, 0f, 10.0f)
+    final val CAMERA_STANDARD_ORIENTATION: Vector3f = new Vector3f(Vals.MIN_CAMERA_PITCH, 0f, 100.0f)
+
+    final val CONTROL_POINT_COLOR: Vector4f = new Vector4f(0, 0.4f, 0.8f, 1)
+
+    final val ROAD_VERTEX_DENSITY: Float = 1.0f
+    final val LARGE_LANE_WIDTH: Float = 3.7f
+
 
     def getSizeOf(t: Int): Int = t match {
         case GL_UNSIGNED_INT => 4
@@ -63,44 +71,6 @@ object Vals {
         } else {
             camPos.add(ray.scale(Vals.MAX_RAY_DISTANCE))
         }
-    }
-
-    def getPoint(t: Float, points: Array[Vector3f]) = {
-        var v = new Vector3f()
-        var r = Math.pow(1 - t, points.length - 1).toFloat
-        var l = 1.0f
-        var i = 0
-        for (p <- points) {
-            val f = l * r
-            v = v.add(p.scale(f))
-            if (t == 1.0f) {
-                if (i == points.length - 2) r = 1
-                else r = 0
-            }
-            else r *= t / (1 - t)
-            l *= points.length / (1.0f + i) - 1.0f
-            i += 1
-        }
-        v
-    }
-
-    def getDirection(t: Float, points: Array[Vector3f]) = {
-        var v = new Vector3f()
-        var r = Math.pow(1 - t, points.length - 1).toFloat
-        var l = 1.0f
-        var i = 0
-        for (p <- 0 until points.length - 1) {
-            val f = l * r
-            v = v.add(points(p + 1).subtract(points(p)).scale(f))
-            if (t == 1.0f) {
-                if (i == points.length - 2) r = 1
-                else r = 0
-            }
-            else r *= t / (1 - t)
-            l *= points.length / (1.0f + i) - 1.0f
-            i += 1
-        }
-        v.scale(points.length)
     }
     
     val perspectiveMatrix = Matrix4f.perspective(30, 0.1f, 10000f)

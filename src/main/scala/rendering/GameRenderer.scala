@@ -39,6 +39,7 @@ object GameRenderer {
         Shader.get("sphere").loadUniformBoolean("darkEdge", darkEdges)
         game.spheres.foreach(s => {
             Shader.get("sphere").loadUniformMat4f("transformationMatrix", Matrix4f.translate(s.position))
+            Shader.get("sphere").loadUniformVec4f("color", s.color)
             draw(Sphere.mesh.va, Sphere.mesh.ib)
         })
 
