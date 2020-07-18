@@ -12,27 +12,38 @@ object GameHandler {
 
     var selectedPos: Vector3f = null
     var selectedDirection: Vector3f = null
+    var tempSphere: Sphere = null
     var dragging = false
     val terrainCollisionFunc = () => Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f)
 
     InputHandler.addMousePressSub(click)
 
     def click(event: (Int, Int, Int)) = {
-        if (event._1 == 2 && InputHandler.isPressed(event)) {
+        if (InputHandler.isRightClick(event) && InputHandler.isPressed(event)) {
             game.spheres.addOne(new Sphere(terrainCollisionFunc()))
             (false, true)
         } else if (event._1 == 0 && InputHandler.isPressed(event)) {
             if(selectedPos == null && selectedDirection == null) {
                 selectedPos = terrainCollisionFunc()
+                game.spheres.addOne(new Sphere(selectedPos))
+                tempSphere = new Sphere(selectedPos)
+                game.spheres.addOne(tempSphere)
                 dragging = true
                 InputHandler.addMouseMoveSub( _ => {
                     if(dragging) {
-                        selectedDirection = terrainCollisionFunc().subtract(selectedPos)
+                        val p = terrainCollisionFunc()
+                        selectedDirection = p.subtract(selectedPos)
+                        tempSphere.position = p
                         (false, false)
                     } else (true, false)
                 })
             } else {
-                placeRoad(selectedPos, selectedDirection, terrainCollisionFunc())
+                val array = placeRoad(selectedPos, selectedDirection, terrainCollisionFunc())
+                selectedPos = null
+                selectedDirection = null
+                tempSphere.position = array(1)
+                game.spheres.addOne(new Sphere(array(2)))
+                game.spheres.addOne(new Sphere(array(3)))
             }
 
             (false, true)
