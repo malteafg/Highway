@@ -1,6 +1,7 @@
 package utils.graphics
 
 import java.io.{BufferedReader, FileReader, IOException}
+import java.nio.FloatBuffer
 
 import utils.math._
 import org.lwjgl.opengl.GL11._
@@ -22,6 +23,7 @@ class Shader(programID: Int) {
     })
 
     def loadUniformFloat(name: String, value: Float): Unit = glUniform1f(getUniform(name), value)
+    def setUniform1fa(name: String, value: Array[Float]): Unit = glUniform1fv(getUniform(name), value)
     def loadUniformInt(name: String, value: Int): Unit = glUniform1i(getUniform(name), value)
     def loadUniformIntV(name: String, value: Array[Int]): Unit = glUniform1iv(getUniform(name), value)
 
@@ -31,7 +33,7 @@ class Shader(programID: Int) {
         glUniform1f(getUniform(name), toLoad)
     }
 
-    def loadUniformVec2f(name: String, value: Vector2f): Unit = try {
+    def loadUniformVec2f(name: String, value: Vector2f): Unit = {
         val stack = MemoryStack.stackPush
         try {
             val buffer = stack.mallocFloat(2)
@@ -40,7 +42,21 @@ class Shader(programID: Int) {
         } finally if (stack != null) stack.close()
     }
 
-    def loadUniformVec3f(name: String, value: Vector3f): Unit = try {
+    def setUniformVec2fa(name: String, value: Array[Vector2f]): Unit = {
+        val stack = MemoryStack.stackPush
+        try {
+            val buffer = stack.mallocFloat(2 * value.length)
+            convertToBuffer(value, buffer)
+            glUniform2fv(getUniform(name), buffer)
+        } finally if (stack != null) stack.close()
+    }
+
+    def convertToBuffer(value: Array[Vector2f], buffer: FloatBuffer) = {
+        value.foreach(v => buffer.put(v.x).put(v.y))
+        buffer.flip()
+    }
+
+    def loadUniformVec3f(name: String, value: Vector3f): Unit = {
         val stack = MemoryStack.stackPush
         try {
             val buffer = stack.mallocFloat(3)
@@ -49,7 +65,7 @@ class Shader(programID: Int) {
         } finally if (stack != null) stack.close()
     }
 
-    def loadUniformVec4f(name: String, value: Vector4f): Unit = try {
+    def loadUniformVec4f(name: String, value: Vector4f): Unit = {
         val stack = MemoryStack.stackPush
         try {
             val buffer = stack.mallocFloat(4)
@@ -58,7 +74,21 @@ class Shader(programID: Int) {
         } finally if (stack != null) stack.close()
     }
 
-    def loadUniformMat2f(name: String, value: Matrix2f): Unit = try {
+    def setUniformVec4fa(name: String, value: Array[Vector4f]): Unit = {
+        val stack = MemoryStack.stackPush
+        try {
+            val buffer = stack.mallocFloat(4)
+            convertToBuffer(value, buffer)
+            glUniform4fv(getUniform(name), buffer)
+        } finally if (stack != null) stack.close()
+    }
+
+    def convertToBuffer(value: Array[Vector4f], buffer: FloatBuffer) = {
+        value.foreach(v => buffer.put(v.x).put(v.y).put(v.z).put(v.w))
+        buffer.flip()
+    }
+
+    def loadUniformMat2f(name: String, value: Matrix2f): Unit = {
         val stack = MemoryStack.stackPush
         try {
             val buffer = stack.mallocFloat(2 * 2)
@@ -67,7 +97,7 @@ class Shader(programID: Int) {
         } finally if (stack != null) stack.close()
     }
 
-    def loadUniformMat3f(name: String, value: Matrix3f): Unit = try {
+    def loadUniformMat3f(name: String, value: Matrix3f): Unit = {
         val stack = MemoryStack.stackPush
         try {
             val buffer = stack.mallocFloat(3 * 3)
@@ -76,7 +106,7 @@ class Shader(programID: Int) {
         } finally if (stack != null) stack.close()
     }
 
-    def loadUniformMat4f(name: String, value: Matrix4f): Unit = try {
+    def loadUniformMat4f(name: String, value: Matrix4f): Unit = {
         val stack = MemoryStack.stackPush
         try {
             val buffer = stack.mallocFloat(4 * 4)

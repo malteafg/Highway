@@ -15,6 +15,11 @@ void main() {
 
 layout(location = 0) out vec4 o_Color;
 
+uniform vec2 pos1[1];
+uniform vec2 pos2[1];
+uniform float width[1];
+uniform vec4 color[1];
+
 void main() {
     o_Color = vec4(0.29f, 0.61f, 0.24f, 1.0f);
 }

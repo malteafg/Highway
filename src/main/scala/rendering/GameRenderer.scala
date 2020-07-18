@@ -1,11 +1,13 @@
 package rendering
 
+import java.nio.FloatBuffer
+
 import game.{Game, Sphere}
 import org.lwjgl.opengl.GL11.{GL_TRIANGLES, GL_UNSIGNED_INT, glDrawElements}
 import utils.Vals
 import utils.graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import utils.loader.OBJLoader
-import utils.math.Matrix4f
+import utils.math.{Matrix4f, Vector2f, Vector4f}
 
 import scala.collection.mutable._
 
@@ -38,9 +40,28 @@ object GameRenderer {
             draw(Sphere.mesh.va, Sphere.mesh.ib)
         })
 
-        game.terrain.render(camera.getViewMatrix)
+        game.terrain.terrainShader.bind()
+        game.terrain.terrainShader.loadUniformMat4f("viewMatrix", camera.getViewMatrix)
 
-
+        // load lines for terrain
+        val lines = game.terrain.lines
+        val pos1 = new Array[Vector2f](lines.length)
+        val pos2 = new Array[Vector2f](lines.length)
+        val width = new Array[Float](lines.length)
+        val color = new Array[Vector4f](lines.length)
+        val counter = 0
+        lines.foreach(l => {
+            val line = l.getLine()
+            pos1(counter) = line._1
+            pos2(counter) = line._2
+            width(counter) = line._3
+            color(counter) = line._4
+        })
+        game.terrain.terrainShader.setUniformVec2fa("pos1", pos1)
+        game.terrain.terrainShader.setUniformVec2fa("pos2", pos2)
+        game.terrain.terrainShader.setUniform1fa("width", width)
+        game.terrain.terrainShader.setUniformVec4fa("color", color)
+        draw(game.terrain.va, game.terrain.ib)
     }
 
     def draw(va: VertexArray, ib: IndexBuffer): Unit = {
