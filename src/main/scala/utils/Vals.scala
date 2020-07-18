@@ -25,7 +25,8 @@ object Vals {
 
     final val CONTROL_POINT_COLOR: Vector4f = new Vector4f(0, 0.4f, 0.8f, 1)
 
-    final val ROAD_VERTEX_DENSITY: Float = 1.0f
+    final val ROAD_HEIGHT: Float = 0.3f
+    final val ROAD_VERTEX_DENSITY: Float = 0.5f
     final val LARGE_LANE_WIDTH: Float = 3.7f
 
 

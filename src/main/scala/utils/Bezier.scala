@@ -60,22 +60,59 @@ object Bezier {
     }
 
     def triangulate(array: Array[Vector3f], roadWidth: Float) = {
-        val points = new Array[Vector3f]((array(0).subtract(array.last).length * Vals.ROAD_VERTEX_DENSITY).toInt * 2)
-        val indices = new Array[Int](points.length * 3)
-        for(p <- 0 until points.length by 2) {
-            val t = 1.0f * p / (points.length - 2)
+        val points = new Array[Vector3f]((array(0).subtract(array.last).length * Vals.ROAD_VERTEX_DENSITY).toInt * 4)
+        val indices = new Array[Int](points.length * 9 / 2 + 12)
+        val heightVector = new Vector3f(0, Vals.ROAD_HEIGHT, 0)
+        for(p <- 0 until points.length by 4) {
+            val t = 1.0f * p / (points.length - 4)
             val v = getPoint(t, array)
             val d = getDirection(t, array).normalize
-            points(p)       = v.add(d.leftHand.scale(roadWidth / 2.0f))
+            val n = p * 9 / 2
+            points(p + 0)   = v.add(d.leftHand.scale(roadWidth / 2.0f))
             points(p + 1)   = v.add(d.rightHand.scale(roadWidth / 2.0f))
+            points(p + 2)   = points(p + 0).add(heightVector)
+            points(p + 3)   = points(p + 1).add(heightVector)
 
-            if(p < points.length / 2) {
-                indices(p * 3 + 0) = p
-                indices(p * 3 + 1) = p + 1
-                indices(p * 3 + 2) = p + 2
-                indices(p * 3 + 3) = p + 1
-                indices(p * 3 + 4) = p + 2
-                indices(p * 3 + 5) = p + 3
+            if(p < points.length - 4) {
+                indices(n + 0)  = p
+                indices(n + 1)  = p + 2
+                indices(n + 2)  = p + 4
+                
+                indices(n + 3)  = p + 2
+                indices(n + 4 ) = p + 4
+                indices(n + 5)  = p + 6
+                
+                indices(n + 6)   = p + 2
+                indices(n + 7)   = p + 3
+                indices(n + 8)   = p + 6
+                
+                indices(n + 9)   = p + 3
+                indices(n + 10)  = p + 6
+                indices(n + 11)  = p + 7
+                
+                indices(n + 12) = p + 1
+                indices(n + 13) = p + 3
+                indices(n + 14) = p + 7
+                
+                indices(n + 15) = p + 1
+                indices(n + 16) = p + 5
+                indices(n + 17) = p + 7
+            } else {
+                indices(n + 0)  = p
+                indices(n + 1)  = p + 2
+                indices(n + 2)  = p + 3
+
+                indices(n + 3)  = p + 0
+                indices(n + 4)  = p + 1
+                indices(n + 5)  = p + 4
+
+                indices(n + 6)  = 0
+                indices(n + 7)  = 1
+                indices(n + 8)  = 2
+
+                indices(n + 9)  = 1
+                indices(n + 10) = 2
+                indices(n + 11) = 3
             }
         }
         (points, indices)
