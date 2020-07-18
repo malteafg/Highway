@@ -61,7 +61,7 @@ object Bezier {
 
     def triangulate(array: Array[Vector3f], roadWidth: Float) = {
         val points = new Array[Vector3f]((array(0).subtract(array.last).length * Vals.ROAD_VERTEX_DENSITY).toInt * 4)
-        val indices = new Array[Int](points.length * 9 / 2 + 12)
+        val indices = new Array[Int](points.length * 9 / 2 - 6)
         val heightVector = new Vector3f(0, Vals.ROAD_HEIGHT, 0)
         for(p <- 0 until points.length by 4) {
             val t = 1.0f * p / (points.length - 4)
