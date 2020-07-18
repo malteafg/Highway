@@ -63,8 +63,25 @@ object Vals {
         } else {
             camPos.add(ray.scale(Vals.MAX_RAY_DISTANCE))
         }
-        
-        
+    }
+
+    def getPoint(t: Float, points: Array[Vector3f]) = {
+        var v = new Vector3f()
+        var r = Math.pow(1 - t, points.length - 1).toFloat
+        var l = 1.0f
+        var i = 0
+        for (p <- points) {
+            val f = l * r
+            v = v.add(p.scale(f))
+            if (t == 1.0f) {
+                if (i == points.length - 2) r = 1
+                else r = 0
+            }
+            else r *= t / (1 - t)
+            l *= points.length / (1.0f + i) - 1.0
+            i += 1
+        }
+        v
     }
     
     val perspectiveMatrix = Matrix4f.perspective(30, 0.1f, 10000f)

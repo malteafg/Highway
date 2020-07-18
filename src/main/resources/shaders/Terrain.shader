@@ -6,7 +6,10 @@ layout(location = 0) in vec3 a_Position;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
+out vec2 worldPos;
+
 void main() {
+    worldPos = a_Position.xz;
     gl_Position = projMatrix * viewMatrix * vec4(a_Position, 1.0f);
 }
 
@@ -20,6 +23,26 @@ uniform vec2 pos2[1];
 uniform float width[1];
 uniform vec4 color[1];
 
+in vec2 worldPos;
+
+float distToLine(int line) {
+    if(dot(worldPos - pos1[line], pos2[line] - pos1[line]) < 0) return length(worldPos - pos1[line]);
+    if(dot(worldPos - pos2[line], pos1[line] - pos2[line]) < 0) return length(worldPos - pos2[line]);
+    vec2 x = worldPos - pos1[line];
+    vec2 a = pos2[line] - pos1[line];
+    return length(x - a * dot(x, a) / dot(a, a));
+}
+
+vec4 addColors(vec4 v1, vec4 v2, float a) {
+    return (v1 * v1.w * (1.0f-v2.w * a) + v2 * v2.w * a) / (v1.w * (1.0f-v2.w * a) + v2.w * a);
+}
+
+float smoothEdge(float f) {
+    return 4 * pow(f , 12.5) - 5 * pow(f, 10) + 1.0f;
+}
+
 void main() {
-    o_Color = vec4(0.29f, 0.61f, 0.24f, 1.0f);
+    float dist = distToLine(0);
+    bool b = dist <= width[0] / 2.0f;
+    o_Color = addColors(vec4(0.29f, 0.61f, 0.24f, 1.0f), (b ? color[0] : vec4(0,0,0,0)), b ? smoothEdge(2 * dist / width[0]) : 1.0);
 }
