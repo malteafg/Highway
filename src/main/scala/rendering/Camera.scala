@@ -1,6 +1,7 @@
 package rendering
 
 import input.InputHandler
+import input.InputEvent
 import utils.math.{Matrix4f, Vector2f, Vector3f}
 import utils.{Options, Vals}
 
@@ -65,24 +66,24 @@ class Camera {
     
     def step(a: Float, b: Float, V: Vector3f, T: Vector3f) = T.scale(b).add(V.subtract(T.scale(a)).scale((1.0f - b)/(1.0f - a)))
     
-    def click(event: (Int, Int, Int)) = {
-        if(InputHandler.isPressed(event) && InputHandler.isWheelClick(event)) {
+    def click(event: InputEvent) = {
+        if(event.isPressed() && event.isWheelClick()) {
             InputHandler.addMouseMoveSub(drag)
             dragging = true
             stop
             (false, true)
-        } else if(InputHandler.isReleased(event) && InputHandler.isWheelClick(event)) {
+        } else if(event.isReleased() && event.isWheelClick()) {
             dragging = false
             stop
             (false, true)
         } else (false, false)
     }
 
-    def keyPress(event: (Int, Int, Int)) = {
-        if(!InputHandler.isContinued(event) && InputHandler.isUnAltered(event)) {
-            var a = !InputHandler.isReleased(event)
+    def keyPress(event: InputEvent) = {
+        if(!event.isContinued() && event.isUnAltered()) {
+            var a = !event.isReleased()
             var b = true
-            event._1 match {
+            event.key match {
                 case 87 => input(0) = a
                 case 65 => input(1) = a
                 case 83 => input(2) = a
@@ -103,15 +104,15 @@ class Camera {
         } else (false, false)
     }
 
-    def scroll(event: (Int, Int, Int)) = {
-        orientation.z = Vals.restrain(orientation.z * Math.pow(1.1f, -event._3).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT)
+    def scroll(event: InputEvent) = {
+        orientation.z = Vals.restrain(orientation.z * Math.pow(1.1f, -event.mods).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT)
         stop
         (false, true)
     }
 
-    def drag(event: (Int, Int, Int)) = {
+    def drag(event: InputEvent) = {
         if(dragging) {
-            val newPos = new Vector2f(event._2, event._3)
+            val newPos = new Vector2f(event.action, event.mods)
             val diff = newPos.subtract(InputHandler.mousePos)
 
             orientation.y = Vals.center(orientation.y - diff.x / Vals.WIDTH * 5.0f, Math.PI.toFloat)

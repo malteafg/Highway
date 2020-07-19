@@ -159,3 +159,17 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
     override def toString = s"$x, $y, $z"
 
 }
+
+object Vector3f {
+
+    def convertToFloatArray(array: Array[Vector3f]) = {
+        val floats = new Array[Float](array.length * 3)
+        for(i <- 0 until array.length) {
+            floats(i * 3 + 0) = array(i).x
+            floats(i * 3 + 1) = array(i).y
+            floats(i * 3 + 2) = array(i).z
+        }
+        floats
+    }
+
+}

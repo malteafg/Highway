@@ -1,8 +1,6 @@
-package game
+package game.terrain
 
-import rendering.{Camera, GameRenderer}
-import utils.graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
-import utils.math.Matrix4f
+import utils.graphics._
 
 import scala.collection.mutable.ListBuffer
 

@@ -52,19 +52,27 @@ object GameRenderer {
         val pos2 = new Array[Vector2f](lines.length)
         val width = new Array[Float](lines.length)
         val color = new Array[Vector4f](lines.length)
-        val counter = 0
+        var counter = 0
         lines.foreach(l => {
             val line = l.getLine()
             pos1(counter) = line._1
             pos2(counter) = line._2
             width(counter) = line._3
             color(counter) = line._4
+            counter += 1
         })
         game.terrain.terrainShader.setUniformVec2fa("pos1", pos1)
         game.terrain.terrainShader.setUniformVec2fa("pos2", pos2)
         game.terrain.terrainShader.setUniform1fa("width", width)
         game.terrain.terrainShader.setUniformVec4fa("color", color)
         draw(game.terrain.va, game.terrain.ib)
+
+        // render road segments
+        Shader.get("road").bind()
+        Shader.get("road").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
+        for(s <- game.roads) {
+            draw(s.mesh.va, s.mesh.ib)
+        }
     }
 
     def draw(va: VertexArray, ib: IndexBuffer): Unit = {

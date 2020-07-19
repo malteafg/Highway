@@ -1,6 +1,7 @@
 package ui.components
 
 import input.InputHandler
+import input.InputEvent
 import utils.math.{Vector2f, Vector4f}
 import utils.Vals
 import utils.graphics.Texture
@@ -18,14 +19,14 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f
     size = size.scale(Vals.UNIT)
     var active = true
 
-    /*
+    /**
      * Constructors
      */
     def this(par: UIComponent, x: Float, y: Float, width: Float, height: Float, c: Vector4f) {
         this(par, new Vector2f(x, y), new Vector2f(width, height), c)
     }
 
-    /*
+    /**
      * Functions
      */
     def isInside(vec: Vector2f): Boolean = {
@@ -33,7 +34,7 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f
         active && vec.x > p.x && vec.y > p.y && vec.x < p.x + size.x && vec.y < p.y + size.y
     }
 
-    def click(event: (Int, Int, Int)): Boolean = {
+    def click(event: InputEvent): Boolean = {
         var b = false
         if(isInside(InputHandler.mousePos)) for (child <- children) b = b || child.click(event)
         b
@@ -41,7 +42,7 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f
 
     def addTexture(tex: Texture) = this.tex = tex
 
-    /*
+    /**
      * Getters and Setters
      */
     def getChildren() = children

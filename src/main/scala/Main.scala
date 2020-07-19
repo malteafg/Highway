@@ -62,6 +62,7 @@ object Main {
         Shader.loadShader("Pyramid", Vals.perspectiveMatrix)
         Shader.loadShader("sphere", Vals.perspectiveMatrix)
         Shader.loadShader("Terrain", Vals.perspectiveMatrix)
+        Shader.loadShader("road", Vals.perspectiveMatrix)
 
         // initialization
         GameHandler.init

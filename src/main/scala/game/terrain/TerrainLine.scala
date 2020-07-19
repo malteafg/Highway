@@ -1,4 +1,4 @@
-package game
+package game.terrain
 
 import utils.math.{Vector2f, Vector4f}
 

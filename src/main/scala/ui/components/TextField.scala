@@ -1,6 +1,7 @@
 package ui.components
 
 import input.InputHandler
+import input.InputEvent
 import utils.math.{Vector2f, Vector4f}
 import utils.Options
 
@@ -12,8 +13,8 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
     /*
      * Functions
      */
-    override def click(event: (Int, Int, Int)): Boolean = {
-        if(InputHandler.isPressed(event) && isInside(InputHandler.mousePos) ) {
+    override def click(event: InputEvent): Boolean = {
+        if(event.isPressed() && isInside(InputHandler.mousePos) ) {
             Options.log(s"Writing!", Options.TextField)
             if(typingPos == -1) {
                 InputHandler.addCharSub(write)
@@ -25,24 +26,24 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
         } else false
     }
 
-    def unfocus(event: (Int, Int, Int)) = {
-        if(InputHandler.isPressed(event) && !isInside(InputHandler.mousePos) ) {
+    def unfocus(event: InputEvent) = {
+        if(event.isPressed() && !isInside(InputHandler.mousePos) ) {
             typingPos = -1
             func(text)
             (true, false)
         } else (false, false)
     }
 
-    def write(event: (Int, Int, Int)) = {
+    def write(event: InputEvent) = {
         if(typingPos > -1) {
             var b = false
-            if(InputHandler.isCodePoint(event)) {
-                text = text.substring(0, typingPos) + event._1.toChar + text.substring(typingPos, text.length)
+            if(event.isCodePoint()) {
+                text = text.substring(0, typingPos) + event.key.toChar + text.substring(typingPos, text.length)
                 typingPos += 1
                 b = true
-            } else if(InputHandler.isUnAltered(event) && (InputHandler.isPressed(event) || InputHandler.isContinued(event))) {
+            } else if(event.isUnAltered() && (event.isPressed() || event.isContinued())) {
                 b = true
-                event._1 match {
+                event.key match {
                     case 257 => {
                         typingPos = -1
                         func(text)
