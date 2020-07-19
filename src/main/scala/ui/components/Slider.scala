@@ -1,7 +1,6 @@
 package ui.components
 
-import input.InputHandler
-import input.InputEvent
+import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Vector2f, Vector4f}
 import utils.Vals
 
@@ -25,7 +24,7 @@ class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
      */
     override def click(event: InputEvent): Boolean = {
         if(bar.isInside(InputHandler.mousePos) && event.isPressed()) {
-            InputHandler.addMousePressSub((event: InputEvent) => { val b = event.isReleased(); sliding = !b; (b, b)})
+            InputHandler.addMousePressSub((event: InputEvent) => { val b = event.isReleased(); sliding = !b; Feedback.custom(b, b)})
             InputHandler.addMouseMoveSub(slide)
             sliding = true
             calcValue(InputHandler.mousePos)
@@ -43,9 +42,9 @@ class Slider(val par: UIComponent, p: Vector2f, s: Vector2f, c: Vector4f,
         func(value)
     }
 
-    def slide(event: InputEvent) = {
+    def slide(event: InputEvent): Feedback = {
         if(sliding) calcValue(new Vector2f(event.action, event.mods))
-        (!sliding, false)
+        Feedback.custom(!sliding, false)
     }
 
 }

@@ -1,7 +1,6 @@
 package ui.components
 
-import input.InputHandler
-import input.InputEvent
+import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Vector2f, Vector4f}
 import utils.Options
 
@@ -26,15 +25,15 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
         } else false
     }
 
-    def unfocus(event: InputEvent) = {
+    def unfocus(event: InputEvent): Feedback = {
         if(event.isPressed() && !isInside(InputHandler.mousePos) ) {
             typingPos = -1
             func(text)
-            (true, false)
-        } else (false, false)
+            Feedback.Unsubscribe
+        } else Feedback.Passive
     }
 
-    def write(event: InputEvent) = {
+    def write(event: InputEvent): Feedback = {
         if(typingPos > -1) {
             var b = false
             if(event.isCodePoint()) {
@@ -60,8 +59,8 @@ class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: V
                     case _ => b = false
                 }
             }
-            (typingPos == -1, b)
-        } else (true, false)
+            Feedback.custom(typingPos == -1, b)
+        } else Feedback.Unsubscribe
     }
 
 }

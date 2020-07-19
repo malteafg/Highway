@@ -1,7 +1,6 @@
 package rendering
 
-import input.InputHandler
-import input.InputEvent
+import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Matrix4f, Vector2f, Vector3f}
 import utils.{Options, Vals}
 
@@ -66,20 +65,20 @@ class Camera {
     
     def step(a: Float, b: Float, V: Vector3f, T: Vector3f) = T.scale(b).add(V.subtract(T.scale(a)).scale((1.0f - b)/(1.0f - a)))
     
-    def click(event: InputEvent) = {
+    def click(event: InputEvent): Feedback = {
         if(event.isPressed() && event.isWheelClick()) {
             InputHandler.addMouseMoveSub(drag)
             dragging = true
             stop
-            (false, true)
+            Feedback.Block
         } else if(event.isReleased() && event.isWheelClick()) {
             dragging = false
             stop
-            (false, true)
-        } else (false, false)
+            Feedback.Block
+        } else Feedback.Passive
     }
 
-    def keyPress(event: InputEvent) = {
+    def keyPress(event: InputEvent): Feedback = {
         if(!event.isContinued() && event.isUnAltered()) {
             var a = !event.isReleased()
             var b = true
@@ -100,17 +99,17 @@ class Camera {
             
             if(b && a) stop
             
-            (false, b)
-        } else (false, false)
+            Feedback.custom(false, b)
+        } else Feedback.Passive
     }
 
-    def scroll(event: InputEvent) = {
+    def scroll(event: InputEvent): Feedback = {
         orientation.z = Vals.restrain(orientation.z * Math.pow(1.1f, -event.mods).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT)
         stop
-        (false, true)
+        Feedback.Block
     }
 
-    def drag(event: InputEvent) = {
+    def drag(event: InputEvent): Feedback = {
         if(dragging) {
             val newPos = new Vector2f(event.action, event.mods)
             val diff = newPos.subtract(InputHandler.mousePos)
@@ -119,8 +118,8 @@ class Camera {
             orientation.x = Vals.restrain(orientation.x + diff.y / Vals.HEIGHT * 3.0f, Vals.MIN_CAMERA_PITCH, Vals.MAX_CAMERA_PITCH)
             stop
             
-            (false, false)
-        } else (true, false)
+            Feedback.Passive
+        } else Feedback.Unsubscribe
     }
     
     def getCameraPos = {

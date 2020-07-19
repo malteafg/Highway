@@ -9,24 +9,6 @@
 
 
 ### ToDo
-- Game loop √
-  - Threads √
-- Input     √
-  - Ctrl, alt and shift √
-  - Pressed or released √
-  - MouseWheel √
-- UI
-  - Qol rework for panels √
-  - Basic component √
-  - Button √
-  - Slider √
-- Graphics
-  - Open-gl
-  - Buffer stuff
-  - UI
-  - Shaders √
-  - 3D utils.math √
-  
 - Graphics
   - Restructure shader uniforms
   - Shader Storage Objects
@@ -48,7 +30,9 @@
 - UI
   - Restructure UI for panel use
 - Input
-  - Input events
+  - Input events √
+  - Feedback case class √
+  - BSF through UI components then input to game for mouse clicks?
 - Camera
   - Acceleration and deceleration
   - Smooth scrolling

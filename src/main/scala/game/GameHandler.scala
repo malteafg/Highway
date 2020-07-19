@@ -1,37 +1,36 @@
 package game
 
 import game.roads.{RoadSegment, SnapPoint}
-import input.InputHandler
-import input.InputEvent
+import input.{Feedback, InputEvent, InputHandler, Mouse}
 import rendering.{Camera, GameRenderer}
 import utils.graphics.Mesh
 import utils.{Bezier, Vals}
-import utils.math.{Vector3f, Vector4f}
+import utils.math.Vector3f
 
 object GameHandler {
 
-    var game: Game = null
+    var game: Game = _
     val camera = new Camera
 
-    var selectedPos: Vector3f = null
-    var selectedDirection: Vector3f = null
-    var tempSphere: Sphere = null
+    var selectedPos: Vector3f = _
+    var selectedDirection: Vector3f = _
+    var tempSphere: Sphere = _
     var dragging = false
     val terrainCollisionFunc = () => Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f)
 
-    def init() = {
+    def init(): Unit = {
         newGame()
     }
 
-    def newGame() = {
+    def newGame(): Unit = {
         game = new Game()
     }
 
-    def update() = {
+    def update(): Unit = {
         camera.update
     }
     
-    def render() = {
+    def render(): Unit = {
         if(game != null) GameRenderer.render(game, camera)
     }
 
@@ -40,12 +39,15 @@ object GameHandler {
      */
     InputHandler.addMousePressSub(click)
 
-    def click(event: InputEvent) = {
-            if (event.isRightClick() && event.isPressed()) {
+    def click(event: InputEvent): Feedback = mode match {
+        case Free => (event.key, event.action) match {
+            case (Mouse.RIGHT, Mouse.PRESSED) =>
                 game.spheres.addOne(new Sphere(terrainCollisionFunc()))
-                (false, true)
-            }
-             else if (event.key == 0 && event.isPressed()) {
+                Feedback.Block
+            case (_, _) => Feedback.Passive
+        }
+        case Road =>
+            if (event.key == 0 && event.isPressed()) {
                 if (selectedPos == null || selectedDirection == null) {
                     selectedPos = terrainCollisionFunc()
                     game.spheres.addOne(new Sphere(selectedPos, Vals.CONTROL_POINT_COLOR))
@@ -57,8 +59,8 @@ object GameHandler {
                             val p = terrainCollisionFunc()
                             selectedDirection = p.subtract(selectedPos)
                             tempSphere.position = p
-                            (false, false)
-                        } else (true, false)
+                            Feedback.Passive
+                        } else Feedback.Unsubscribe
                     })
                 } else {
                     val array = Bezier.circleCurve(selectedPos, selectedDirection, terrainCollisionFunc())
@@ -75,11 +77,11 @@ object GameHandler {
                         new Mesh(boundaries._1, boundaries._2)))
                 }
 
-                (false, true)
+                Feedback.Block
             } else if (event.key == 0 && event.isReleased()) {
                 dragging = false
-                (false, true)
-            } else (false, false)
+                Feedback.Block
+            } else Feedback.Passive
     }
 
     /**
@@ -91,6 +93,6 @@ object GameHandler {
 
     var mode: Mode = Free
 
-    def placeRoad() = mode = Road
+    def roadMode(): Unit = mode = Road
 
 }

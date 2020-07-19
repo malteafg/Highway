@@ -9,11 +9,11 @@ object InputHandler {
 
     var mousePos: Vector2f = new Vector2f()
 
-    val keyPressSubs: Subscriber    = new Subscriber(_ => (false, false), null)
-    val charSubs: Subscriber        = new Subscriber(_ => (false, false), null)
-    val mousePressSubs: Subscriber  = new Subscriber(_ => (false, false), null)
-    val mouseMoveSubs: Subscriber   = new Subscriber(_ => (false, false), null)
-    val mouseScrollSubs: Subscriber = new Subscriber(_ => (false, false), null)
+    val keyPressSubs: Subscriber    = new Subscriber(_ => Feedback.Passive, null)
+    val charSubs: Subscriber        = new Subscriber(_ => Feedback.Passive, null)
+    val mousePressSubs: Subscriber  = new Subscriber(_ => Feedback.Passive, null)
+    val mouseMoveSubs: Subscriber   = new Subscriber(_ => Feedback.Passive, null)
+    val mouseScrollSubs: Subscriber = new Subscriber(_ => Feedback.Passive, null)
 
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = InputEvent(key, action, mods)
@@ -66,7 +66,7 @@ object InputHandler {
      *             to the next subscriber if true
      * @param prev A reference to another subscriber object usually the head of the list
      */
-    class Subscriber(func: InputEvent => (Boolean, Boolean), var prev: Subscriber) {
+    class Subscriber(func: InputEvent => Feedback, var prev: Subscriber) {
 
         var next: Subscriber = null
         if(prev != null) {
@@ -76,18 +76,18 @@ object InputHandler {
 
         def iterate(event: InputEvent): Unit = {
             val t = func(event)
-            if(t._1) {
+            if(t.unsubscribe) {
                 if(prev != null) prev.next = next
                 if(next != null) next.prev = prev
             }
-            if(next != null && !t._2) next.iterate(event)
+            if(next != null && !t.block) next.iterate(event)
         }
     }
 
-    def addKeyPressSub(func: InputEvent => (Boolean, Boolean)) = new Subscriber(func, keyPressSubs)
-    def addCharSub(func: InputEvent => (Boolean, Boolean)) = new Subscriber(func, charSubs)
-    def addMousePressSub(func: InputEvent => (Boolean, Boolean)) = new Subscriber(func, mousePressSubs)
-    def addMouseMoveSub(func: InputEvent => (Boolean, Boolean)) = new Subscriber(func, mouseMoveSubs)
-    def addMouseScrollSub(func: InputEvent => (Boolean, Boolean)) = new Subscriber(func, mouseScrollSubs)
+    def addKeyPressSub(func: InputEvent => Feedback) = new Subscriber(func, keyPressSubs)
+    def addCharSub(func: InputEvent => Feedback) = new Subscriber(func, charSubs)
+    def addMousePressSub(func: InputEvent => Feedback) = new Subscriber(func, mousePressSubs)
+    def addMouseMoveSub(func: InputEvent => Feedback) = new Subscriber(func, mouseMoveSubs)
+    def addMouseScrollSub(func: InputEvent => Feedback) = new Subscriber(func, mouseScrollSubs)
 
 }

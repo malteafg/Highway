@@ -2,10 +2,9 @@ package ui
 
 import game.GameHandler
 import rendering.{GameRenderer, UIRenderer}
-import input.InputHandler
-import input.InputEvent
+import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Vector2f, Vector4f}
-import ui.components.{Button, RadioButton, Slider, TextField, UIComponent}
+import ui.components.{Button, RadioButton, UIComponent}
 import utils.graphics.Texture
 import utils.{Options, Vals}
 
@@ -31,7 +30,7 @@ object Interface {
     val button3: Button = new Button(panel, new Vector2f(2.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(0, 1, 1, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
-            GameHandler.placeRoad()
+            GameHandler.roadMode()
         })
 
     /*
@@ -54,18 +53,14 @@ object Interface {
         })
      */
 
-    def init: Unit = {
+    def init(): Unit = {
         InputHandler.addMousePressSub(mousePressed)
         InputHandler.addMouseScrollSub(mousePressed)
         UIRenderer.init()
     }
 
-    def render(): Unit = {
-        UIRenderer.render(screen)
-    }
+    def render(): Unit = UIRenderer.render(screen)
 
-    def mousePressed(event: InputEvent) = {
-        (false, screen.click(event))
-    }
+    def mousePressed(event: InputEvent): Feedback = Feedback.custom(false, block = screen.click(event))
 
 }
