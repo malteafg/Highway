@@ -37,9 +37,9 @@ object Vals {
 
     def restrain(value: Float, min: Float, max: Float): Float = if(value < min) min else if(value > max) max else value
     
-    def square(value: Float) = value * value
+    def square(value: Float): Float = value * value
     
-    def center(v: Float, r: Float) = {
+    def center(v: Float, r: Float): Float = {
         val f = v % (2 * r)
         if(f > r) f - 2 * r else if(f < -r) f + 2 * r else f
     }
@@ -47,7 +47,6 @@ object Vals {
     def toRadians(deg: Float) = deg * Math.PI.toFloat / 180
     
     def getRay(vec: Vector2f) = {
-        
         val eyeVector = perspectiveMatrix.invert.multiply(vec.toScreenVector.fill(1.0f, 1.0f))
         val worldVector = GameHandler.camera.getViewMatrix.invert.multiply(new Vector4f(eyeVector.x, eyeVector.y, -1f, 0))
         worldVector.xyz.normalize.negate
@@ -73,7 +72,7 @@ object Vals {
         }
     }
     
-    val perspectiveMatrix = Matrix4f.perspective(30, 0.1f, 10000f)
+    val perspectiveMatrix = Matrix4f.perspective(30, 1f, 10000f)
     val UIProjMatrix = Matrix4f.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
     
     

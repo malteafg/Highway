@@ -4,15 +4,17 @@ import utils.{Bezier, Vals}
 import utils.graphics.Mesh
 import utils.math.Vector3f
 
+import scala.collection.mutable
+
 // straight roads have empty controlpoints
-class RoadSegment(startPoint: Node, endPoint: Node, controlPoints: Array[Vector3f], var mesh: Mesh) {
+class RoadSegment(startPoint: RoadNode, endPoint: RoadNode, var mesh: Mesh) {
 
     /**
      * Constructors
      */
     // used for preview road
     def this(selectedPos: Vector3f) {
-        this(new Node(new Vector3f(), new Vector3f()), new Node(new Vector3f(), new Vector3f()), new Array[Vector3f](0),
+        this(new RoadNode(new Vector3f(), new Vector3f()), new RoadNode(new Vector3f(), new Vector3f()),
             RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(new Vector3f(0, 0, 1f))))
     }
 
@@ -37,9 +39,10 @@ object RoadSegment {
         new Mesh(vertices, indices, Array(3))
     }
 
-    def generateCurvedMesh(pos: Vector3f, dir: Vector3f, point: Vector3f): Mesh = {
+    def generateCurvedMesh(pos: Vector3f, dir: Vector3f, point: Vector3f): (Mesh, Vector3f) = {
         val controlPoints = Bezier.circleCurve(pos, dir, point)
-        val numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt
+        var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt
+        if (numOfCuts < 2) numOfCuts = 2
         val vertices = new Array[Vector3f](numOfCuts * 4)
 
         for(p <- 0 until vertices.length by 4) {
@@ -52,7 +55,7 @@ object RoadSegment {
         }
 
         val indices = generateIndices(numOfCuts)
-        new Mesh(vertices, indices, Array(3))
+        (new Mesh(vertices, indices, Array(3)), controlPoints(3).subtract(controlPoints(2)))
     }
 
     private def roadCut(pos: Vector3f, dir: Vector3f, roadWidth: Float): Array[Vector3f] = {
@@ -69,47 +72,52 @@ object RoadSegment {
     }
 
     private def generateIndices(numOfCuts: Int): Array[Int] = {
-        // 6 for triangles at each end
-        val indices = new Array[Int](6 + (numOfCuts - 1) * 6 * 3 + 6)
+        indicesMap.getOrElse(numOfCuts, {
+            // 6 for triangles at each end
+            val indices = new Array[Int](6 + (numOfCuts - 1) * 6 * 3 + 6)
 
-        indices(0) = 0
-        indices(1) = 1
-        indices(2) = 2
-        indices(3) = 2
-        indices(4) = 3
-        indices(5) = 0
+            indices(0) = 0
+            indices(1) = 1
+            indices(2) = 2
+            indices(3) = 2
+            indices(4) = 3
+            indices(5) = 0
 
-        for(i <- 0 until numOfCuts - 1) {
-            indices(i * 18 + 6 + 0)  = i * 4 + 0
-            indices(i * 18 + 6 + 1)  = i * 4 + 0 + 4
-            indices(i * 18 + 6 + 2)  = i * 4 + 3 + 4
-            indices(i * 18 + 6 + 3)  = i * 4 + 3 + 4
-            indices(i * 18 + 6 + 4)  = i * 4 + 3
-            indices(i * 18 + 6 + 5)  = i * 4 + 0
+            for(i <- 0 until numOfCuts - 1) {
+                indices(i * 18 + 6 + 0)  = i * 4 + 0
+                indices(i * 18 + 6 + 1)  = i * 4 + 3 + 4
+                indices(i * 18 + 6 + 2)  = i * 4 + 0 + 4
+                indices(i * 18 + 6 + 3)  = i * 4 + 3 + 4
+                indices(i * 18 + 6 + 4)  = i * 4 + 0
+                indices(i * 18 + 6 + 5)  = i * 4 + 3
 
-            indices(i * 18 + 6 + 6)  = i * 4 + 3
-            indices(i * 18 + 6 + 7)  = i * 4 + 3 + 4
-            indices(i * 18 + 6 + 8)  = i * 4 + 2 + 4
-            indices(i * 18 + 6 + 9)  = i * 4 + 2 + 4
-            indices(i * 18 + 6 + 10) = i * 4 + 2
-            indices(i * 18 + 6 + 11) = i * 4 + 3
+                indices(i * 18 + 6 + 6)  = i * 4 + 3
+                indices(i * 18 + 6 + 7)  = i * 4 + 2 + 4
+                indices(i * 18 + 6 + 8)  = i * 4 + 3 + 4
+                indices(i * 18 + 6 + 9)  = i * 4 + 2 + 4
+                indices(i * 18 + 6 + 10) = i * 4 + 3
+                indices(i * 18 + 6 + 11) = i * 4 + 2
 
-            indices(i * 18 + 6 + 12) = i * 4 + 2
-            indices(i * 18 + 6 + 13) = i * 4 + 2 + 4
-            indices(i * 18 + 6 + 14) = i * 4 + 1 + 4
-            indices(i * 18 + 6 + 15) = i * 4 + 1 + 4
-            indices(i * 18 + 6 + 16) = i * 4 + 1
-            indices(i * 18 + 6 + 17) = i * 4 + 2
-        }
+                indices(i * 18 + 6 + 12) = i * 4 + 2
+                indices(i * 18 + 6 + 13) = i * 4 + 1 + 4
+                indices(i * 18 + 6 + 14) = i * 4 + 2 + 4
+                indices(i * 18 + 6 + 15) = i * 4 + 1 + 4
+                indices(i * 18 + 6 + 16) = i * 4 + 2
+                indices(i * 18 + 6 + 17) = i * 4 + 1
+            }
 
-        indices(indices.length - 6) = (numOfCuts - 1) * 4 + 0
-        indices(indices.length - 5) = (numOfCuts - 1) * 4 + 1
-        indices(indices.length - 4) = (numOfCuts - 1) * 4 + 2
-        indices(indices.length - 3) = (numOfCuts - 1) * 4 + 2
-        indices(indices.length - 2) = (numOfCuts - 1) * 4 + 3
-        indices(indices.length - 1) = (numOfCuts - 1) * 4 + 0
+            indices(indices.length - 6) = (numOfCuts - 1) * 4 + 0
+            indices(indices.length - 5) = (numOfCuts - 1) * 4 + 1
+            indices(indices.length - 4) = (numOfCuts - 1) * 4 + 2
+            indices(indices.length - 3) = (numOfCuts - 1) * 4 + 2
+            indices(indices.length - 2) = (numOfCuts - 1) * 4 + 3
+            indices(indices.length - 1) = (numOfCuts - 1) * 4 + 0
 
-        indices
+            indicesMap.put(numOfCuts, indices)
+            indices
+        })
     }
+
+    private val indicesMap = mutable.Map[Int, Array[Int]]()
 
 }

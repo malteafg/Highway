@@ -24,8 +24,8 @@ object OBJLoader {
                         vertices.addOne(currentLine(3).toFloat)
                     case "f" =>
                         indices.addOne(currentLine(1).toInt - 1)
-                        indices.addOne(currentLine(2).toInt - 1)
                         indices.addOne(currentLine(3).toInt - 1)
+                        indices.addOne(currentLine(2).toInt - 1)
                     case _ =>
                 }
                 line = reader.readLine()

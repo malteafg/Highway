@@ -1,34 +1,21 @@
 package rendering
 
 import game.{Game, GameHandler, Sphere}
-import org.lwjgl.opengl.GL11.{GL_TRIANGLES, GL_UNSIGNED_INT, glDrawElements}
+import org.lwjgl.opengl.GL11.{GL_BACK, GL_CULL_FACE, GL_TRIANGLES, GL_UNSIGNED_INT, glCullFace, glDrawElements, glEnable, glDisable}
 import utils.Vals
 import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import utils.math.{Matrix4f, Vector2f, Vector4f}
 
 object GameRenderer {
 
-    val va = new VertexArray
-    val vb = new VertexBuffer(Array(    -0.5f, 0,  0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-        0f,  1f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0f,    0f, 1.0f, 0.0f, 1.0f, 1.0f,
-        0f, 0f,   -1f, 0.0f, 1.0f, 1.0f, 1.0f))
-    val layout = new VertexBufferLayout
-    val ib = new IndexBuffer(Array(0, 1, 2, 2, 3, 0, 0, 1, 3, 3, 2, 1), 12)
-    var transformationMatrix = Matrix4f.place(0, 0, 0, Vals.toRadians(90))
-    var darkEdges = false;
-
-    layout.pushFloat(3)
-    layout.pushFloat(4)
-    va.addBuffer(vb, layout)
+    var darkEdges = false
 
     val terrainShader = Shader.get("terrain")
 
     def render(game: Game, camera: Camera) = {
-        Shader.get("pyramid").bind()
-        Shader.get("pyramid").loadUniformMat4f("transformationMatrix", transformationMatrix)
-        Shader.get("pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
-        draw(va, ib)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+
         Shader.get("sphere").bind()
         Shader.get("sphere").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("sphere").loadUniformVec3f("cameraPos", camera.getCameraPos)
@@ -72,6 +59,8 @@ object GameRenderer {
         }
         Shader.get("road").loadUniformVec4f("in_Color", new Vector4f(0.3f, 0.3f, 0.9f, 0.7f))
         if(GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
+
+        glDisable(GL_CULL_FACE)
     }
 
     def draw(mesh: Mesh): Unit = draw(mesh.va, mesh.ib)

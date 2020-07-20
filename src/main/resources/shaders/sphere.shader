@@ -35,7 +35,7 @@ float calcBorder(vec3 n, vec3 c, float a) {
 }
 
 void main() {
-    vec3 normal = normalize(cross(worldPosition[1] - worldPosition[0], worldPosition[2] - worldPosition[0]));
+    vec3 normal = -normalize(cross(worldPosition[1] - worldPosition[0], worldPosition[2] - worldPosition[0]));
     float avgDot = dot(normal, normalize(cameraPos - (worldPosition[0] + worldPosition[1] + worldPosition[2]) / 3.0f));
 
     faceNormal = normal;
