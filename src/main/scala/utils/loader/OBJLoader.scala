@@ -36,7 +36,7 @@ object OBJLoader {
                 System.exit(-1)
         }
 
-        new Mesh(vertices.toArray, indices.toArray)
+        new Mesh(vertices.toArray, indices.toArray, Array(3))
     }
 
 }

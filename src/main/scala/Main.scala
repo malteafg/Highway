@@ -59,9 +59,9 @@ object Main {
 
         // loading
         Shader.loadShader("UI", Vals.UIProjMatrix)
-        Shader.loadShader("Pyramid", Vals.perspectiveMatrix)
+        Shader.loadShader("pyramid", Vals.perspectiveMatrix)
         Shader.loadShader("sphere", Vals.perspectiveMatrix)
-        Shader.loadShader("Terrain", Vals.perspectiveMatrix)
+        Shader.loadShader("terrain", Vals.perspectiveMatrix)
         Shader.loadShader("road", Vals.perspectiveMatrix)
 
         // initialization

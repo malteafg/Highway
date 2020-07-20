@@ -2,13 +2,16 @@
 #version 450 core
 
 layout(location = 0) in vec3 a_Position;
+layout(location = 1) in vec4 a_Color;
 
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
 out vec2 worldPos;
+flat out vec4 v_Color;
 
 void main() {
+    v_Color = a_Color;
     worldPos = a_Position.xz;
     gl_Position = projMatrix * viewMatrix * vec4(a_Position, 1.0f);
 }
@@ -24,6 +27,7 @@ uniform float width[1];
 uniform vec4 color[1];
 
 in vec2 worldPos;
+flat in vec4 v_Color;
 
 float distToLine(int line) {
     if(dot(worldPos - pos1[line], pos2[line] - pos1[line]) < 0) return length(worldPos - pos1[line]);
@@ -46,5 +50,5 @@ float smoothEdge(float f) {
 void main() {
     float dist = distToLine(0);
     bool b = dist <= width[0] / 2.0f;
-    o_Color = addColors(vec4(0.29f, 0.61f, 0.24f, 1.0f), (b ? color[0] : vec4(0,0,0,0)), b ? smoothEdge(2 * dist / width[0]) : 1.0);
+    o_Color = addColors(v_Color, (b ? color[0] : vec4(0,0,0,0)), b ? smoothEdge(2 * dist / width[0]) : 1.0);
 }

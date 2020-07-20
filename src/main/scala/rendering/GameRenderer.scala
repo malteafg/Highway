@@ -5,7 +5,7 @@ import java.nio.FloatBuffer
 import game.{Game, Sphere}
 import org.lwjgl.opengl.GL11.{GL_TRIANGLES, GL_UNSIGNED_INT, glDrawElements}
 import utils.Vals
-import utils.graphics.{IndexBuffer, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
+import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
 import utils.loader.OBJLoader
 import utils.math.{Matrix4f, Vector2f, Vector4f}
 
@@ -27,11 +27,13 @@ object GameRenderer {
     layout.pushFloat(4)
     va.addBuffer(vb, layout)
 
+    val terrainShader = Shader.get("terrain")
+
     def render(game: Game, camera: Camera) = {
     
-        Shader.get("Pyramid").bind()
-        Shader.get("Pyramid").loadUniformMat4f("transformationMatrix", transformationMatrix)
-        Shader.get("Pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
+        Shader.get("pyramid").bind()
+        Shader.get("pyramid").loadUniformMat4f("transformationMatrix", transformationMatrix)
+        Shader.get("pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
         draw(va, ib)
         Shader.get("sphere").bind()
         Shader.get("sphere").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
@@ -43,8 +45,8 @@ object GameRenderer {
             draw(Sphere.mesh.va, Sphere.mesh.ib)
         })
 
-        game.terrain.terrainShader.bind()
-        game.terrain.terrainShader.loadUniformMat4f("viewMatrix", camera.getViewMatrix)
+        terrainShader.bind()
+        terrainShader.loadUniformMat4f("viewMatrix", camera.getViewMatrix)
 
         // load lines for terrain
         val lines = game.terrain.lines
@@ -61,11 +63,11 @@ object GameRenderer {
             color(counter) = line._4
             counter += 1
         })
-        game.terrain.terrainShader.setUniformVec2fa("pos1", pos1)
-        game.terrain.terrainShader.setUniformVec2fa("pos2", pos2)
-        game.terrain.terrainShader.setUniform1fa("width", width)
-        game.terrain.terrainShader.setUniformVec4fa("color", color)
-        draw(game.terrain.va, game.terrain.ib)
+        terrainShader.setUniformVec2fa("pos1", pos1)
+        terrainShader.setUniformVec2fa("pos2", pos2)
+        terrainShader.setUniform1fa("width", width)
+        terrainShader.setUniformVec4fa("color", color)
+        draw(game.terrain.terrainMesh)
 
         // render road segments
         Shader.get("road").bind()
@@ -74,6 +76,8 @@ object GameRenderer {
             draw(s.mesh.va, s.mesh.ib)
         }
     }
+
+    def draw(mesh: Mesh): Unit = draw(mesh.va, mesh.ib)
 
     def draw(va: VertexArray, ib: IndexBuffer): Unit = {
         va.bind()

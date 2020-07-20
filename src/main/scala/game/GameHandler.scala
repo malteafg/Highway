@@ -40,11 +40,11 @@ object GameHandler {
     InputHandler.addMousePressSub(click)
 
     def click(event: InputEvent): Feedback = mode match {
-        case Free => (event.key, event.action) match {
-            case (Mouse.RIGHT, Mouse.PRESSED) =>
+        case Free => event match {
+            case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) =>
                 game.spheres.addOne(new Sphere(terrainCollisionFunc()))
                 Feedback.Block
-            case (_, _) => Feedback.Passive
+            case _ => Feedback.Passive
         }
         case Road =>
             if (event.key == 0 && event.isPressed()) {
@@ -74,7 +74,7 @@ object GameHandler {
                         new SnapPoint(array(0), array(1).subtract(array(0))),
                         new SnapPoint(array(3), array(2).subtract(array(3))),
                         array,
-                        new Mesh(boundaries._1, boundaries._2)))
+                        new Mesh(boundaries._1, boundaries._2, Array(3))))
                 }
 
                 Feedback.Block

@@ -7,7 +7,6 @@
 - Usable and visible UI
 - Green plane on white background, movable camera by mouse input with restrictions
 
-
 ### ToDo
 - Graphics
   - Restructure shader uniforms
@@ -16,7 +15,7 @@
   - Textured 3d models
   - Text rendering
   - Skybox
-  - Simple terrain texturing
+  - Simple terrain mesh and colors √
 - Roads
   - Straight road segment
   - Curved road segment
@@ -32,8 +31,10 @@
 - Input
   - Input events √
   - Feedback case class √
-  - BSF through UI components then input to game for mouse clicks?
 - Camera
   - Acceleration and deceleration
   - Smooth scrolling
+- Optimization
+  - BSF through UI components then input to game for mouse clicks?
+  - Terrain shader only calculate lines if line is in triangle 
 
