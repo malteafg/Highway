@@ -18,4 +18,13 @@ class Mesh(vertices: Array[Float], indices: Array[Int], layout: Array[Int]) {
         this(Vector3f.convertToFloatArray(vertices), indices, layout)
     }
 
+    /**
+     * Functions
+     */
+    def delete(): Unit = {
+        va.delete()
+        vb.delete()
+        ib.delete()
+    }
+
 }

@@ -27,10 +27,16 @@ object Interface {
             GameHandler.game.spheres.clear()
         })
 
-    val button3: Button = new Button(panel, new Vector2f(2.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(0, 1, 1, 1),
+    val straight: Button = new Button(panel, new Vector2f(2.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(0, 1, 1, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
-            GameHandler.roadMode()
+            GameHandler.straightRoad()
+        })
+
+    val curved: Button = new Button(panel, new Vector2f(3.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(0, 1, 0, 1),
+        () => "Bottom button", () => {
+            Options.log(s"Bottom button says click!", Options.Button)
+            GameHandler.curvedRoad()
         })
 
     /*

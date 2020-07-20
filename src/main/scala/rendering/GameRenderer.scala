@@ -1,15 +1,10 @@
 package rendering
 
-import java.nio.FloatBuffer
-
-import game.{Game, Sphere}
+import game.{Game, GameHandler, Sphere}
 import org.lwjgl.opengl.GL11.{GL_TRIANGLES, GL_UNSIGNED_INT, glDrawElements}
 import utils.Vals
 import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
-import utils.loader.OBJLoader
 import utils.math.{Matrix4f, Vector2f, Vector4f}
-
-import scala.collection.mutable._
 
 object GameRenderer {
 
@@ -30,7 +25,6 @@ object GameRenderer {
     val terrainShader = Shader.get("terrain")
 
     def render(game: Game, camera: Camera) = {
-    
         Shader.get("pyramid").bind()
         Shader.get("pyramid").loadUniformMat4f("transformationMatrix", transformationMatrix)
         Shader.get("pyramid").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
@@ -72,9 +66,12 @@ object GameRenderer {
         // render road segments
         Shader.get("road").bind()
         Shader.get("road").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
+        Shader.get("road").loadUniformVec4f("in_Color", new Vector4f(0.4f, 0.4f, 0.4f, 1.0f))
         for(s <- game.roads) {
             draw(s.mesh.va, s.mesh.ib)
         }
+        Shader.get("road").loadUniformVec4f("in_Color", new Vector4f(0.3f, 0.3f, 0.9f, 0.7f))
+        if(GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
     }
 
     def draw(mesh: Mesh): Unit = draw(mesh.va, mesh.ib)

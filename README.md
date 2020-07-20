@@ -3,38 +3,18 @@
 
 ## Project about highways
 
-## Milestone
+## Milestones
 - Usable and visible UI
 - Green plane on white background, movable camera by mouse input with restrictions
 
-### ToDo
-- Graphics
-  - Restructure shader uniforms
-  - Shader Storage Objects
-  - Abstract batch rendering for easier use
-  - Textured 3d models
-  - Text rendering
-  - Skybox
-  - Simple terrain mesh and colors √
-- Roads
-  - Straight road segment
-  - Curved road segment
-  - Lanes in road segments
-  - Segment snapping
-  - Lane snapping
-  - Remove bottom faces of roads
-  - Asphalt texturing
-- Utils
-  - Make all math utils useable statically
-- UI
-  - Restructure UI for panel use
-- Input
-  - Input events √
-  - Feedback case class √
-- Camera
-  - Acceleration and deceleration
-  - Smooth scrolling
-- Optimization
-  - BSF through UI components then input to game for mouse clicks?
-  - Terrain shader only calculate lines if line is in triangle 
+## Todo
+https://trello.com/b/5XTbD0qW/highway-architect
+
+## Readable code
+- Always write return types on defs
+- Let vars and vals have names of at least three letters unless used in a simple structure (as an iterator or in a fold for instance)
+- Always add empty parenthesis such as to distinguish between defs and vars/vals unless accessor def
+- Use _ instead of null when first initializing
+- Don't call an Array array, call it what it is
+
 

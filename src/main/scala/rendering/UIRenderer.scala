@@ -15,7 +15,7 @@ import utils.math.{Vector2f, Vector4f}
 
 import scala.collection.mutable
 
-final object UIRenderer {
+object UIRenderer {
 
     final val maxQuadCount = 2
     final val maxVertexCount = maxQuadCount * 4
@@ -237,7 +237,6 @@ final object UIRenderer {
             }
         }
         UIRenderer.flush()
-
         glEnable(GL_DEPTH_TEST)
     }
 

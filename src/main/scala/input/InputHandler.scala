@@ -22,6 +22,10 @@ object InputHandler {
         Options.log(s"Ctrl: ${event.isControlDown()}, Alt: ${event.isAltDown()}, Shift: ${event.isShiftDown()}, none: ${event.isUnAltered()}", Options.Keys)
         Options.log("", Options.Keys)
 
+        Keys.CONTROL_DOWN = event.isControlDown()
+        Keys.SHIFT_DOWN = event.isShiftDown()
+        Keys.ALT_DOWN = event.isAltDown()
+
         if(charSubs.next == null) keyPressSubs.iterate(event)
         else charSubs.iterate(event)
     }

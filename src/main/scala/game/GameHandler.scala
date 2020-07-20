@@ -1,19 +1,15 @@
 package game
 
-import game.roads.{RoadSegment, SnapPoint}
-import input.{Feedback, InputEvent, InputHandler, Mouse}
+import game.roads.{Node, RoadSegment}
+import input.{Feedback, InputEvent, InputHandler, Keys, Mouse}
 import rendering.{Camera, GameRenderer}
-import utils.graphics.Mesh
-import utils.{Bezier, Vals}
+import utils.Vals
 import utils.math.Vector3f
 
 object GameHandler {
 
     var game: Game = _
     val camera = new Camera
-
-    var selectedPos: Vector3f = _
-    var selectedDirection: Vector3f = _
     var tempSphere: Sphere = _
     var dragging = false
     val terrainCollisionFunc = () => Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f)
@@ -46,42 +42,71 @@ object GameHandler {
                 Feedback.Block
             case _ => Feedback.Passive
         }
-        case Road =>
-            if (event.key == 0 && event.isPressed()) {
-                if (selectedPos == null || selectedDirection == null) {
-                    selectedPos = terrainCollisionFunc()
-                    game.spheres.addOne(new Sphere(selectedPos, Vals.CONTROL_POINT_COLOR))
-                    tempSphere = new Sphere(selectedPos, Vals.CONTROL_POINT_COLOR)
-                    game.spheres.addOne(tempSphere)
-                    dragging = true
-                    InputHandler.addMouseMoveSub(_ => {
-                        if (dragging) {
-                            val p = terrainCollisionFunc()
-                            selectedDirection = p.subtract(selectedPos)
-                            tempSphere.position = p
-                            Feedback.Passive
-                        } else Feedback.Unsubscribe
-                    })
-                } else {
-                    val array = Bezier.circleCurve(selectedPos, selectedDirection, terrainCollisionFunc())
-                    val boundaries = Bezier.triangulate(array, 3f * Vals.LARGE_LANE_WIDTH)
-                    selectedPos = null
-                    selectedDirection = null
-                    tempSphere.position = array(1)
-                    game.spheres.addOne(new Sphere(array(2), Vals.CONTROL_POINT_COLOR))
-                    game.spheres.addOne(new Sphere(array(3), Vals.CONTROL_POINT_COLOR))
-                    game.roads.addOne(new RoadSegment(
-                        new SnapPoint(array(0), array(1).subtract(array(0))),
-                        new SnapPoint(array(3), array(2).subtract(array(3))),
-                        array,
-                        new Mesh(boundaries._1, boundaries._2, Array(3))))
-                }
+        case StraightRoad =>
+            event match {
+                case InputEvent(Mouse.LEFT, Mouse.PRESSED, _) =>
+                    if (selectedPos == null) startRoadPreview()
+                    else {
+                        val currentPos = terrainCollisionFunc()
+                        game.roads.addOne(new RoadSegment(
+                            new Node(selectedPos, currentPos.subtract(selectedPos)),
+                            new Node(currentPos, currentPos.subtract(selectedPos)),
+                            new Array[Vector3f](0),
+                            RoadSegment.generateStraightMesh(selectedPos, currentPos)
+                        ))
+                        resetPreview()
+                    }
+                    Feedback.Block
+                case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) =>
+                    if (selectedPos == null) freeMode()
+                    else resetPreview()
+                    Feedback.Block
+                case _ => Feedback.Passive
+            }
+        case CurveRoad =>
+            event match {
+                case InputEvent(Mouse.LEFT, Mouse.PRESSED, _) =>
+                    if (selectedPos == null) startRoadPreview()
+                    else if (selectedDirection == null) selectedDirection = terrainCollisionFunc().subtract(selectedPos)
+                    else {
+                        val currentPos = terrainCollisionFunc()
+                        game.roads.addOne(new RoadSegment(
+                            new Node(selectedPos, selectedDirection),
+                            new Node(currentPos, currentPos.subtract(selectedPos)),
+                            new Array[Vector3f](0),
+                            RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, currentPos)
+                        ))
+                        selectedPos = null
+                        selectedDirection = null
+                        previewRoad = null
+                    }
+                    Feedback.Block
+                case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) =>
+                    if (selectedPos == null) freeMode()
+                    else if (selectedDirection == null) resetPreview()
+                    else selectedDirection = null
+                    Feedback.Block
+                case _ => Feedback.Passive
+            }
+        case _ => Feedback.Passive
+    }
 
-                Feedback.Block
-            } else if (event.key == 0 && event.isReleased()) {
-                dragging = false
-                Feedback.Block
-            } else Feedback.Passive
+    private def resetPreview(): Unit = {
+        selectedPos = null
+        selectedDirection = null
+        previewRoad = null
+    }
+
+    private def startRoadPreview(): Unit = {
+        selectedPos = terrainCollisionFunc()
+        previewRoad = new RoadSegment(selectedPos)
+        InputHandler.addMouseMoveSub(_ => {
+            if (previewRoad == null) Feedback.Unsubscribe else {
+                if (selectedDirection == null) previewRoad.updateMesh(RoadSegment.generateStraightMesh(selectedPos, terrainCollisionFunc()))
+                else previewRoad.updateMesh(RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, terrainCollisionFunc()))
+                Feedback.Passive
+            }
+        })
     }
 
     /**
@@ -89,10 +114,30 @@ object GameHandler {
      */
     sealed trait Mode
     case object Free extends Mode
-    case object Road extends Mode
+    case object StraightRoad extends Mode
+    case object CurveRoad extends Mode
 
     var mode: Mode = Free
 
-    def roadMode(): Unit = mode = Road
+    def straightRoad(): Unit = {
+        mode = StraightRoad
+        selectedDirection = null
+    }
+
+    def curvedRoad(): Unit = {
+        mode = CurveRoad
+    }
+
+    def freeMode(): Unit = {
+        resetPreview()
+        mode = Free
+    }
+
+    /**
+     * Road preview
+     */
+    var selectedPos: Vector3f = _
+    var selectedDirection: Vector3f = _
+    var previewRoad: RoadSegment = _
 
 }

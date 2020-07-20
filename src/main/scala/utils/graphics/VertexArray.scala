@@ -23,4 +23,6 @@ class VertexArray {
     def bind(): Unit = glBindVertexArray(renderID)
     def unbind(): Unit = glBindVertexArray(0)
 
+    def delete(): Unit = glDeleteVertexArrays(renderID)
+
 }

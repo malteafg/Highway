@@ -42,7 +42,7 @@ object Bezier {
         v.scale(points.length)
     }
 
-    def circleCurve(v1: Vector3f, r: Vector3f, v2: Vector3f) = {
+    def circleCurve(v1: Vector3f, r: Vector3f, v2: Vector3f): Array[Vector3f] = {
         val points = new Array[Vector3f](4)
 
         val ab = v2.subtract(v1)

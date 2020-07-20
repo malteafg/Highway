@@ -3,7 +3,6 @@ package game.terrain
 import utils.graphics._
 import utils.math.Vector4f
 
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Terrain {

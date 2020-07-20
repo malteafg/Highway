@@ -16,6 +16,8 @@ void main() {
 
 layout(location = 0) out vec4 o_Color;
 
+uniform vec4 in_Color;
+
 void main() {
-    o_Color = vec4(0.2f, 0.2f, 0.2f, 1.0f);
+    o_Color = in_Color;
 }
