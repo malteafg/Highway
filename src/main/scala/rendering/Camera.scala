@@ -1,21 +1,21 @@
 package rendering
 
 import input.{Feedback, InputEvent, InputHandler}
-import utils.math.{Matrix4f, Vector2f, Vector3f}
+import utils.math.{Mat4, Vec2, Vec3}
 import utils.{Options, Vals}
 
 class Camera {
 
     // x = pitch, y = yaw, z = dist to target
     var orientation = Vals.CAMERA_STANDARD_ORIENTATION
-    var targetPos   = new Vector3f()
+    var targetPos   = new Vec3()
 
     var input: Array[Boolean] = new Array[Boolean](6)
-    
+
     var dragging: Boolean = false
 
-    var nextOrientation:  Vector3f = new Vector3f(0.4f, 0, 10.0f)
-    var nextTargetPos:    Vector3f = new Vector3f(0, 0f, 0.0f)
+    var nextOrientation:  Vec3 = new Vec3(0.4f, 0, 10.0f)
+    var nextTargetPos:    Vec3 = new Vec3(0, 0f, 0.0f)
 
     var progress = 0.0f
     var progressionSpeed = Vals.CAMERA_MOVE_SPEED
@@ -31,10 +31,10 @@ class Camera {
             val currentNLP = progressionFunction(progress)
             progress       = Math.min(progress + progressionSpeed, 1.0f)
             val nextNLP    = progressionFunction(progress)
-            
+
             orientation = step(currentNLP, nextNLP, orientation, nextOrientation)
             targetPos   = step(currentNLP, nextNLP, targetPos,   nextTargetPos)
-            
+
             if(progress == 1.0f) stop
         } else {
             val speed = Vals.CAMERA_MOVE_SPEED * orientation.z
@@ -42,12 +42,12 @@ class Camera {
             if(input(1)) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed))
             if(input(2)) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed))
             if(input(3)) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed))
-            if(input(4)) orientation.y = Vals.center(orientation.y + 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat)
-            if(input(5)) orientation.y = Vals.center(orientation.y - 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat)
+            if(input(4)) orientation = orientation.y(Vals.center(orientation.y + 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat))
+            if(input(5)) orientation = orientation.y(Vals.center(orientation.y - 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat))
         }
     }
-    
-    def move(pos: Vector3f, direction: Vector3f, speed: Float, func: Float => Float): Unit = {
+
+    def move(pos: Vec3, direction: Vec3, speed: Float, func: Float => Float): Unit = {
         nextTargetPos = pos
         nextOrientation = direction
         progressionSpeed = speed
@@ -56,15 +56,15 @@ class Camera {
     }
 
     def stop = progressionSpeed = 0
-    
+
     def linearMove(f: Float) = f
-    
+
     def smoothMove(f: Float) = (Vals.CAMERA_MOVE_SMOOTH_FACTOR + 1) / 2.0f *
-        (2 * f - 1) / Math.sqrt(Vals.square(Vals.CAMERA_MOVE_SMOOTH_FACTOR) * (Vals.square(2 * f - 1) - 1) +
-        Vals.square(Vals.CAMERA_MOVE_SMOOTH_FACTOR + 1)).toFloat + 0.5f
-    
-    def step(a: Float, b: Float, V: Vector3f, T: Vector3f) = T.scale(b).add(V.subtract(T.scale(a)).scale((1.0f - b)/(1.0f - a)))
-    
+      (2 * f - 1) / Math.sqrt(Vals.square(Vals.CAMERA_MOVE_SMOOTH_FACTOR) * (Vals.square(2 * f - 1) - 1) +
+      Vals.square(Vals.CAMERA_MOVE_SMOOTH_FACTOR + 1)).toFloat + 0.5f
+
+    def step(a: Float, b: Float, V: Vec3, T: Vec3) = T.scale(b).add(V.subtract(T.scale(a)).scale((1.0f - b)/(1.0f - a)))
+
     def click(event: InputEvent): Feedback = {
         if(event.isPressed() && event.isWheelClick()) {
             InputHandler.addMouseMoveSub(drag)
@@ -90,49 +90,49 @@ class Camera {
                 case 69 => input(4) = a
                 case 81 => input(5) = a
                 case 32 => if(progressionSpeed <= 0 && a) {
-                        move(new Vector3f(), Vals.CAMERA_STANDARD_ORIENTATION, Vals.CAMERA_MOVE_SPEED, smoothMove)
-                        a = false
+                    move(new Vec3(), Vals.CAMERA_STANDARD_ORIENTATION, Vals.CAMERA_MOVE_SPEED, smoothMove)
+                    a = false
                 }
-                case 90 => orientation.x = Math.PI.toFloat / 2
+                case 90 => orientation = orientation.x(Math.PI.toFloat / 2)
                 case _ => b = false
             }
-            
+
             if(b && a) stop
-            
+
             Feedback.custom(false, b)
         } else Feedback.Passive
     }
 
     def scroll(event: InputEvent): Feedback = {
-        orientation.z = Vals.restrain(orientation.z * Math.pow(1.1f, -event.mods).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT)
+        orientation = orientation.z(Vals.restrain(orientation.z * Math.pow(1.1f, -event.mods).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT))
         stop
         Feedback.Block
     }
 
     def drag(event: InputEvent): Feedback = {
         if(dragging) {
-            val newPos = new Vector2f(event.action, event.mods)
+            val newPos = new Vec2(event.action, event.mods)
             val diff = newPos.subtract(InputHandler.mousePos)
 
-            orientation.y = Vals.center(orientation.y - diff.x / Vals.WIDTH * 5.0f, Math.PI.toFloat)
-            orientation.x = Vals.restrain(orientation.x + diff.y / Vals.HEIGHT * 3.0f, Vals.MIN_CAMERA_PITCH, Vals.MAX_CAMERA_PITCH)
+            orientation = orientation.y(Vals.center(orientation.y - diff.x / Vals.WIDTH * 5.0f, Math.PI.toFloat))
+            orientation = orientation.x(Vals.restrain(orientation.x + diff.y / Vals.HEIGHT * 3.0f, Vals.MIN_CAMERA_PITCH, Vals.MAX_CAMERA_PITCH))
             stop
-            
+
             Feedback.Passive
         } else Feedback.Unsubscribe
     }
-    
+
     def getCameraPos = {
         val horizontalDist = Math.cos(orientation.x).toFloat
         val verticalDist = Math.sin(orientation.x).toFloat
 
         val pos = targetPos.add(getDirectionVector(orientation.y).scale(horizontalDist)
-                 .add(new Vector3f(0, verticalDist, 0)).scale(orientation.z))
+          .add(new Vec3(0, verticalDist, 0)).scale(orientation.z))
         pos
     }
 
-    def getViewMatrix = Matrix4f.rotate(-orientation.x, 1, 0,0).rotate(orientation.y, 0, 1, 0).translate(getCameraPos.negate)
+    def getViewMatrix = Mat4.rotate(-orientation.x, 1, 0,0).rotate(orientation.y, 0, 1, 0).translate(getCameraPos.negate)
 
-    private def getDirectionVector(a: Float) = new Vector3f(Math.sin(a).toFloat, 0, -Math.cos(a).toFloat)
+    private def getDirectionVector(a: Float) = new Vec3(Math.sin(a).toFloat, 0, -Math.cos(a).toFloat)
 
 }

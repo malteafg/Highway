@@ -2,27 +2,16 @@ package utils.math
 
 import java.nio.FloatBuffer
 
-class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
+import utils.Vals
 
-    /**
-     * Creates a default 4-tuple vector with all values set to 0.
-     */
-    def this() = this(0f, 0f, 0f, 0f)
-
-    /**
-     * Creates a 4-tuple vector with specified values.
-     *
-     * @param v        Vector3f value
-     * @param w        w value
-     */
-    def this(v: Vector3f, w: Float) = this(v.x, v.y, v.z, w)
+case class Vec2(x: Float = 0, y: Float = 0) {
 
     /**
      * Calculates the squared length of the vector.
      *
      * @return Squared length of this vector
      */
-    def lengthSquared: Float = x * x + y * y + z * z + w * w
+    def lengthSquared: Float = x * x + y * y
 
     /**
      * Calculates the length of the vector.
@@ -36,7 +25,7 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      *
      * @return Normalized vector
      */
-    def normalize: Vector4f = divide(length)
+    def normalize: Vec2 = divide(length)
 
     /**
      * Adds this vector to another vector.
@@ -44,12 +33,10 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      * @param other The other vector
      * @return Sum of this + other
      */
-    def add(other: Vector4f): Vector4f = {
+    def add(other: Vec2): Vec2 = {
         val x = this.x + other.x
         val y = this.y + other.y
-        val z = this.z + other.z
-        val w = this.w + other.w
-        new Vector4f(x, y, z, w)
+        Vec2(x, y)
     }
 
     /**
@@ -57,7 +44,7 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      *
      * @return Negated vector
      */
-    def negate: Vector4f = scale(-1f)
+    def negate: Vec2 = scale(-1f)
 
     /**
      * Subtracts this vector from another vector.
@@ -65,20 +52,19 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      * @param other The other vector
      * @return Difference of this - other
      */
-    def subtract(other: Vector4f): Vector4f = this.add(other.negate)
-
+    def subtract(other: Vec2): Vec2 = this.add(other.negate)
+    def subtract(f: Float): Vec2 = Vec2(x - f, y - f)
+    
     /**
      * Multiplies a vector by a scalar.
      *
      * @param scalar Scalar to multiply
      * @return Scalar product of this * scalar
      */
-    def scale(scalar: Float): Vector4f = {
+    def scale(scalar: Float): Vec2 = {
         val x = this.x * scalar
         val y = this.y * scalar
-        val z = this.z * scalar
-        val w = this.w * scalar
-        new Vector4f(x, y, z, w)
+        Vec2(x, y)
     }
 
     /**
@@ -87,7 +73,7 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      * @param scalar Scalar to multiply
      * @return Scalar quotient of this / scalar
      */
-    def divide(scalar: Float): Vector4f = scale(1f / scalar)
+    def divide(scalar: Float): Vec2 = scale(1f / scalar)
 
     /**
      * Calculates the dot product of this vector with another vector.
@@ -95,7 +81,7 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      * @param other The other vector
      * @return Dot product of this * other
      */
-    def dot(other: Vector4f): Float = this.x * other.x + this.y * other.y + this.z * other.z + this.w * other.w
+    def dot(other: Vec2): Float = this.x * other.x + this.y * other.y
 
     /**
      * Calculates a linear interpolation between this vector with another
@@ -105,30 +91,25 @@ class Vector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
      * @param alpha The alpha value, must be between 0.0 and 1.0
      * @return Linear interpolated vector
      */
-    def lerp(other: Vector4f, alpha: Float): Vector4f = this.scale(1f - alpha).add(other.scale(alpha))
+    def lerp(other: Vec2, alpha: Float): Vec2 = this.scale(1f - alpha).add(other.scale(alpha))
 
     /**
      * Stores the vector in a given Buffer.
      *
      * @param buffer The buffer to store the vector data
      */
-    def toBuffer(buffer: FloatBuffer): Unit = {
-        buffer.put(x).put(y).put(z).put(w)
+    def toBuffer(buffer: FloatBuffer): FloatBuffer = {
+        buffer.put(x).put(y)
         buffer.flip
     }
 
-    def copy = new Vector4f(x, y, z, w)
+    def x(newX: Float): Vec2 = Vec2(newX, y)
+    def y(newY: Float): Vec2 = Vec2(x, newY)
 
-    def set(x: Float, y: Float, z: Float, w: Float): Unit = {
-        this.x = x
-        this.y = y
-        this.z = z
-        this.w = w
-    }
-
-    def xyz = new Vector3f(x, y, z)
+    def toScreenVector: Vec2 = Vec2(1.0f - 2.0f * x / Vals.WIDTH, 2.0f * y / Vals.HEIGHT - 1.0f)
     
-    @Override
-    override def toString: String = s"$x, $y, $z, $w"
+    def fill(z: Float, w: Float): Vec4 = Vec4(x, y, z, w)
+    
+    override def toString = s"($x, $y)"
 
 }

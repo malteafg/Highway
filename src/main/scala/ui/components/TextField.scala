@@ -1,10 +1,10 @@
 package ui.components
 
 import input.{Feedback, InputEvent, InputHandler}
-import utils.math.{Vector2f, Vector4f}
+import utils.math.{Vec2, Vec4}
 import utils.Options
 
-class TextField(val par: UIComponent, val p: Vector2f, val s: Vector2f, val c: Vector4f,
+class TextField(val par: UIComponent, val p: Vec2, val s: Vec2, val c: Vec4,
                 var text: String, val func: String => Unit) extends UIComponent(par, p, s, c) {
 
     var typingPos: Int = -1

@@ -1,7 +1,7 @@
 package utils
 
 import game.GameHandler
-import utils.math.{Matrix4f, Vector2f, Vector3f, Vector4f}
+import utils.math.{Mat4, Vec2, Vec3, Vec4}
 import org.lwjgl.opengl.GL11._
 
 object Vals {
@@ -10,7 +10,7 @@ object Vals {
     final val WIDTH: Int = 16 * UNIT
     final val HEIGHT: Int = 9 * UNIT
 
-    final val UI_COLOR: Vector4f = new Vector4f(0.3f, 0.4f, 0.5f, 1.0f)
+    final val UI_COLOR: Vec4 = new Vec4(0.3f, 0.4f, 0.5f, 1.0f)
 
     final val MIN_CAMERA_PITCH: Float = 0.1f
     final val MAX_CAMERA_PITCH: Float = 1.5f
@@ -21,11 +21,11 @@ object Vals {
     
     final val MAX_RAY_DISTANCE: Float = 500
     
-    final val CAMERA_STANDARD_ORIENTATION: Vector3f = new Vector3f(Vals.MIN_CAMERA_PITCH, 0f, 100.0f)
+    final val CAMERA_STANDARD_ORIENTATION: Vec3 = Vec3(Vals.MIN_CAMERA_PITCH, 0f, 100.0f)
 
-    final val CONTROL_POINT_COLOR: Vector4f = new Vector4f(0, 0.4f, 0.8f, 1)
+    final val CONTROL_POINT_COLOR: Vec4 = Vec4(0, 0.4f, 0.8f, 1)
 
-    final val ROAD_HEIGHT: Float = 0.1f
+    final val ROAD_HEIGHT: Float = 0.2f
     final val ROAD_VERTEX_DENSITY: Float = 0.5f
     final val LARGE_LANE_WIDTH: Float = 3.7f
 
@@ -46,16 +46,16 @@ object Vals {
     
     def toRadians(deg: Float) = deg * Math.PI.toFloat / 180
     
-    def getRay(vec: Vector2f) = {
+    def getRay(vec: Vec2) = {
         val eyeVector = perspectiveMatrix.invert.multiply(vec.toScreenVector.fill(1.0f, 1.0f))
-        val worldVector = GameHandler.camera.getViewMatrix.invert.multiply(new Vector4f(eyeVector.x, eyeVector.y, -1f, 0))
+        val worldVector = GameHandler.camera.getViewMatrix.invert.multiply(new Vec4(eyeVector.x, eyeVector.y, -1f, 0))
         worldVector.xyz.normalize.negate
     }
     
     // heightMap should return positive infinity outside its borders
-    def terrainRayCollision(ray: Vector3f, heightMap: (Float, Float) => Float, accuracy: Float) = {
+    def terrainRayCollision(ray: Vec3, heightMap: (Float, Float) => Float, accuracy: Float) = {
         val camPos = GameHandler.camera.getCameraPos
-        var v: Vector3f = new Vector3f
+        var v: Vec3 = new Vec3
         var f = -camPos.y / ray.y
         var g = 0.0f
         
@@ -66,14 +66,14 @@ object Vals {
                 if(v.y > heightMap(v.x, v.z)) g = a
                 else f = a
             }
-            new Vector3f(v.x, heightMap(v.x, v.z), v.z)
+            new Vec3(v.x, heightMap(v.x, v.z), v.z)
         } else {
             camPos.add(ray.scale(Vals.MAX_RAY_DISTANCE))
         }
     }
     
-    val perspectiveMatrix = Matrix4f.perspective(30, 1f, 10000f)
-    val UIProjMatrix = Matrix4f.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
+    val perspectiveMatrix = Mat4.perspective(30, 1f, 10000f)
+    val UIProjMatrix = Mat4.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
     
     
     

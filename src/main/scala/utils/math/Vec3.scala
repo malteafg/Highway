@@ -2,12 +2,7 @@ package utils.math
 
 import java.nio.FloatBuffer
 
-class Vector3f(var x: Float, var y: Float, var z: Float) {
-
-    /**
-     * Creates a default 3-tuple vector with all values set to 0.
-     */
-    def this() = this(0f, 0f, 0f)
+case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
 
     /**
      * Calculates the squared length of the vector.
@@ -28,7 +23,7 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      *
      * @return Normalized vector
      */
-    def normalize: Vector3f = divide(length)
+    def normalize: Vec3 = divide(length)
 
     /**
      * Adds this vector to another vector.
@@ -36,11 +31,11 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param other The other vector
      * @return Sum of this + other
      */
-    def add(other: Vector3f): Vector3f = {
+    def add(other: Vec3): Vec3 = {
         val x = this.x + other.x
         val y = this.y + other.y
         val z = this.z + other.z
-        new Vector3f(x, y, z)
+        Vec3(x, y, z)
     }
 
     /**
@@ -48,7 +43,7 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      *
      * @return Negated vector
      */
-    def negate: Vector3f = scale(-1f)
+    def negate: Vec3 = scale(-1f)
 
     /**
      * Subtracts this vector from another vector.
@@ -56,7 +51,7 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param other The other vector
      * @return Difference of this - other
      */
-    def subtract(other: Vector3f): Vector3f = this.add(other.negate)
+    def subtract(other: Vec3): Vec3 = this.add(other.negate)
 
     /**
      * Multiplies a vector by a scalar.
@@ -64,11 +59,11 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param scalar Scalar to multiply
      * @return Scalar product of this * scalar
      */
-    def scale(scalar: Float): Vector3f = {
+    def scale(scalar: Float): Vec3 = {
         val x = this.x * scalar
         val y = this.y * scalar
         val z = this.z * scalar
-        new Vector3f(x, y, z)
+        Vec3(x, y, z)
     }
 
     /**
@@ -77,7 +72,7 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param scalar Scalar to multiply
      * @return Scalar quotient of this / scalar
      */
-    def divide(scalar: Float): Vector3f = scale(1f / scalar)
+    def divide(scalar: Float): Vec3 = scale(1f / scalar)
 
     /**
      * Calculates the dot product of this vector with another vector.
@@ -85,7 +80,7 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param other The other vector
      * @return Dot product of this * other
      */
-    def dot(other: Vector3f): Float = this.x * other.x + this.y * other.y + this.z * other.z
+    def dot(other: Vec3): Float = this.x * other.x + this.y * other.y + this.z * other.z
 
     /**
      * Calculates the dot product of this vector with another vector.
@@ -93,11 +88,11 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param other The other vector
      * @return Cross product of this x other
      */
-    def cross(other: Vector3f): Vector3f = {
+    def cross(other: Vec3): Vec3 = {
         val x = this.y * other.z - this.z * other.y
         val y = this.z * other.x - this.x * other.z
         val z = this.x * other.y - this.y * other.x
-        new Vector3f(x, y, z)
+        Vec3(x, y, z)
     }
 
     /**
@@ -108,14 +103,14 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
      * @param alpha The alpha value, must be between 0.0 and 1.0
      * @return Linear interpolated vector
      */
-    def lerp(other: Vector3f, alpha: Float): Vector3f = this.scale(1f - alpha).add(other.scale(alpha))
+    def lerp(other: Vec3, alpha: Float): Vec3 = this.scale(1f - alpha).add(other.scale(alpha))
 
     /**
      * Stores the vector in a given Buffer.
      *
      * @param buffer The buffer to store the vector data
      */
-    def toBuffer(buffer: FloatBuffer): Unit = {
+    def toBuffer(buffer: FloatBuffer): FloatBuffer = {
         buffer.put(x).put(y).put(z)
         buffer.flip
     }
@@ -123,12 +118,12 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
     /**
      * Returns a vector with the remainders of the old vector.
      */
-    def mod(mod: Float) = new Vector3f(x % mod, y % mod, z % mod)
+    def mod(mod: Float): Vec3 = Vec3(x % mod, y % mod, z % mod)
 
     /**
      * If the values in the vector is more than half the entered number, it will subtract the number
      */
-    def cent(num: Float): Vector3f = {
+    def cent(num: Float): Vec3 = {
         var tx = if (x > num / 2f) x - num
         else x
         tx = if (x < -num / 2f) x + num
@@ -141,35 +136,16 @@ class Vector3f(var x: Float, var y: Float, var z: Float) {
         else z
         tz = if (z < -num / 2f) z + num
         else tz
-        new Vector3f(tx, ty, tz)
+        Vec3(tx, ty, tz)
     }
 
-    def copy = new Vector3f(x, y, z)
+    def x(newX: Float): Vec3 = Vec3(newX, y, z)
+    def y(newY: Float): Vec3 = Vec3(x, newY, z)
+    def z(newZ: Float): Vec3 = Vec3(x, y, newZ)
 
-    def set(x: Float, y: Float, z: Float): Unit = {
-        this.x = x
-        this.y = y
-        this.z = z
-    }
-
-    def rightHand() = new Vector3f(z, y, -x)
-
-    def leftHand() = new Vector3f(-z, y, x)
+    def rightHand(): Vec3 = Vec3(z, y, -x)
+    def leftHand(): Vec3 = Vec3(-z, y, x)
 
     override def toString = s"$x, $y, $z"
-
-}
-
-object Vector3f {
-
-    def convertToFloatArray(array: Array[Vector3f]) = {
-        val floats = new Array[Float](array.length * 3)
-        for(i <- 0 until array.length) {
-            floats(i * 3 + 0) = array(i).x
-            floats(i * 3 + 1) = array(i).y
-            floats(i * 3 + 2) = array(i).z
-        }
-        floats
-    }
 
 }

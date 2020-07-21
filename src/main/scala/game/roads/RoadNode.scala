@@ -1,8 +1,8 @@
 package game.roads
 
-import utils.math.Vector3f
+import utils.math.Vec3
 
-case class RoadNode(position: Vector3f, direction: Vector3f) {
+case class RoadNode(position: Vec3, direction: Vec3) {
 
 
 

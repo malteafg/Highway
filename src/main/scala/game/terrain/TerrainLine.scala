@@ -1,14 +1,14 @@
 package game.terrain
 
-import utils.math.{Vector2f, Vector4f}
+import utils.math.{Vec2, Vec4}
 
-class TerrainLine(var pos1: Vector2f, var pos2: Vector2f, width: Float, color: Vector4f) {
+class TerrainLine(var pos1: Vec2, var pos2: Vec2, width: Float, color: Vec4) {
 
-    def updatePos(pos: Vector2f) = pos2 = pos
+    def updatePos(pos: Vec2) = pos2 = pos
 
-    def setPos(pos: Vector2f): Unit = {
+    def setPos(pos: Vec2): Unit = {
         pos1 = pos
-        pos2 = pos.add(new Vector2f(0, 0.1f))
+        pos2 = pos.add(new Vec2(0, 0.1f))
     }
 
     def getLine() = (pos1, pos2, width, color)

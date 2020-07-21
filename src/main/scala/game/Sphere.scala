@@ -1,12 +1,12 @@
 package game
 
 import utils.loader.OBJLoader
-import utils.math.{Matrix4f, Vector3f, Vector4f}
+import utils.math.{Mat4, Vec3, Vec4}
 
-class Sphere(var position: Vector3f, var color: Vector4f) {
+class Sphere(var position: Vec3, var color: Vec4) {
 
-   def this(pos: Vector3f) {
-       this(pos, new Vector4f(0.9f, 0, 0, 1))
+   def this(pos: Vec3) {
+       this(pos, new Vec4(0.9f, 0, 0, 1))
    }
 
 

@@ -1,6 +1,6 @@
 package utils.graphics
 
-import utils.math.Vector3f
+import utils.math.{Vec3, VecUtils}
 
 class Mesh(vertices: Array[Float], indices: Array[Int], layout: Array[Int]) {
 
@@ -14,8 +14,8 @@ class Mesh(vertices: Array[Float], indices: Array[Int], layout: Array[Int]) {
     /**
      * Constructors
      */
-    def this(vertices: Array[Vector3f], indices: Array[Int], layout: Array[Int]) {
-        this(Vector3f.convertToFloatArray(vertices), indices, layout)
+    def this(vertices: Array[Vec3], indices: Array[Int], layout: Array[Int]) {
+        this(VecUtils.convertToFloatArray(vertices), indices, layout)
     }
 
     /**

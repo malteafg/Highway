@@ -3,18 +3,12 @@ package utils.math
 import java.nio.FloatBuffer
 import utils.Vals
 
-class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
-               var m10: Float, var m11: Float, var m12: Float, var m13: Float,
-               var m20: Float, var m21: Float, var m22: Float, var m23: Float,
-               var m30: Float, var m31: Float, var m32: Float, var m33: Float) {
-
-    /**
-     * Creates a 4x4 identity matrix.
-     */
-    def this() = this(1f, 0f, 0f, 0f,
-                      0f, 1f, 0f, 0f,
-                      0f, 0f, 1f, 0f,
-                      0f, 0f, 0f, 1f)
+case class Mat4(
+                 m00: Float = 1, m01: Float = 0, m02: Float = 0, m03: Float = 0,
+                 m10: Float = 0, m11: Float = 1, m12: Float = 0, m13: Float = 0,
+                 m20: Float = 0, m21: Float = 0, m22: Float = 1, m23: Float = 0,
+                 m30: Float = 0, m31: Float = 0, m32: Float = 0, m33: Float = 1
+               ) {
 
     /**
      * Creates a 4x4 matrix with specified columns.
@@ -24,46 +18,25 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param col3 Vector with values of the third column
      * @param col4 Vector with values of the fourth column
      */
-    def this(col1: Vector4f, col2: Vector4f, col3: Vector4f, col4: Vector4f) {
-        this()
-        m00 = col1.x
-        m10 = col1.y
-        m20 = col1.z
-        m30 = col1.w
-        m01 = col2.x
-        m11 = col2.y
-        m21 = col2.z
-        m31 = col2.w
-        m02 = col3.x
-        m12 = col3.y
-        m22 = col3.z
-        m32 = col3.w
-        m03 = col4.x
-        m13 = col4.y
-        m23 = col4.z
-        m33 = col4.w
-    }
-
-    /**
-     * Sets this matrix to the identity matrix.
-     */
-    def setIdentity(): Unit = {
-        m00 = 1f
-        m11 = 1f
-        m22 = 1f
-        m33 = 1f
-        m01 = 0f
-        m02 = 0f
-        m03 = 0f
-        m10 = 0f
-        m12 = 0f
-        m13 = 0f
-        m20 = 0f
-        m21 = 0f
-        m23 = 0f
-        m30 = 0f
-        m31 = 0f
-        m32 = 0f
+    def this(col1: Vec4, col2: Vec4, col3: Vec4, col4: Vec4) {
+        this(
+            m00 = col1.x,
+            m10 = col1.y,
+            m20 = col1.z,
+            m30 = col1.w,
+            m01 = col2.x,
+            m11 = col2.y,
+            m21 = col2.z,
+            m31 = col2.w,
+            m02 = col3.x,
+            m12 = col3.y,
+            m22 = col3.z,
+            m32 = col3.w,
+            m03 = col4.x,
+            m13 = col4.y,
+            m23 = col4.z,
+            m33 = col4.w
+        )
     }
 
     /**
@@ -72,25 +45,25 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param other The other matrix
      * @return Sum of this + other
      */
-    def add(other: Matrix4f): Matrix4f = {
-        val result = new Matrix4f
-        result.m00 = this.m00 + other.m00
-        result.m10 = this.m10 + other.m10
-        result.m20 = this.m20 + other.m20
-        result.m30 = this.m30 + other.m30
-        result.m01 = this.m01 + other.m01
-        result.m11 = this.m11 + other.m11
-        result.m21 = this.m21 + other.m21
-        result.m31 = this.m31 + other.m31
-        result.m02 = this.m02 + other.m02
-        result.m12 = this.m12 + other.m12
-        result.m22 = this.m22 + other.m22
-        result.m32 = this.m32 + other.m32
-        result.m03 = this.m03 + other.m03
-        result.m13 = this.m13 + other.m13
-        result.m23 = this.m23 + other.m23
-        result.m33 = this.m33 + other.m33
-        result
+    def add(other: Mat4): Mat4 = {
+        Mat4(
+            m00 = this.m00 + other.m00,
+            m10 = this.m10 + other.m10,
+            m20 = this.m20 + other.m20,
+            m30 = this.m30 + other.m30,
+            m01 = this.m01 + other.m01,
+            m11 = this.m11 + other.m11,
+            m21 = this.m21 + other.m21,
+            m31 = this.m31 + other.m31,
+            m02 = this.m02 + other.m02,
+            m12 = this.m12 + other.m12,
+            m22 = this.m22 + other.m22,
+            m32 = this.m32 + other.m32,
+            m03 = this.m03 + other.m03,
+            m13 = this.m13 + other.m13,
+            m23 = this.m23 + other.m23,
+            m33 = this.m33 + other.m33
+        )
     }
 
     /**
@@ -98,7 +71,7 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      *
      * @return Negated matrix
      */
-    def negate: Matrix4f = multiply(-1f)
+    def negate: Mat4 = multiply(-1f)
 
     /**
      * Subtracts this matrix from another matrix.
@@ -106,7 +79,7 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param other The other matrix
      * @return Difference of this - other
      */
-    def subtract(other: Matrix4f): Matrix4f = this.add(other.negate)
+    def subtract(other: Mat4): Mat4 = this.add(other.negate)
 
     /**
      * Multiplies this matrix with a scalar.
@@ -114,25 +87,25 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param scalar The scalar
      * @return Scalar product of this * scalar
      */
-    def multiply(scalar: Float): Matrix4f = {
-        val result = new Matrix4f
-        result.m00 = this.m00 * scalar
-        result.m10 = this.m10 * scalar
-        result.m20 = this.m20 * scalar
-        result.m30 = this.m30 * scalar
-        result.m01 = this.m01 * scalar
-        result.m11 = this.m11 * scalar
-        result.m21 = this.m21 * scalar
-        result.m31 = this.m31 * scalar
-        result.m02 = this.m02 * scalar
-        result.m12 = this.m12 * scalar
-        result.m22 = this.m22 * scalar
-        result.m32 = this.m32 * scalar
-        result.m03 = this.m03 * scalar
-        result.m13 = this.m13 * scalar
-        result.m23 = this.m23 * scalar
-        result.m33 = this.m33 * scalar
-        result
+    def multiply(scalar: Float): Mat4 = {
+        Mat4(
+            m00 = this.m00 * scalar,
+            m10 = this.m10 * scalar,
+            m20 = this.m20 * scalar,
+            m30 = this.m30 * scalar,
+            m01 = this.m01 * scalar,
+            m11 = this.m11 * scalar,
+            m21 = this.m21 * scalar,
+            m31 = this.m31 * scalar,
+            m02 = this.m02 * scalar,
+            m12 = this.m12 * scalar,
+            m22 = this.m22 * scalar,
+            m32 = this.m32 * scalar,
+            m03 = this.m03 * scalar,
+            m13 = this.m13 * scalar,
+            m23 = this.m23 * scalar,
+            m33 = this.m33 * scalar
+        )
     }
 
     /**
@@ -141,12 +114,12 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param vector The vector
      * @return Vector product of this * other
      */
-    def multiply(vector: Vector4f): Vector4f = {
+    def multiply(vector: Vec4): Vec4 = {
         val x = this.m00 * vector.x + this.m01 * vector.y + this.m02 * vector.z + this.m03 * vector.w
         val y = this.m10 * vector.x + this.m11 * vector.y + this.m12 * vector.z + this.m13 * vector.w
         val z = this.m20 * vector.x + this.m21 * vector.y + this.m22 * vector.z + this.m23 * vector.w
         val w = this.m30 * vector.x + this.m31 * vector.y + this.m32 * vector.z + this.m33 * vector.w
-        new Vector4f(x, y, z, w)
+        Vec4(x, y, z, w)
     }
 
     /**
@@ -155,12 +128,12 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param vector The vector
      * @return Vector product of this * other
      */
-    def transform(vector: Vector4f): Vector4f = {
+    def transform(vector: Vec4): Vec4 = {
         val x = this.m00 * vector.x + this.m10 * vector.y + this.m20 * vector.z + this.m30 * vector.w
         val y = this.m01 * vector.x + this.m11 * vector.y + this.m21 * vector.z + this.m31 * vector.w
         val z = this.m02 * vector.x + this.m12 * vector.y + this.m22 * vector.z + this.m32 * vector.w
         val w = this.m03 * vector.x + this.m13 * vector.y + this.m23 * vector.z + this.m33 * vector.w
-        new Vector4f(x, y, z, w)
+        Vec4(x, y, z, w)
     }
 
     /**
@@ -169,25 +142,25 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param other The other matrix
      * @return Matrix product of this * other
      */
-    def multiply(other: Matrix4f): Matrix4f = {
-        val result = new Matrix4f
-        result.m00 = this.m00 * other.m00 + this.m01 * other.m10 + this.m02 * other.m20 + this.m03 * other.m30
-        result.m10 = this.m10 * other.m00 + this.m11 * other.m10 + this.m12 * other.m20 + this.m13 * other.m30
-        result.m20 = this.m20 * other.m00 + this.m21 * other.m10 + this.m22 * other.m20 + this.m23 * other.m30
-        result.m30 = this.m30 * other.m00 + this.m31 * other.m10 + this.m32 * other.m20 + this.m33 * other.m30
-        result.m01 = this.m00 * other.m01 + this.m01 * other.m11 + this.m02 * other.m21 + this.m03 * other.m31
-        result.m11 = this.m10 * other.m01 + this.m11 * other.m11 + this.m12 * other.m21 + this.m13 * other.m31
-        result.m21 = this.m20 * other.m01 + this.m21 * other.m11 + this.m22 * other.m21 + this.m23 * other.m31
-        result.m31 = this.m30 * other.m01 + this.m31 * other.m11 + this.m32 * other.m21 + this.m33 * other.m31
-        result.m02 = this.m00 * other.m02 + this.m01 * other.m12 + this.m02 * other.m22 + this.m03 * other.m32
-        result.m12 = this.m10 * other.m02 + this.m11 * other.m12 + this.m12 * other.m22 + this.m13 * other.m32
-        result.m22 = this.m20 * other.m02 + this.m21 * other.m12 + this.m22 * other.m22 + this.m23 * other.m32
-        result.m32 = this.m30 * other.m02 + this.m31 * other.m12 + this.m32 * other.m22 + this.m33 * other.m32
-        result.m03 = this.m00 * other.m03 + this.m01 * other.m13 + this.m02 * other.m23 + this.m03 * other.m33
-        result.m13 = this.m10 * other.m03 + this.m11 * other.m13 + this.m12 * other.m23 + this.m13 * other.m33
-        result.m23 = this.m20 * other.m03 + this.m21 * other.m13 + this.m22 * other.m23 + this.m23 * other.m33
-        result.m33 = this.m30 * other.m03 + this.m31 * other.m13 + this.m32 * other.m23 + this.m33 * other.m33
-        result
+    def multiply(other: Mat4): Mat4 = {
+        Mat4(
+            m00 = this.m00 * other.m00 + this.m01 * other.m10 + this.m02 * other.m20 + this.m03 * other.m30,
+            m10 = this.m10 * other.m00 + this.m11 * other.m10 + this.m12 * other.m20 + this.m13 * other.m30,
+            m20 = this.m20 * other.m00 + this.m21 * other.m10 + this.m22 * other.m20 + this.m23 * other.m30,
+            m30 = this.m30 * other.m00 + this.m31 * other.m10 + this.m32 * other.m20 + this.m33 * other.m30,
+            m01 = this.m00 * other.m01 + this.m01 * other.m11 + this.m02 * other.m21 + this.m03 * other.m31,
+            m11 = this.m10 * other.m01 + this.m11 * other.m11 + this.m12 * other.m21 + this.m13 * other.m31,
+            m21 = this.m20 * other.m01 + this.m21 * other.m11 + this.m22 * other.m21 + this.m23 * other.m31,
+            m31 = this.m30 * other.m01 + this.m31 * other.m11 + this.m32 * other.m21 + this.m33 * other.m31,
+            m02 = this.m00 * other.m02 + this.m01 * other.m12 + this.m02 * other.m22 + this.m03 * other.m32,
+            m12 = this.m10 * other.m02 + this.m11 * other.m12 + this.m12 * other.m22 + this.m13 * other.m32,
+            m22 = this.m20 * other.m02 + this.m21 * other.m12 + this.m22 * other.m22 + this.m23 * other.m32,
+            m32 = this.m30 * other.m02 + this.m31 * other.m12 + this.m32 * other.m22 + this.m33 * other.m32,
+            m03 = this.m00 * other.m03 + this.m01 * other.m13 + this.m02 * other.m23 + this.m03 * other.m33,
+            m13 = this.m10 * other.m03 + this.m11 * other.m13 + this.m12 * other.m23 + this.m13 * other.m33,
+            m23 = this.m20 * other.m03 + this.m21 * other.m13 + this.m22 * other.m23 + this.m23 * other.m33,
+            m33 = this.m30 * other.m03 + this.m31 * other.m13 + this.m32 * other.m23 + this.m33 * other.m33
+        )
     }
 
     /**
@@ -195,25 +168,25 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      *
      * @return Transposed matrix
      */
-    def transpose: Matrix4f = {
-        val result = new Matrix4f
-        result.m00 = this.m00
-        result.m10 = this.m01
-        result.m20 = this.m02
-        result.m30 = this.m03
-        result.m01 = this.m10
-        result.m11 = this.m11
-        result.m21 = this.m12
-        result.m31 = this.m13
-        result.m02 = this.m20
-        result.m12 = this.m21
-        result.m22 = this.m22
-        result.m32 = this.m23
-        result.m03 = this.m30
-        result.m13 = this.m31
-        result.m23 = this.m32
-        result.m33 = this.m33
-        result
+    def transpose: Mat4 = {
+        Mat4(
+            m00 = this.m00,
+            m10 = this.m01,
+            m20 = this.m02,
+            m30 = this.m03,
+            m01 = this.m10,
+            m11 = this.m11,
+            m21 = this.m12,
+            m31 = this.m13,
+            m02 = this.m20,
+            m12 = this.m21,
+            m22 = this.m22,
+            m32 = this.m23,
+            m03 = this.m30,
+            m13 = this.m31,
+            m23 = this.m32,
+            m33 = this.m33
+        )
     }
 
     /**
@@ -221,7 +194,7 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      *
      * @param buffer The buffer to store the matrix data
      */
-    def toBuffer(buffer: FloatBuffer): Unit = {
+    def toBuffer(buffer: FloatBuffer): FloatBuffer = {
         buffer.put(m00).put(m10).put(m20).put(m30)
         buffer.put(m01).put(m11).put(m21).put(m31)
         buffer.put(m02).put(m12).put(m22).put(m32)
@@ -232,8 +205,7 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
     /**
      * Invert this 4x4 matrix.
      */
-    def invert: Matrix4f = {
-        val invert = new Matrix4f
+    def invert: Mat4 = {
         val tmp = new Array[Float](12)
         val src = new Array[Float](16)
         val dst = new Array[Float](16)
@@ -318,23 +290,24 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
         var det = src(0) * dst(0) + src(1) * dst(1) + src(2) * dst(2) + src(3) * dst(3)
         // Calculate matrix inverse
         det = 1.0f / det
-        invert.m00 = dst(0) * det
-        invert.m01 = dst(1) * det
-        invert.m02 = dst(2) * det
-        invert.m03 = dst(3) * det
-        invert.m10 = dst(4) * det
-        invert.m11 = dst(5) * det
-        invert.m12 = dst(6) * det
-        invert.m13 = dst(7) * det
-        invert.m20 = dst(8) * det
-        invert.m21 = dst(9) * det
-        invert.m22 = dst(10) * det
-        invert.m23 = dst(11) * det
-        invert.m30 = dst(12) * det
-        invert.m31 = dst(13) * det
-        invert.m32 = dst(14) * det
-        invert.m33 = dst(15) * det
-        invert
+        Mat4(
+            m00 = dst(0) * det,
+            m01 = dst(1) * det,
+            m02 = dst(2) * det,
+            m03 = dst(3) * det,
+            m10 = dst(4) * det,
+            m11 = dst(5) * det,
+            m12 = dst(6) * det,
+            m13 = dst(7) * det,
+            m20 = dst(8) * det,
+            m21 = dst(9) * det,
+            m22 = dst(10) * det,
+            m23 = dst(11) * det,
+            m30 = dst(12) * det,
+            m31 = dst(13) * det,
+            m32 = dst(14) * det,
+            m33 = dst(15) * det
+        )
     }
 
     /**
@@ -346,8 +319,8 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param z z coordinate of translation vector
      * @return Translation matrix
      */
-    def translate(x: Float, y: Float, z: Float): Matrix4f = {
-        this.multiply(Matrix4f.translate(x, y, z))
+    def translate(x: Float, y: Float, z: Float): Mat4 = {
+        this.multiply(Mat4.translate(x, y, z))
     }
 
     /**
@@ -357,8 +330,8 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param v Vector3f
      * @return Translation matrix
      */
-    def translate(v: Vector3f): Matrix4f = {
-        this.multiply(Matrix4f.translate(v.x, v.y, v.z))
+    def translate(v: Vec3): Mat4 = {
+        this.multiply(Mat4.translate(v.x, v.y, v.z))
     }
 
     /**
@@ -371,8 +344,8 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param nz     z coordinate of the rotation vector
      * @return Rotation matrix
      */
-    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Matrix4f = {
-        this.multiply(Matrix4f.rotate(angle, nx, ny, nz))
+    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Mat4 = {
+        this.multiply(Mat4.rotate(angle, nx, ny, nz))
     }
 
     /**
@@ -383,13 +356,13 @@ class Matrix4f(var m00: Float, var m01: Float, var m02: Float, var m03: Float,
      * @param z Scale factor along the z coordinate
      * @return Scaling matrix
      */
-    def scale(x: Float, y: Float, z: Float): Matrix4f = {
-        this.multiply(Matrix4f.scale(x, y, z))
+    def scale(x: Float, y: Float, z: Float): Mat4 = {
+        this.multiply(Mat4.scale(x, y, z))
     }
 
 }
 
-object Matrix4f {
+object Mat4 {
 
     /**
      * Creates a orthographic projection matrix. Similar to
@@ -403,15 +376,15 @@ object Matrix4f {
      * @param far    Coordinate for the far depth clipping pane
      * @return Orthographic matrix
      */
-    def orthographic(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
-        val ortho = new Matrix4f
-        ortho.m00 = 2.0f / (right - left)
-        ortho.m11 = 2.0f / (top - bottom)
-        ortho.m22 = 2.0f / (near - far)
-        ortho.m03 = (left + right) / (left - right)
-        ortho.m13 = (bottom + top) / (bottom - top)
-        ortho.m23 = (far + near) / (far - near)
-        ortho
+    def orthographic(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Mat4 = {
+        Mat4(
+            m00 = 2.0f / (right - left),
+            m11 = 2.0f / (top - bottom),
+            m22 = 2.0f / (near - far),
+            m03 = (left + right) / (left - right),
+            m13 = (bottom + top) / (bottom - top),
+            m23 = (far + near) / (far - near)
+        )
     }
 
     /**
@@ -428,21 +401,20 @@ object Matrix4f {
      *               positive
      * @return Perspective matrix
      */
-    def frustum(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
-        val frustum = new Matrix4f
+    def frustum(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Mat4 = {
         val a = (right + left) / (right - left)
         val b = (top + bottom) / (top - bottom)
         val c = -(far + near) / (far - near)
         val d = -(2f * far * near) / (far - near)
-        frustum.m00 = (2f * near) / (right - left)
-        frustum.m11 = (2f * near) / (top - bottom)
-        frustum.m02 = a
-        frustum.m12 = b
-        frustum.m22 = c
-        frustum.m32 = -1f
-        frustum.m23 = d
-        frustum.m33 = 0f
-        frustum
+        Mat4(
+            m00 = (2f * near) / (right - left),
+            m11 = (2f * near) / (top - bottom),
+            m02 = a,
+            m12 = b,
+            m22 = c,
+            m32 = -1f,
+            m23 = d,
+        )
     }
 
     /**
@@ -456,31 +428,20 @@ object Matrix4f {
      *               positive
      * @return Perspective matrix
      */
-    def perspective(fovy: Float, near: Float, far: Float): Matrix4f = {
-        val result = new Matrix4f()
+    def perspective(fovy: Float, near: Float, far: Float): Mat4 = {
         val ar = 1.0f * Vals.WIDTH / Vals.HEIGHT
         val range = near - far
         val tanHalfFOV = Math.tan(Math.toRadians(fovy / 2)).toFloat
 
-        result.m00 = 1.0f / tanHalfFOV / ar
-        result.m11 = 1.0f / tanHalfFOV
-        result.m22 = (-near - far) / range
-        result.m23 = 2.0f * far * near / range
-        result.m32 = 1f
-        result.m33 = 0.0f
-
-        result
+        Mat4(
+            m00 = 1.0f / tanHalfFOV / ar,
+            m11 = 1.0f / tanHalfFOV,
+            m22 = (-near - far) / range,
+            m23 = 2.0f * far * near / range,
+            m32 = 1f,
+        )
     }
 
-    /**
-     * Creates a translation matrix. Similar to
-     * <code>glTranslate(x, y, z)</code>.
-     *
-     * @param v: Vector to translate
-     * @return Translation matrix
-     */
-    def translate(v: Vector3f): Matrix4f = translate(v.x, v.y, v.z)
-    
     /**
      * Creates a translation matrix with rotation around the vertical y axis.
      *
@@ -490,10 +451,19 @@ object Matrix4f {
      * @param a angle of rotation
      * @return Translation matrix
      */
-    def place(x: Float, y: Float, z: Float, a: Float) = {
+    def place(x: Float, y: Float, z: Float, a: Float): Mat4 = {
         translate(x, y, z).rotate(a, 0, 1, 0)
     }
-    
+
+    /**
+     * Creates a translation matrix. Similar to
+     * <code>glTranslate(x, y, z)</code>.
+     *
+     * @param v: Vector to translate
+     * @return Translation matrix
+     */
+    def translate(v: Vec3): Mat4 = translate(v.x, v.y, v.z)
+
     /**
      * Creates a translation matrix. Similar to
      * <code>glTranslate(x, y, z)</code>.
@@ -503,12 +473,12 @@ object Matrix4f {
      * @param z z coordinate of translation vector
      * @return Translation matrix
      */
-    def translate(x: Float, y: Float, z: Float): Matrix4f = {
-        val translation = new Matrix4f
-        translation.m03 = x
-        translation.m13 = y
-        translation.m23 = z
-        translation
+    def translate(x: Float, y: Float, z: Float): Mat4 = {
+        Mat4(
+            m03 = x,
+            m13 = y,
+            m23 = z
+        )
     }
 
     /**
@@ -521,24 +491,24 @@ object Matrix4f {
      * @param nz     z coordinate of the rotation vector
      * @return Rotation matrix
      */
-    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Matrix4f = {
-        val rotation = new Matrix4f
+    def rotate(angle: Float, nx: Float, ny: Float, nz: Float): Mat4 = {
         val c = Math.cos(angle).toFloat
         val s = Math.sin(angle).toFloat
-        val vec = new Vector3f(nx, ny, nz).normalize
+        val vec = Vec3(nx, ny, nz).normalize
         val x = vec.x
         val y = vec.y
         val z = vec.z
-        rotation.m00 = x * x * (1f - c) + c
-        rotation.m10 = y * x * (1f - c) + z * s
-        rotation.m20 = x * z * (1f - c) - y * s
-        rotation.m01 = x * y * (1f - c) - z * s
-        rotation.m11 = y * y * (1f - c) + c
-        rotation.m21 = y * z * (1f - c) + x * s
-        rotation.m02 = x * z * (1f - c) + y * s
-        rotation.m12 = y * z * (1f - c) - x * s
-        rotation.m22 = z * z * (1f - c) + c
-        rotation
+        Mat4(
+            m00 = x * x * (1f - c) + c,
+            m10 = y * x * (1f - c) + z * s,
+            m20 = x * z * (1f - c) - y * s,
+            m01 = x * y * (1f - c) - z * s,
+            m11 = y * y * (1f - c) + c,
+            m21 = y * z * (1f - c) + x * s,
+            m02 = x * z * (1f - c) + y * s,
+            m12 = y * z * (1f - c) - x * s,
+            m22 = z * z * (1f - c) + c
+        )
     }
 
     /**
@@ -549,12 +519,11 @@ object Matrix4f {
      * @param z Scale factor along the z coordinate
      * @return Scaling matrix
      */
-    def scale(x: Float, y: Float, z: Float): Matrix4f = {
-        val scaling = new Matrix4f
-        scaling.m00 = x
-        scaling.m11 = y
-        scaling.m22 = z
-        scaling
-    }
+    def scale(x: Float, y: Float, z: Float): Mat4 = Mat4(m00 = x, m11 = y, m22 = z)
+
+    /**
+     * Returns empty matrix.
+     */
+    def empty(): Mat4 = Mat4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 }

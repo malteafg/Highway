@@ -3,17 +3,17 @@ package ui
 import game.GameHandler
 import rendering.{GameRenderer, UIRenderer}
 import input.{Feedback, InputEvent, InputHandler}
-import utils.math.{Vector2f, Vector4f}
+import utils.math.{Vec2, Vec4}
 import ui.components.{Button, RadioButton, UIComponent}
 import utils.graphics.Texture
 import utils.{Options, Vals}
 
 object Interface {
 
-    val screen: UIComponent = new UIComponent(null, new Vector2f(), new Vector2f(16, 9), new Vector4f(1, 0, 1, 0))
-    val panel: UIComponent = new UIComponent(screen, new Vector2f(1, 8), new Vector2f(14, 1), Vals.UI_COLOR)
+    val screen: UIComponent = new UIComponent(null, new Vec2(), Vec2(16, 9), Vec4(1, 0, 1, 0))
+    val panel: UIComponent = new UIComponent(screen, Vec2(1, 8), Vec2(14, 1), Vals.UI_COLOR)
 
-    val button1: RadioButton = new RadioButton(panel, new Vector2f(0.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(1, 0, 1, 1),
+    val button1: RadioButton = new RadioButton(panel, Vec2(0.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(1, 0, 1, 1),
         () => "Top button", (b: Boolean) => {
             Options.log(s"Top button says click!", Options.Button)
             GameRenderer.darkEdges = b
@@ -21,19 +21,19 @@ object Interface {
 
     button1.addTexture(new Texture("logo"))
 
-    val button2: Button = new Button(panel, new Vector2f(1.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(1, 1, 0, 1),
+    val button2: Button = new Button(panel, Vec2(1.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(1, 1, 0, 1),
         () => "Middle button", () => {
             Options.log(s"Middle button says click!", Options.Button)
             GameHandler.game.spheres.clear()
         })
 
-    val straight: Button = new Button(panel, new Vector2f(2.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(0, 1, 1, 1),
+    val straight: Button = new Button(panel, Vec2(2.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(0, 1, 1, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
             GameHandler.straightRoad()
         })
 
-    val curved: Button = new Button(panel, new Vector2f(3.1f, 0.1f), new Vector2f(0.8f, 0.8f), new Vector4f(0, 1, 0, 1),
+    val curved: Button = new Button(panel, Vec2(3.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(0, 1, 0, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
             GameHandler.curvedRoad()

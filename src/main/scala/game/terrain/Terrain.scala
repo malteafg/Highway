@@ -1,13 +1,13 @@
 package game.terrain
 
 import utils.graphics._
-import utils.math.Vector4f
+import utils.math.Vec4
 
 import scala.collection.mutable.ListBuffer
 
 class Terrain {
 
-    final val color = new Vector4f(0.29f, 0.61f, 0.24f, 1.0f)
+    final val color = Vec4(0.29f, 0.61f, 0.24f, 1.0f)
 
     // in meters
     final val mapsize = 1000f

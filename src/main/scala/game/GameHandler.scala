@@ -5,7 +5,7 @@ import game.roads.{RoadNode, RoadSegment}
 import input.{Feedback, InputEvent, InputHandler, Mouse}
 import rendering.{Camera, GameRenderer}
 import utils.Vals
-import utils.math.{Vector2f, Vector3f}
+import utils.math.{Vec2, Vec3}
 
 object GameHandler {
 
@@ -13,7 +13,7 @@ object GameHandler {
     val camera = new Camera
     var tempSphere: Sphere = _
     var dragging = false
-    val terrainCollisionFunc: () => Vector3f = () => Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f)
+    val terrainCollisionFunc: () => Vec3 = () => Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f)
 
     def init(): Unit = {
         newGame()
@@ -113,7 +113,7 @@ object GameHandler {
     }
 
     private def startRoadPreview(): Unit = startRoadPreview(terrainCollisionFunc())
-    private def startRoadPreview(startPos: Vector3f): Unit = {
+    private def startRoadPreview(startPos: Vec3): Unit = {
         selectedPos = startPos
         previewRoad = new RoadSegment(selectedPos)
     }
@@ -144,12 +144,12 @@ object GameHandler {
             game.nodes.foreach(n => {
                 if (n.position.subtract(cursorPos).length < Vals.LARGE_LANE_WIDTH) {
                     snappedNode = n
-                    game.terrain.lines.head.setPos(new Vector2f(n.position.x, n.position.z))
+                    game.terrain.lines.head.setPos(Vec2(n.position.x, n.position.z))
                     return Feedback.Passive
                 }
             })
             snappedNode = null
-            game.terrain.lines.head.setPos(new Vector2f(cursorPos.x, cursorPos.z))
+            game.terrain.lines.head.setPos(Vec2(cursorPos.x, cursorPos.z))
             Feedback.Passive
         }
     }
@@ -189,8 +189,8 @@ object GameHandler {
     /**
      * Road preview
      */
-    var selectedPos: Vector3f = _
-    var selectedDirection: Vector3f = _
+    var selectedPos: Vec3 = _
+    var selectedDirection: Vec3 = _
     var previewRoad: RoadSegment = _
     var selectedNode: RoadNode = _
     var snappedNode: RoadNode = _

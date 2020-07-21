@@ -1,10 +1,9 @@
 package rendering
 
 import game.{Game, GameHandler, Sphere}
-import org.lwjgl.opengl.GL11.{GL_BACK, GL_CULL_FACE, GL_TRIANGLES, GL_UNSIGNED_INT, glCullFace, glDrawElements, glEnable, glDisable}
-import utils.Vals
-import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray, VertexBuffer, VertexBufferLayout}
-import utils.math.{Matrix4f, Vector2f, Vector4f}
+import org.lwjgl.opengl.GL11.{GL_BACK, GL_CULL_FACE, GL_TRIANGLES, GL_UNSIGNED_INT, glCullFace, glDisable, glDrawElements, glEnable}
+import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray}
+import utils.math.{Mat4, Vec2, Vec4}
 
 object GameRenderer {
 
@@ -21,7 +20,7 @@ object GameRenderer {
         Shader.get("sphere").loadUniformVec3f("cameraPos", camera.getCameraPos)
         Shader.get("sphere").loadUniformBoolean("darkEdge", darkEdges)
         game.spheres.foreach(s => {
-            Shader.get("sphere").loadUniformMat4f("transformationMatrix", Matrix4f.translate(s.position))
+            Shader.get("sphere").loadUniformMat4f("transformationMatrix", Mat4.translate(s.position))
             Shader.get("sphere").loadUniformVec4f("color", s.color)
             draw(Sphere.mesh.va, Sphere.mesh.ib)
         })
@@ -31,10 +30,10 @@ object GameRenderer {
 
         // load lines for terrain
         val lines = game.terrain.lines
-        val pos1 = new Array[Vector2f](lines.length)
-        val pos2 = new Array[Vector2f](lines.length)
+        val pos1 = new Array[Vec2](lines.length)
+        val pos2 = new Array[Vec2](lines.length)
         val width = new Array[Float](lines.length)
-        val color = new Array[Vector4f](lines.length)
+        val color = new Array[Vec4](lines.length)
         var counter = 0
         lines.foreach(l => {
             val line = l.getLine()
@@ -53,11 +52,11 @@ object GameRenderer {
         // render road segments
         Shader.get("road").bind()
         Shader.get("road").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
-        Shader.get("road").loadUniformVec4f("in_Color", new Vector4f(0.4f, 0.4f, 0.4f, 1.0f))
+        Shader.get("road").loadUniformVec4f("in_Color", new Vec4(0.4f, 0.4f, 0.4f, 1.0f))
         for(s <- game.roads) {
             draw(s.mesh.va, s.mesh.ib)
         }
-        Shader.get("road").loadUniformVec4f("in_Color", new Vector4f(0.3f, 0.3f, 0.9f, 0.7f))
+        Shader.get("road").loadUniformVec4f("in_Color", new Vec4(0.3f, 0.3f, 0.9f, 0.5f))
         if(GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
 
         glDisable(GL_CULL_FACE)

@@ -1,11 +1,11 @@
 package utils
 
-import utils.math.Vector3f
+import utils.math.Vec3
 
 object Bezier {
 
-    def getPoint(t: Float, points: Array[Vector3f]) = {
-        var v = new Vector3f()
+    def getPoint(t: Float, points: Array[Vec3]) = {
+        var v = new Vec3()
         var r = Math.pow(1 - t, points.length - 1).toFloat
         var l = 1.0f
         var i = 0
@@ -23,8 +23,8 @@ object Bezier {
         v
     }
 
-    def getDirection(t: Float, points: Array[Vector3f]) = {
-        var v = new Vector3f()
+    def getDirection(t: Float, points: Array[Vec3]) = {
+        var v = new Vec3()
         var r = Math.pow(1 - t, points.length - 1).toFloat
         var l = 1.0f
         var i = 0
@@ -42,8 +42,8 @@ object Bezier {
         v.scale(points.length)
     }
 
-    def circleCurve(v1: Vector3f, r: Vector3f, v2: Vector3f): Array[Vector3f] = {
-        val points = new Array[Vector3f](4)
+    def circleCurve(v1: Vec3, r: Vec3, v2: Vec3): Array[Vec3] = {
+        val points = new Array[Vec3](4)
 
         val ab = v2.subtract(v1)
         val d = ab.normalize.dot(r.normalize)

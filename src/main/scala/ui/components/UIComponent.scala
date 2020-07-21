@@ -2,13 +2,14 @@ package ui.components
 
 import input.InputHandler
 import input.InputEvent
-import utils.math.{Vector2f, Vector4f}
+import utils.math.{Vec2, Vec4}
 import utils.Vals
 import utils.graphics.Texture
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
-class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f, protected var size: Vector2f, protected val color: Vector4f) {
+class UIComponent(protected val parent: UIComponent, protected var pos: Vec2, protected var size: Vec2, protected val color: Vec4) {
 
     var tex: Texture = null
 
@@ -22,14 +23,14 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f
     /**
      * Constructors
      */
-    def this(par: UIComponent, x: Float, y: Float, width: Float, height: Float, c: Vector4f) {
-        this(par, new Vector2f(x, y), new Vector2f(width, height), c)
+    def this(par: UIComponent, x: Float, y: Float, width: Float, height: Float, c: Vec4) {
+        this(par, Vec2(x, y), Vec2(width, height), c)
     }
 
     /**
      * Functions
      */
-    def isInside(vec: Vector2f): Boolean = {
+    def isInside(vec: Vec2): Boolean = {
         val p = getPos
         active && vec.x > p.x && vec.y > p.y && vec.x < p.x + size.x && vec.y < p.y + size.y
     }
@@ -40,19 +41,19 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vector2f
         b
     }
 
-    def addTexture(tex: Texture) = this.tex = tex
+    def addTexture(tex: Texture): Unit = this.tex = tex
 
     /**
      * Getters and Setters
      */
-    def getChildren() = children
-    def getPos: Vector2f = if(parent != null) parent.getPos.add(pos) else pos
-    def getSize: Vector2f = size
-    def getColor: Vector4f = color
+    def getChildren: ListBuffer[UIComponent] = children
+    def getPos: Vec2 = if(parent != null) parent.getPos.add(pos) else pos
+    def getSize: Vec2 = size
+    def getColor: Vec4 = color
 
-    def isActive(): Boolean = if(parent == null || !active) active else parent.isActive()
-    def activate() = active = true
-    def deactivate() = active = false
+    def isActive: Boolean = if(parent == null || !active) active else parent.isActive
+    def activate(): Unit = active = true
+    def deactivate(): Unit = active = false
 
     def depth(): Int = if(parent == null) 0 else parent.depth() + 1
 

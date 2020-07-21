@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL30.glBindVertexArray
 import org.lwjgl.opengl.GL45.{glCreateBuffers, glCreateTextures, glCreateVertexArrays, glEnableVertexArrayAttrib}
 import ui.components.UIComponent
 import utils.graphics.Shader
-import utils.math.{Vector2f, Vector4f}
+import utils.math.{Vec2, Vec4}
 
 import scala.collection.mutable
 
@@ -107,7 +107,7 @@ object UIRenderer {
         quadCount = 0
     }
 
-    def drawQuad(pos: Vector2f, size: Vector2f, color: Vector4f): Unit = {
+    def drawQuad(pos: Vec2, size: Vec2, color: Vec4): Unit = {
         if (quadCount >= maxQuadCount) flush()
 
         bufferData(quadCount * vertexSize * 4 + 0) = pos.x
@@ -157,7 +157,7 @@ object UIRenderer {
         quadCount += 1
     }
 
-    def drawQuad(pos: Vector2f, size: Vector2f, textureID: Int): Unit = {
+    def drawQuad(pos: Vec2, size: Vec2, textureID: Int): Unit = {
         if (quadCount >= maxQuadCount || texSlotIndex >= maxTextures) flush()
 
         var texIndex = 0.0f
@@ -172,7 +172,7 @@ object UIRenderer {
             glBindTexture(GL_TEXTURE_2D, textureID)
         }
 
-        val color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
+        val color = Vec4(1.0f, 1.0f, 1.0f, 1.0f)
 
         bufferData(quadCount * vertexSize * 4 + 0) = pos.x
         bufferData(quadCount * vertexSize * 4 + 1) = pos.y
@@ -230,10 +230,10 @@ object UIRenderer {
         elements.enqueue(screen)
         while (!elements.isEmpty) {
             val e = elements.dequeue()
-            if (e.isActive()) {
+            if (e.isActive) {
                 if (e.tex == null) UIRenderer.drawQuad(e.getPos, e.getSize, e.getColor)
                 else UIRenderer.drawQuad(e.getPos, e.getSize, e.tex.getTextureID)
-                elements.enqueueAll(e.getChildren())
+                elements.enqueueAll(e.getChildren)
             }
         }
         UIRenderer.flush()

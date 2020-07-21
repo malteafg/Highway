@@ -1,13 +1,13 @@
 package input
 
 import game.GameHandler
-import utils.math.Vector2f
+import utils.math.Vec2
 import ui.Interface
 import utils.{Options, Vals}
 
 object InputHandler {
 
-    var mousePos: Vector2f = new Vector2f()
+    var mousePos: Vec2 = new Vec2()
 
     val keyPressSubs: Subscriber    = new Subscriber(_ => Feedback.Passive, null)
     val charSubs: Subscriber        = new Subscriber(_ => Feedback.Passive, null)
@@ -53,7 +53,7 @@ object InputHandler {
         Options.log(s"Mouse was moved to (${mousePos.x}, ${mousePos.y})", Options.MouseMoved)
         mouseMoveSubs.iterate(event)
 
-        mousePos.set(xpos.toInt, ypos.toInt)
+        mousePos = Vec2(xpos.toInt, ypos.toInt)
     }
 
     def mouseScrolled(window: Long, xScroll: Double, yScroll: Double): Unit = {
