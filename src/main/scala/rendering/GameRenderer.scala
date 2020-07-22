@@ -1,10 +1,14 @@
 package rendering
 
 import game.{Game, GameHandler, Sphere}
-import org.lwjgl.opengl.GL11.{GL_BACK, GL_CULL_FACE, GL_TRIANGLES, GL_UNSIGNED_INT, glBindTexture, glCullFace, glDisable, glDrawElements, glEnable}
-import org.lwjgl.opengl.GL13.{GL_TEXTURE0, GL_TEXTURE_CUBE_MAP, glActiveTexture}
+import org.lwjgl.opengl.GL11._
+import org.lwjgl.opengl.GL13._
+import org.lwjgl.opengl.GL15._
+import org.lwjgl.opengl.GL30._
+import org.lwjgl.opengl.GL43._
+import org.lwjgl.opengl.GL45._
 import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray}
-import utils.math.{Mat4, Vec2, Vec4}
+import utils.math.{Mat4, Vec2, Vec4, VecUtils}
 
 object GameRenderer {
 
@@ -12,6 +16,28 @@ object GameRenderer {
 
     private val terrainShader = Shader.get("terrain")
     private val skybox = new Skybox
+
+    val pos1ID = glCreateBuffers()
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pos1ID)
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 20 * 4, GL_DYNAMIC_DRAW)
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, pos1ID)
+
+    val pos2ID = glCreateBuffers()
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pos2ID)
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 20 * 4, GL_DYNAMIC_DRAW)
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, pos2ID)
+
+    val widthID = glCreateBuffers()
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, widthID)
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 10 * 4, GL_DYNAMIC_DRAW)
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, widthID)
+
+    val colorID = glCreateBuffers()
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, colorID)
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 40 * 4, GL_DYNAMIC_DRAW)
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, colorID)
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0)
+
 
     def render(game: Game, camera: Camera): Unit = {
         glEnable(GL_CULL_FACE)
@@ -45,11 +71,22 @@ object GameRenderer {
             color(counter) = line._4
             counter += 1
         })
-        terrainShader.setUniformVec2fa("pos1", pos1)
-        terrainShader.setUniformVec2fa("pos2", pos2)
-        terrainShader.setUniform1fa("width", width)
-        terrainShader.setUniformVec4fa("color", color)
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, pos1ID)
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, VecUtils.toFloatArray(pos1))
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, pos2ID)
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, VecUtils.toFloatArray(pos2))
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, widthID)
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, width)
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, colorID)
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, VecUtils.toFloatArray(color))
+
         draw(game.terrain.terrainMesh)
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0)
 
         // render road segments
         Shader.get("road").bind()

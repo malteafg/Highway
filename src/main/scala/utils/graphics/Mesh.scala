@@ -15,7 +15,7 @@ class Mesh(vertices: Array[Float], indices: Array[Int], layout: Array[Int]) {
      * Constructors
      */
     def this(vertices: Array[Vec3], indices: Array[Int], layout: Array[Int]) {
-        this(VecUtils.convertToFloatArray(vertices), indices, layout)
+        this(VecUtils.toFloatArray(vertices), indices, layout)
     }
 
     /**

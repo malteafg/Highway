@@ -21,10 +21,18 @@ void main() {
 
 layout(location = 0) out vec4 o_Color;
 
-uniform vec2 pos1[1];
-uniform vec2 pos2[1];
-uniform float width[1];
-uniform vec4 color[1];
+layout(std430, binding = 2) buffer pos1buffer {
+    vec2 pos1[];
+};
+layout(std430, binding = 3) buffer pos2buffer {
+    vec2 pos2[];
+};
+layout(std430, binding = 4) buffer widthbuffer {
+    float width[];
+};
+layout(std430, binding = 5) buffer colorbuffer {
+    vec4 color[];
+};
 
 in vec2 worldPos;
 flat in vec4 v_Color;
@@ -48,7 +56,11 @@ float smoothEdge(float f) {
 }
 
 void main() {
-    float dist = distToLine(0);
-    bool b = dist <= width[0] / 2.0f;
-    o_Color = addColors(v_Color, (b ? color[0] : vec4(0,0,0,0)), b ? smoothEdge(2 * dist / width[0]) : 1.0);
+    float mindist = 1000;
+    for(int i = 0; i < pos1.length(); i++) {
+        mindist = min(mindist, distToLine(i));
+    }
+
+    bool b = mindist <= width[0] / 2.0f;
+    o_Color = addColors(v_Color, (b ? color[0] : vec4(0,0,0,0)), b ? smoothEdge(2 * mindist / width[0]) : 1.0);
 }
