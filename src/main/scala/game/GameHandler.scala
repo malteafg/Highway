@@ -1,11 +1,13 @@
 package game
 
-import game.GameHandler.{previewRoad, selectSnapNode, snappedNode}
 import game.roads.{RoadNode, RoadSegment}
+import game.terrain.TerrainLine
 import input.{Feedback, InputEvent, InputHandler, Mouse}
 import rendering.{Camera, GameRenderer}
 import utils.Vals
-import utils.math.{Vec2, Vec3}
+import utils.math.{Vec2, Vec3, Vec4}
+
+import scala.collection.mutable
 
 object GameHandler {
 
@@ -130,6 +132,11 @@ object GameHandler {
         Feedback.Passive
     })
 
+    /**
+     * Node Snapping
+     */
+    val cursorMarker = new TerrainLine(width = 6, color = Vec4(0.2f, 0.4f, 1f, 0.8f))
+
     private def selectSnapNode(node: RoadNode): Unit = {
         selectedNode = node
         snappedNode = null
@@ -144,12 +151,12 @@ object GameHandler {
             game.nodes.foreach(n => {
                 if (n.position.subtract(cursorPos).length < Vals.LARGE_LANE_WIDTH) {
                     snappedNode = n
-                    game.terrain.lines.head.setPos(Vec2(n.position.x, n.position.z))
+                    cursorMarker.setPosAsPoint(Vec2(n.position.x, n.position.z))
                     return Feedback.Passive
                 }
             })
             snappedNode = null
-            game.terrain.lines.head.setPos(Vec2(cursorPos.x, cursorPos.z))
+            cursorMarker.setPosAsPoint(Vec2(cursorPos.x, cursorPos.z))
             Feedback.Passive
         }
     }
@@ -157,6 +164,11 @@ object GameHandler {
     private def turnOnSnap(): Unit = {
         InputHandler.addMouseMoveSub(nodeSnapper)
     }
+
+    /**
+     * Road guidelines
+     */
+    val guidelines = new mutable.ListBuffer[TerrainLine]()
 
     /**
      * Modes

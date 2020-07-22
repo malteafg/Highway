@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 class Game {
 
     val terrain = new Terrain
-    //terrain.lines.addOne(new TerrainLine(Vec2(10, 0), Vec2(10, 5), 2, Vec4(1.0f, 0.0f, 0.2f, 0.8f)))
+    addLineToTerrain(new TerrainLine(Vec2(10), Vec2(10, 5), 2, Vec4(1.0f, 0.0f, 0.2f, 0.8f)))
     val spheres = new ListBuffer[Sphere]()
 
     val roads = new ListBuffer[RoadSegment]()
@@ -21,5 +21,7 @@ class Game {
         nodes.addOne(endNode)
         roads.addOne(new RoadSegment(startNode, endNode, mesh))
     }
+
+    def addLineToTerrain(line: TerrainLine): Unit = terrain.addLine(line)
 
 }

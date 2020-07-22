@@ -34,6 +34,8 @@ layout(std430, binding = 5) buffer colorbuffer {
     vec4 color[];
 };
 
+uniform int numOfLines;
+
 in vec2 worldPos;
 flat in vec4 v_Color;
 
@@ -57,10 +59,15 @@ float smoothEdge(float f) {
 
 void main() {
     float mindist = 1000;
-    for(int i = 0; i < pos1.length(); i++) {
-        mindist = min(mindist, distToLine(i));
+    int line = 0;
+    for(int i = 0; i < numOfLines; i++) {
+        float dist = distToLine(i);
+        if (distToLine(i) < mindist) {
+            mindist = dist;
+            line = i;
+        }
     }
 
-    bool b = mindist <= width[0] / 2.0f;
-    o_Color = addColors(v_Color, (b ? color[0] : vec4(0,0,0,0)), b ? smoothEdge(2 * mindist / width[0]) : 1.0);
+    bool b = mindist <= width[line] / 2.0f;
+    o_Color = addColors(v_Color, (b ? color[line] : vec4(0,0,0,0)), b ? smoothEdge(2 * mindist / width[line]) : 1.0);
 }

@@ -16,12 +16,17 @@ object ShaderLoader {
     def loadAll(): Unit = {
         loadShader("UI", Vals.UIProjMatrix)
         loadShader("sphere", Vals.perspectiveMatrix)
-        loadShader("terrain", Vals.perspectiveMatrix)
         loadShader("road", Vals.perspectiveMatrix)
         loadShader("skybox", Vals.perspectiveMatrix)
+
+        val terrain = loadShader("terrain", Vals.perspectiveMatrix)
+        terrain.createStorageBuffer(2)
+        terrain.createStorageBuffer(3)
+        terrain.createStorageBuffer(4)
+        terrain.createStorageBuffer(5)
     }
 
-    private def loadShader(file: String, projMatrix: Mat4 = null): Unit = {
+    private def loadShader(file: String, projMatrix: Mat4 = null): Shader = {
         val program = glCreateProgram()
         val shaderProgam = readShaderProgram(file)
 
@@ -39,8 +44,9 @@ object ShaderLoader {
         Shader.put(file, shader)
         if(projMatrix != null) {
             shader.bind()
-            shader.loadUniformMat4f("projMatrix", projMatrix)
+            shader.uniformMat4f("projMatrix", projMatrix)
         }
+        shader
     }
 
     private def readShaderProgram(file: String): (Int, Int, Int) = {

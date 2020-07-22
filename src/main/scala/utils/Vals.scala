@@ -6,11 +6,11 @@ import org.lwjgl.opengl.GL11._
 
 object Vals {
 
-    final val UNIT: Int = 80
+    final val UNIT: Int = 100
     final val WIDTH: Int = 16 * UNIT
     final val HEIGHT: Int = 9 * UNIT
 
-    final val UI_COLOR: Vec4 = new Vec4(0.3f, 0.4f, 0.5f, 1.0f)
+    final val UI_COLOR: Vec4 = Vec4(0.3f, 0.4f, 0.5f, 1.0f)
 
     final val MIN_CAMERA_PITCH: Float = 0.1f
     final val MAX_CAMERA_PITCH: Float = 1.5f
@@ -74,5 +74,7 @@ object Vals {
     
     val perspectiveMatrix = Mat4.perspective(30, 1f, 5000f)
     val UIProjMatrix = Mat4.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
+
+    val defaultTerrainLineColor = Vec4(1.0f, 0.0f, 0.2f, 0.8f)
     
 }

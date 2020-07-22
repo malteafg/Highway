@@ -91,7 +91,7 @@ object UIRenderer {
         val samplers = new Array[Int](32)
         for (i <- 0 until 32) samplers(i) = i
         Shader.get("UI").bind()
-        Shader.get("UI").loadUniformIntV("u_Textures", samplers)
+        Shader.get("UI").uniform1iv("u_Textures", samplers)
     }
 
     def flush(): Unit = {
