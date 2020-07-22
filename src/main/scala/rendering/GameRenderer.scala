@@ -1,7 +1,8 @@
 package rendering
 
 import game.{Game, GameHandler, Sphere}
-import org.lwjgl.opengl.GL11.{GL_BACK, GL_CULL_FACE, GL_TRIANGLES, GL_UNSIGNED_INT, glCullFace, glDisable, glDrawElements, glEnable}
+import org.lwjgl.opengl.GL11.{GL_BACK, GL_CULL_FACE, GL_TRIANGLES, GL_UNSIGNED_INT, glBindTexture, glCullFace, glDisable, glDrawElements, glEnable}
+import org.lwjgl.opengl.GL13.{GL_TEXTURE0, GL_TEXTURE_CUBE_MAP, glActiveTexture}
 import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray}
 import utils.math.{Mat4, Vec2, Vec4}
 
@@ -9,9 +10,10 @@ object GameRenderer {
 
     var darkEdges = false
 
-    val terrainShader = Shader.get("terrain")
+    private val terrainShader = Shader.get("terrain")
+    private val skybox = new Skybox
 
-    def render(game: Game, camera: Camera) = {
+    def render(game: Game, camera: Camera): Unit = {
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
 
@@ -52,14 +54,23 @@ object GameRenderer {
         // render road segments
         Shader.get("road").bind()
         Shader.get("road").loadUniformMat4f("viewMatrix", camera.getViewMatrix)
-        Shader.get("road").loadUniformVec4f("in_Color", new Vec4(0.4f, 0.4f, 0.4f, 1.0f))
+        Shader.get("road").loadUniformVec4f("in_Color", Vec4(0.4f, 0.4f, 0.4f, 1.0f))
         for(s <- game.roads) {
             draw(s.mesh.va, s.mesh.ib)
         }
-        Shader.get("road").loadUniformVec4f("in_Color", new Vec4(0.3f, 0.3f, 0.9f, 0.5f))
+        Shader.get("road").loadUniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.5f))
         if(GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
 
         glDisable(GL_CULL_FACE)
+
+        // render skybox
+        skybox.shader.bind()
+        skybox.shader.loadUniformMat4f("viewMatrix", camera.getViewMatrix)
+        skybox.shader.loadUniformMat4f("transformationMatrix", Mat4.translate(0, -100, 0))
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture.getTextureID)
+        draw(skybox.mesh)
+        glActiveTexture(0)
     }
 
     def draw(mesh: Mesh): Unit = draw(mesh.va, mesh.ib)

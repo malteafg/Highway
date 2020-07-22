@@ -1,4 +1,4 @@
-import game.{GameHandler}
+import game.GameHandler
 import org.lwjgl.opengl.GL11._
 import input.InputHandler
 import org.lwjgl.glfw.GLFW._
@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL13._
 import org.lwjgl.system.MemoryUtil.NULL
 import utils.{Options, Vals}
 import ui.Interface
-import utils.graphics.{Shader}
+import utils.loader.{ShaderLoader, TextureLoader}
 
 object Main {
 
@@ -58,14 +58,12 @@ object Main {
         System.out.println("OpenGL: " + glGetString(GL_VERSION))
 
         // loading
-        Shader.loadShader("UI", Vals.UIProjMatrix)
-        Shader.loadShader("sphere", Vals.perspectiveMatrix)
-        Shader.loadShader("terrain", Vals.perspectiveMatrix)
-        Shader.loadShader("road", Vals.perspectiveMatrix)
+        ShaderLoader.loadAll()
+        TextureLoader.loadAll()
 
         // initialization
-        GameHandler.init
-        Interface.init
+        GameHandler.init()
+        Interface.init()
     }
 
     private def gameUpdate(): Unit = {

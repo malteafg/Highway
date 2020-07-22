@@ -19,7 +19,7 @@ object Interface {
             GameRenderer.darkEdges = b
         }, false, 0)
 
-    button1.addTexture(new Texture("logo"))
+    button1.addTexture(Texture.get("logo"))
 
     val button2: Button = new Button(panel, Vec2(1.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(1, 1, 0, 1),
         () => "Middle button", () => {

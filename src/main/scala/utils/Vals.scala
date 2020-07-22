@@ -72,9 +72,7 @@ object Vals {
         }
     }
     
-    val perspectiveMatrix = Mat4.perspective(30, 1f, 10000f)
+    val perspectiveMatrix = Mat4.perspective(30, 1f, 5000f)
     val UIProjMatrix = Mat4.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
-    
-    
     
 }

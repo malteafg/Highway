@@ -3,12 +3,12 @@ package rendering
 import java.nio.{ByteBuffer, ByteOrder}
 
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
-import org.lwjgl.opengl.GL13.glActiveTexture
+import org.lwjgl.opengl.GL12._
+import org.lwjgl.opengl.GL13._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20.glVertexAttribPointer
 import org.lwjgl.opengl.GL30.glBindVertexArray
-import org.lwjgl.opengl.GL45.{glCreateBuffers, glCreateTextures, glCreateVertexArrays, glEnableVertexArrayAttrib}
+import org.lwjgl.opengl.GL45.{glCreateBuffers, glCreateVertexArrays, glEnableVertexArrayAttrib}
 import ui.components.UIComponent
 import utils.graphics.Shader
 import utils.math.{Vec2, Vec4}
@@ -75,7 +75,7 @@ object UIRenderer {
         glBindVertexArray(0)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
 
-        val whiteTex = glCreateTextures(GL_TEXTURE_2D)
+        val whiteTex = glGenTextures()
         glBindTexture(GL_TEXTURE_2D, whiteTex)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)

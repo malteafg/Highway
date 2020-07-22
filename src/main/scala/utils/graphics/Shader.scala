@@ -1,12 +1,9 @@
 package utils.graphics
 
-import java.io.{BufferedReader, FileReader, IOException}
 import java.nio.FloatBuffer
 
 import utils.math._
-import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
-import org.lwjgl.opengl.GL32._
 import org.lwjgl.system.MemoryStack
 
 import scala.collection.mutable
@@ -124,72 +121,7 @@ object Shader {
 
     private val shaders = mutable.Map.empty[String, Shader]
 
-    def get(shader: String): Shader = shaders.getOrElse(shader, throw new ShaderError(s"Shader $shader not loaded"))
-
-    def loadShader(file: String, projMatrix: Mat4 = null): Unit = {
-        val program = glCreateProgram()
-        val shaderProgam = readShaderProgram(file)
-
-        glAttachShader(program, shaderProgam._1)
-        if (shaderProgam._2 != -1) glAttachShader(program, shaderProgam._2)
-        glAttachShader(program, shaderProgam._3)
-        glLinkProgram(program)
-        glValidateProgram(program)
-
-        glDeleteShader(shaderProgam._1)
-        if (shaderProgam._2 != -1) glDeleteShader(shaderProgam._2)
-        glDeleteShader(shaderProgam._3)
-
-        val shader = new Shader(program)
-        shaders.put(file, shader)
-        if(projMatrix != null) {
-            shader.bind()
-            shader.loadUniformMat4f("projMatrix", projMatrix)
-        }
-    }
-
-    private def readShaderProgram(file: String): (Int, Int, Int) = {
-        val vertSource = new StringBuilder
-        val geomSource = new StringBuilder
-        val fragSource = new StringBuilder
-        try {
-            val reader = new BufferedReader(new FileReader(s"src/main/resources/shaders/$file.shader"))
-            if (!reader.readLine().contains("#vertex")) throw new ShaderError(s"vertex shader not found in $file")
-            var line = readShader(vertSource, reader, "#vertex")
-            if (line.contains("#geometry")) line = readShader(geomSource, reader, "#geometry")
-            if (!line.contains("#fragment")) throw new ShaderError(s"fragment shader not found in $file")
-            readShader(fragSource, reader, "#fragment")
-            reader.close()
-        } catch {
-            case e: IOException =>
-                e.printStackTrace()
-                System.exit(-1)
-        }
-        (compileShader(vertSource.result(), GL_VERTEX_SHADER), if (geomSource.isEmpty) -1 else compileShader(geomSource.result(), GL_GEOMETRY_SHADER), compileShader(fragSource.result(), GL_FRAGMENT_SHADER))
-    }
-
-    private def readShader(source: mutable.StringBuilder, reader: BufferedReader, shader: String): String = {
-        var line = reader.readLine()
-        do {
-            source.append(line).append("//\n")
-            line = reader.readLine()
-        } while (line != null && !line.contains("#vertex") && !line.contains("#geometry") && !line.contains("#fragment"))
-        line
-    }
-
-    private def compileShader(source: String, shaderType: Int): Int = {
-        val id = glCreateShader(shaderType)
-        glShaderSource(id, source)
-        glCompileShader(id)
-
-        if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE) {
-            System.out.println(glGetShaderInfoLog(id, 500))
-            println(s"Could not compile shader: $source")
-            System.exit(-1)
-        }
-        id
-    }
-
-    class ShaderError(msg: String) extends RuntimeException
+    def get(shader: String): Shader = shaders.getOrElse(shader, throw new Error(s"Shader $shader not loaded"))
+    def put(file: String, shader: Shader): Unit = shaders.put(file, shader)
 
 }
