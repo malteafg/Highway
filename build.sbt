@@ -13,7 +13,8 @@ libraryDependencies ++= {
     Seq(
         "lwjgl",
         "lwjgl-glfw",
-        "lwjgl-opengl"
+        "lwjgl-opengl",
+        "lwjgl-assimp"
         // TODO: Add more modules here
     ).flatMap {
         module => {
