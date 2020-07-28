@@ -125,7 +125,6 @@ object GameHandler {
         val cursorPos = terrainCollisionFunc()
         if (previewRoad != null) {
             if (mode == StraightRoad || selectedDirection == null) previewRoad.updateMesh(RoadSegment.generateStraightMesh(selectedPos,
-//                if (selectedDirection == null) cursorPos else selectedPos.add(selectedDirection.scale(selectedPos.subtract(cursorPos).length))))
                 if (selectedDirection == null) cursorPos else selectedPos.add(cursorPos.subtract(selectedPos).proj(selectedDirection).thisOrThat(v => v.dot(selectedDirection) > 0, Vec3()))))
             else previewRoad.updateMesh(RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, terrainCollisionFunc())._1)
             Feedback.Passive

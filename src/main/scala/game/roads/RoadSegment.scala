@@ -14,8 +14,8 @@ class RoadSegment(startPoint: RoadNode, endPoint: RoadNode, var mesh: Mesh) {
      */
     // used for preview road
     def this(selectedPos: Vec3) {
-        this(new RoadNode(new Vec3(), new Vec3()), new RoadNode(new Vec3(), new Vec3()),
-            RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(new Vec3(0, 0, 1f))))
+        this(new RoadNode(Vec3(), Vec3()), new RoadNode(Vec3(), Vec3()),
+            RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(Vec3(z = 1f))))
     }
 
     def updateMesh(newMesh: Mesh): Unit = {
