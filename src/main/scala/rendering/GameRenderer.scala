@@ -1,11 +1,13 @@
 package rendering
 
+import game.roads.RoadNode
 import game.terrain.TerrainLine
 import game.{Game, GameHandler, Sphere}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL13._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL43._
+import utils.Vals
 import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray}
 import utils.math.{Mat4, Vec2, Vec4, VecUtils}
 
@@ -65,11 +67,21 @@ object GameRenderer {
         Shader.get("road").bind()
         Shader.get("road").uniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("road").uniformVec4f("in_Color", Vec4(0.4f, 0.4f, 0.4f, 1.0f))
-        for(s <- game.roads) {
-            draw(s.mesh.va, s.mesh.ib)
+        for(r <- game.roads) {
+            draw(r.mesh.va, r.mesh.ib)
         }
         Shader.get("road").uniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.5f))
         if(GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
+
+        Shader.get("node").bind()
+        Shader.get("node").uniformMat4f("viewMatrix", camera.getViewMatrix)
+        Shader.get("node").uniformVec4f("in_Color", Vec4(0.0f, 0.8f, 0.8f, 1.0f))
+
+        for(n <- game.nodes) {
+            Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.1f)))
+            draw(RoadNode.mesh)
+        }
+
 
         glDisable(GL_CULL_FACE)
 

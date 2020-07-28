@@ -18,6 +18,7 @@ object ShaderLoader {
         loadShader("sphere", Vals.perspectiveMatrix)
         loadShader("road", Vals.perspectiveMatrix)
         loadShader("skybox", Vals.perspectiveMatrix)
+        loadShader("node", Vals.perspectiveMatrix)
 
         val terrain = loadShader("terrain", Vals.perspectiveMatrix)
         terrain.createStorageBuffer(2)

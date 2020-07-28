@@ -107,11 +107,11 @@ object RoadSegment {
             }
 
             indices(indices.length - 6) = (numOfCuts - 1) * 4 + 0
-            indices(indices.length - 5) = (numOfCuts - 1) * 4 + 1
-            indices(indices.length - 4) = (numOfCuts - 1) * 4 + 2
+            indices(indices.length - 5) = (numOfCuts - 1) * 4 + 2
+            indices(indices.length - 4) = (numOfCuts - 1) * 4 + 1
             indices(indices.length - 3) = (numOfCuts - 1) * 4 + 2
-            indices(indices.length - 2) = (numOfCuts - 1) * 4 + 3
-            indices(indices.length - 1) = (numOfCuts - 1) * 4 + 0
+            indices(indices.length - 2) = (numOfCuts - 1) * 4 + 0
+            indices(indices.length - 1) = (numOfCuts - 1) * 4 + 3
 
             indicesMap.put(numOfCuts, indices)
             indices
