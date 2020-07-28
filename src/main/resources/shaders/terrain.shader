@@ -60,14 +60,21 @@ float smoothEdge(float f) {
 void main() {
     float mindist = 1000;
     int line = 0;
+    o_Color = v_Color;
     for(int i = 0; i < numOfLines; i++) {
         float dist = distToLine(i);
-        if (distToLine(i) < mindist) {
+
+        bool b = dist <= width[i] / 2.0f;
+        o_Color = addColors(o_Color, (b ? color[i] : vec4(0,0,0,0)), b ? smoothEdge(2 * dist / width[i]) : 1.0);
+
+        /*
+        if (dist < mindist || dist <= width[i] / 2.0f) {
             mindist = dist;
             line = i;
         }
+        */
     }
 
-    bool b = mindist <= width[line] / 2.0f;
-    o_Color = addColors(v_Color, (b ? color[line] : vec4(0,0,0,0)), b ? smoothEdge(2 * mindist / width[line]) : 1.0);
+//    bool b = mindist <= width[line] / 2.0f;
+//    o_Color = addColors(v_Color, (b ? color[line] : vec4(0,0,0,0)), b ? smoothEdge(2 * mindist / width[line]) : 1.0);
 }

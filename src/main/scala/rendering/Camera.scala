@@ -8,14 +8,14 @@ class Camera {
 
     // x = pitch, y = yaw, z = dist to target
     var orientation = Vals.CAMERA_STANDARD_ORIENTATION
-    var targetPos   = new Vec3()
+    var targetPos   = Vec3()
 
     var input: Array[Boolean] = new Array[Boolean](6)
 
     var dragging: Boolean = false
 
-    var nextOrientation:  Vec3 = new Vec3(0.4f, 0, 10.0f)
-    var nextTargetPos:    Vec3 = new Vec3(0, 0f, 0.0f)
+    var nextOrientation:  Vec3 = Vals.CAMERA_TOPDOWN_ORIENTATION
+    var nextTargetPos:    Vec3 = Vec3()
 
     var progress = 0.0f
     var progressionSpeed = Vals.CAMERA_MOVE_SPEED

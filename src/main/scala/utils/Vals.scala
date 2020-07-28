@@ -23,10 +23,13 @@ object Vals {
     
     final val CAMERA_STANDARD_ORIENTATION: Vec3 = Vec3(Vals.MIN_CAMERA_PITCH, 0f, 100.0f)
 
+    final val CAMERA_TOPDOWN_ORIENTATION: Vec3 = Vec3(Vals.MAX_CAMERA_PITCH, 0f, 100.0f)
+
     final val CONTROL_POINT_COLOR: Vec4 = Vec4(0, 0.4f, 0.8f, 1)
 
     final val ROAD_HEIGHT: Float = 0.2f
-    final val ROAD_VERTEX_DENSITY: Float = 0.5f
+    final val ROAD_VERTEX_DENSITY: Float = 0.25f
+    final val ROAD_VERTEX_MINIMUM: Int = 10
     final val LARGE_LANE_WIDTH: Float = 3.7f
 
     def getSizeOf(t: Int): Int = t match {

@@ -41,7 +41,7 @@ object RoadSegment {
 
     def generateCurvedMesh(pos: Vec3, dir: Vec3, point: Vec3): (Mesh, Vec3) = {
         val controlPoints = Bezier.circleCurve(pos, dir, point)
-        var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt
+        var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
         if (numOfCuts < 2) numOfCuts = 2
         val vertices = new Array[Vec3](numOfCuts * 4)
 

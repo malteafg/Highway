@@ -20,7 +20,7 @@ class Terrain {
         for(y <- 0 until vertexLength) {
             val r = Math.random().toFloat * 0.06f + 0.97f
             vertices((x * vertexLength + y) * 7 + 0) = -mapsize / 2 + x
-            vertices((x * vertexLength + y) * 7 + 1) = 0.0f
+            vertices((x * vertexLength + y) * 7 + 1) = Math.random().toFloat * 0.1f
             vertices((x * vertexLength + y) * 7 + 2) = -mapsize / 2 + y
             vertices((x * vertexLength + y) * 7 + 3) = color.x * r
             vertices((x * vertexLength + y) * 7 + 4) = color.y * r
