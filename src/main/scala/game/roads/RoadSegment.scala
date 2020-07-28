@@ -6,16 +6,15 @@ import utils.math.Vec3
 
 import scala.collection.mutable
 
-// straight roads have empty controlpoints
-class RoadSegment(startPoint: RoadNode, endPoint: RoadNode, var mesh: Mesh) {
+class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: mutable.ListBuffer[Lane], var mesh: Mesh) {
 
     /**
      * Constructors
      */
     // used for preview road
     def this(selectedPos: Vec3) {
-        this(new RoadNode(Vec3(), Vec3()), new RoadNode(Vec3(), Vec3()),
-            RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(Vec3(z = 1f))))
+        this(new RoadNode(Vec3(), Vec3(), null), new RoadNode(Vec3(), Vec3(), null), null,
+            RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(Vec3(z = 1f)), 1))
     }
 
     def updateMesh(newMesh: Mesh): Unit = {
@@ -28,29 +27,29 @@ class RoadSegment(startPoint: RoadNode, endPoint: RoadNode, var mesh: Mesh) {
 
 object RoadSegment {
 
-    def generateStraightMesh(startPoint: Vec3, endPoint: Vec3): Mesh = {
+    def generateStraightMesh(startPoint: Vec3, endPoint: Vec3, lanesNo: Int): Mesh = {
         val dir = endPoint.subtract(startPoint).normalize
 
         val vertices = new Array[Vec3](8)
-        roadCut(startPoint, dir, Vals.LARGE_LANE_WIDTH).foldLeft(0: Int) ((i, c) => {vertices(i) = c; i + 1})
-        roadCut(endPoint, dir, Vals.LARGE_LANE_WIDTH).foldLeft(4: Int) ((i, c) => {vertices(i) = c; i + 1})
+        roadCut(startPoint, dir, Vals.LARGE_LANE_WIDTH * lanesNo).foldLeft(0: Int) ((i, c) => {vertices(i) = c; i + 1})
+        roadCut(endPoint, dir, Vals.LARGE_LANE_WIDTH * lanesNo).foldLeft(4: Int) ((i, c) => {vertices(i) = c; i + 1})
 
         val indices = generateIndices(2)
         new Mesh(vertices, indices, Array(3))
     }
 
-    def generateCurvedMesh(pos: Vec3, dir: Vec3, point: Vec3): (Mesh, Vec3) = {
+    def generateCurvedMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Vec3) = {
         val controlPoints = Bezier.circleCurve(pos, dir, point)
         var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
         if (numOfCuts < 2) numOfCuts = 2
         val vertices = new Array[Vec3](numOfCuts * 4)
 
-        for(p <- 0 until vertices.length by 4) {
+        for(p <- vertices.indices by 4) {
             val cut = 1.0f * p / (vertices.length - 4)
             roadCut(
                 Bezier.getPoint(cut, controlPoints),
                 Bezier.getDirection(cut, controlPoints).normalize,
-                Vals.LARGE_LANE_WIDTH
+                Vals.LARGE_LANE_WIDTH  * lanesNo
             ).foldLeft(p) ((p, c) => {vertices(p) = c; p + 1})
         }
 
@@ -61,7 +60,7 @@ object RoadSegment {
     private def roadCut(pos: Vec3, dir: Vec3, roadWidth: Float): Array[Vec3] = {
         val points = new Array[Vec3](4)
         dir.normalize
-        val heightVector = new Vec3(0, Vals.ROAD_HEIGHT, 0)
+        val heightVector = Vec3(0, Vals.ROAD_HEIGHT)
         val left    = pos.add(dir.leftHand().scale(roadWidth / 2.0f))
         val right   = pos.add(dir.rightHand().scale(roadWidth / 2.0f))
         points(0)   = left.add(dir.leftHand().scale(Vals.ROAD_HEIGHT))

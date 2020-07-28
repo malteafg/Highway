@@ -13,21 +13,21 @@ class VertexBufferLayout {
     private var stride: Int = 0
 
     def pushFloat(count: Int): Unit = {
-        elements.addOne(VertexBufferElement(GL_FLOAT, count, false))
+        elements.addOne(VertexBufferElement(GL_FLOAT, count, normalized = false))
         stride += Vals.getSizeOf(GL_FLOAT) * count
     }
 
     def pushInt(count: Int): Unit = {
-        elements.addOne(VertexBufferElement(GL_UNSIGNED_INT, count, false))
+        elements.addOne(VertexBufferElement(GL_UNSIGNED_INT, count, normalized = false))
         stride += Vals.getSizeOf(GL_UNSIGNED_INT) * count
     }
 
     def pushChar(count: Int): Unit = {
-        elements.addOne(VertexBufferElement(GL_UNSIGNED_BYTE, count, true))
+        elements.addOne(VertexBufferElement(GL_UNSIGNED_BYTE, count, normalized = true))
         stride += Vals.getSizeOf(GL_UNSIGNED_BYTE) * count
     }
 
-    def getElements(): List[VertexBufferElement] = elements.toList
-    def getStride(): Int = stride
+    def getElements: List[VertexBufferElement] = elements.toList
+    def getStride: Int = stride
 
 }

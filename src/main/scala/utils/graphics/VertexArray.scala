@@ -7,7 +7,7 @@ import utils.Vals
 
 class VertexArray {
 
-    val renderID = glCreateVertexArrays()
+    val renderID: Int = glCreateVertexArrays()
 
     def addBuffer(vb: VertexBuffer, layout: VertexBufferLayout): Unit = {
         bind()

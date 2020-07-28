@@ -1,13 +1,11 @@
 package input
 
-import game.GameHandler
 import utils.math.Vec2
-import ui.Interface
-import utils.{Options, Vals}
+import utils.Options
 
 object InputHandler {
 
-    var mousePos: Vec2 = new Vec2()
+    var mousePos: Vec2 = Vec2()
 
     val keyPressSubs: Subscriber    = new Subscriber(_ => Feedback.Passive, null)
     val charSubs: Subscriber        = new Subscriber(_ => Feedback.Passive, null)
@@ -39,7 +37,7 @@ object InputHandler {
 
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
         val event = InputEvent(button, action, mods)
-        Options.log(s"Button ${button} was ${if(event.isPressed()) "pressed" else if(event.isReleased()) "released" else if(event.isContinued()) "held down" else "interacted with"} on (${mousePos.x}, ${mousePos.y})", Options.MousePressed)
+        Options.log(s"Button $button was ${if(event.isPressed()) "pressed" else if(event.isReleased()) "released" else if(event.isContinued()) "held down" else "interacted with"} on (${mousePos.x}, ${mousePos.y})", Options.MousePressed)
 //        Options.log(s"Action: ${action} and mods: ${mods}", Options.MousePressed)
         Options.log(s"Ctrl: ${event.isControlDown()}, Alt: ${event.isAltDown()}, Shift: ${event.isShiftDown()}, none: ${event.isUnAltered()}", Options.MousePressed)
         Options.log("", Options.MousePressed)
@@ -63,6 +61,12 @@ object InputHandler {
         mouseScrollSubs.iterate(event)
     }
 
+    def addKeyPressSub(func: InputEvent => Feedback) = new Subscriber(func, keyPressSubs)
+    def addCharSub(func: InputEvent => Feedback) = new Subscriber(func, charSubs)
+    def addMousePressSub(func: InputEvent => Feedback) = new Subscriber(func, mousePressSubs)
+    def addMouseMoveSub(func: InputEvent => Feedback) = new Subscriber(func, mouseMoveSubs)
+    def addMouseScrollSub(func: InputEvent => Feedback) = new Subscriber(func, mouseScrollSubs)
+
     /**
      * An object storing a function to be executed and references to two other Subscriber objects
      *
@@ -72,7 +76,7 @@ object InputHandler {
      */
     class Subscriber(func: InputEvent => Feedback, var prev: Subscriber) {
 
-        var next: Subscriber = null
+        var next: Subscriber = _
         if(prev != null) {
             if(prev.next != null) next = prev.next
             prev.next = this
@@ -87,11 +91,5 @@ object InputHandler {
             if(next != null && !t.block) next.iterate(event)
         }
     }
-
-    def addKeyPressSub(func: InputEvent => Feedback) = new Subscriber(func, keyPressSubs)
-    def addCharSub(func: InputEvent => Feedback) = new Subscriber(func, charSubs)
-    def addMousePressSub(func: InputEvent => Feedback) = new Subscriber(func, mousePressSubs)
-    def addMouseMoveSub(func: InputEvent => Feedback) = new Subscriber(func, mouseMoveSubs)
-    def addMouseScrollSub(func: InputEvent => Feedback) = new Subscriber(func, mouseScrollSubs)
 
 }

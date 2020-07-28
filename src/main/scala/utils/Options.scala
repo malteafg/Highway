@@ -4,7 +4,7 @@ object Options {
 
     abstract class Log {
         var logging: Boolean = false
-        var parent: Log = null
+        var parent: Log = _
         var name: String = "Log"
         def log(): Boolean = if(logging || parent == null) logging else {
             logging = parent.log()

@@ -13,8 +13,6 @@ object GameHandler {
 
     var game: Game = _
     val camera = new Camera
-    var tempSphere: Sphere = _
-    var dragging = false
     val terrainCollisionFunc: () => Vec3 = () => Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f)
 
     def init(): Unit = {
@@ -36,9 +34,7 @@ object GameHandler {
     /**
      * Input
      */
-    InputHandler.addMousePressSub(click)
-
-    private def click(event: InputEvent): Feedback = mode match {
+    InputHandler.addMousePressSub(event => mode match {
         case Free =>
             event match {
                 case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) =>
@@ -55,11 +51,11 @@ object GameHandler {
                     }
                     else {
                         val currentPos = if (selectedDirection == null) terrainCollisionFunc() else selectedPos.add(selectedDirection.scale(selectedPos.subtract(terrainCollisionFunc()).length))
-                        val newNode = RoadNode(currentPos, currentPos.subtract(selectedPos))
+                        val newNode = new RoadNode(currentPos, currentPos.subtract(selectedPos), null)
                         game.buildRoad(
-                            if (selectedNode == null) RoadNode(selectedPos, currentPos.subtract(selectedPos)) else selectedNode,
+                            if (selectedNode == null) new RoadNode(selectedPos, currentPos.subtract(selectedPos), null) else selectedNode,
                             newNode,
-                            RoadSegment.generateStraightMesh(selectedPos, newNode.position)
+                            RoadSegment.generateStraightMesh(selectedPos, newNode.position, noOfLanes)
                         )
                         selectSnapNode(newNode)
                     }
@@ -83,10 +79,10 @@ object GameHandler {
                     else if (selectedDirection == null) selectedDirection = terrainCollisionFunc().subtract(selectedPos)
                     else {
                         val currentPos = terrainCollisionFunc()
-                        val segment = RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, currentPos)
-                        val newNode = RoadNode(currentPos, segment._2)
+                        val segment = RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, currentPos, noOfLanes)
+                        val newNode = new RoadNode(currentPos, segment._2, null)
                         game.buildRoad(
-                            if (selectedNode == null) RoadNode(selectedPos, selectedDirection) else selectedNode,
+                            if (selectedNode == null) new RoadNode(selectedPos, selectedDirection, null) else selectedNode,
                             newNode,
                             segment._1
                         )
@@ -104,6 +100,35 @@ object GameHandler {
                 case _ => Feedback.Passive
             }
         case _ => Feedback.Passive
+    })
+
+    /**
+     * Road preview
+     */
+    var selectedPos: Vec3 = _
+    var selectedDirection: Vec3 = _
+    var previewRoad: RoadSegment = _
+    var selectedNode: RoadNode = _
+    var snappedNode: RoadNode = _
+
+    private def startRoadPreview(): Unit = startRoadPreview(terrainCollisionFunc())
+    private def startRoadPreview(startPos: Vec3): Unit = {
+        selectedPos = startPos
+        previewRoad = new RoadSegment(selectedPos)
+    }
+
+    InputHandler.addMouseMoveSub(_ => {
+        updateRoadPreview()
+        Feedback.Passive
+    })
+
+    private def updateRoadPreview(): Unit = {
+        val cursorPos = terrainCollisionFunc()
+        if (previewRoad != null) {
+            if (mode == StraightRoad || selectedDirection == null) previewRoad.updateMesh(RoadSegment.generateStraightMesh(selectedPos,
+                if (selectedDirection == null) cursorPos else selectedPos.add(cursorPos.subtract(selectedPos).proj(selectedDirection).thisOrThat(v => v.dot(selectedDirection) > 0, Vec3())), noOfLanes))
+            else previewRoad.updateMesh(RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, terrainCollisionFunc(), noOfLanes)._1)
+        }
     }
 
     private def resetPreview(): Unit = {
@@ -114,28 +139,27 @@ object GameHandler {
         turnOnSnap()
     }
 
-    private def startRoadPreview(): Unit = startRoadPreview(terrainCollisionFunc())
-    private def startRoadPreview(startPos: Vec3): Unit = {
-        selectedPos = startPos
-        previewRoad = new RoadSegment(selectedPos)
-    }
+    /**
+     * No of lanes
+     */
+    var noOfLanes: Int = 3
 
-    // update preview road
-    InputHandler.addMouseMoveSub(_ => {
-        val cursorPos = terrainCollisionFunc()
-        if (previewRoad != null) {
-            if (mode == StraightRoad || selectedDirection == null) previewRoad.updateMesh(RoadSegment.generateStraightMesh(selectedPos,
-                if (selectedDirection == null) cursorPos else selectedPos.add(cursorPos.subtract(selectedPos).proj(selectedDirection).thisOrThat(v => v.dot(selectedDirection) > 0, Vec3()))))
-            else previewRoad.updateMesh(RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, terrainCollisionFunc())._1)
-            Feedback.Passive
+    InputHandler.addKeyPressSub(e => {
+        e match {
+            case InputEvent(49, _, _) => noOfLanes = 1
+            case InputEvent(50, _, _) => noOfLanes = 2
+            case InputEvent(51, _, _) => noOfLanes = 3
+            case InputEvent(52, _, _) => noOfLanes = 4
         }
-        Feedback.Passive
+        cursorMarker.setWidth(Vals.LARGE_LANE_WIDTH * noOfLanes)
+        updateRoadPreview()
+        Feedback.Block
     })
 
     /**
      * Node Snapping
      */
-    val cursorMarker = new TerrainLine(width = 6, color = Vec4(0.2f, 0.4f, 1f, 0.8f))
+    val cursorMarker = new TerrainLine(width = noOfLanes * Vals.LARGE_LANE_WIDTH, color = Vec4(0.2f, 0.4f, 1f, 0.8f))
 
     private def selectSnapNode(node: RoadNode): Unit = {
         selectedNode = node
@@ -197,14 +221,5 @@ object GameHandler {
         resetPreview()
         mode = Free
     }
-
-    /**
-     * Road preview
-     */
-    var selectedPos: Vec3 = _
-    var selectedDirection: Vec3 = _
-    var previewRoad: RoadSegment = _
-    var selectedNode: RoadNode = _
-    var snappedNode: RoadNode = _
 
 }
