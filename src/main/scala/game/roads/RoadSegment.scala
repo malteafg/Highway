@@ -6,15 +6,15 @@ import utils.math.Vec3
 
 import scala.collection.mutable
 
-class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: mutable.ListBuffer[Lane], var mesh: Mesh) {
+class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: Array[Lane], controlPoints: Array[Vec3], var mesh: Mesh) {
 
     /**
      * Constructors
      */
     // used for preview road
     def this(selectedPos: Vec3) {
-        this(new RoadNode(Vec3(), Vec3(), null), new RoadNode(Vec3(), Vec3(), null), null,
-            RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(Vec3(z = 1f)), 1))
+        this(new RoadNode(Vec3(), Vec3(), -2), new RoadNode(Vec3(), Vec3(), -2), null, null,
+            RoadSegment.generateStraightMesh(selectedPos, selectedPos.add(Vec3(z = 1f)), 1)._1)
     }
 
     def updateMesh(newMesh: Mesh): Unit = {
@@ -27,7 +27,7 @@ class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: mutable.ListBuf
 
 object RoadSegment {
 
-    def generateStraightMesh(startPoint: Vec3, endPoint: Vec3, lanesNo: Int): Mesh = {
+    def generateStraightMesh(startPoint: Vec3, endPoint: Vec3, lanesNo: Int): (Mesh, Array[Vec3]) = {
         val dir = endPoint.subtract(startPoint).normalize
 
         val vertices = new Array[Vec3](8)
@@ -35,10 +35,11 @@ object RoadSegment {
         roadCut(endPoint, dir, Vals.LARGE_LANE_WIDTH * lanesNo).foldLeft(4: Int) ((i, c) => {vertices(i) = c; i + 1})
 
         val indices = generateIndices(2)
-        new Mesh(vertices, indices, Array(3))
+        val dist = endPoint.subtract(startPoint)
+        (new Mesh(vertices, indices, Array(3)), Array(startPoint, startPoint.add(dist.scale(1f / 3f)), startPoint.add(dist.scale(2f / 3f)), endPoint))
     }
 
-    def generateCurvedMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Vec3) = {
+    def generateCurvedMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Array[Vec3]) = {
         val controlPoints = Bezier.circleCurve(pos, dir, point)
         var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
         if (numOfCuts < 2) numOfCuts = 2
@@ -54,7 +55,7 @@ object RoadSegment {
         }
 
         val indices = generateIndices(numOfCuts)
-        (new Mesh(vertices, indices, Array(3)), controlPoints(3).subtract(controlPoints(2)))
+        (new Mesh(vertices, indices, Array(3)), controlPoints)
     }
 
     private def roadCut(pos: Vec3, dir: Vec3, roadWidth: Float): Array[Vec3] = {

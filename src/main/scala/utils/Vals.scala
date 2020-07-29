@@ -31,6 +31,7 @@ object Vals {
     final val ROAD_VERTEX_DENSITY: Float = 0.25f
     final val ROAD_VERTEX_MINIMUM: Int = 10
     final val LARGE_LANE_WIDTH: Float = 3.7f
+    final val MIN_SEGMENT_LENGTH: Float = 10f
 
     def getSizeOf(t: Int): Int = t match {
         case GL_UNSIGNED_INT => 4

@@ -70,18 +70,27 @@ object GameRenderer {
         for(r <- game.roads) {
             draw(r.mesh.va, r.mesh.ib)
         }
-        Shader.get("road").uniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.5f))
-        if(GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
+        Shader.get("road").uniformVec4f("in_Color", if (GameHandler.allowed) Vec4(0.3f, 0.3f, 0.9f, 0.8f) else Vec4(0.9f, 0.2f, 0.2f, 0.8f))
+        if (GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
 
-        Shader.get("node").bind()
-        Shader.get("node").uniformMat4f("viewMatrix", camera.getViewMatrix)
-        Shader.get("node").uniformVec4f("in_Color", Vec4(0.0f, 0.8f, 0.8f, 1.0f))
-
-        for(n <- game.nodes) {
-            Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.1f)))
-            draw(RoadNode.mesh)
+        // render nodes
+        if (GameHandler.mode != GameHandler.Free && GameHandler.selectedNode == null) {
+            Shader.get("node").bind()
+            Shader.get("node").uniformMat4f("viewMatrix", camera.getViewMatrix)
+            Shader.get("node").uniformVec4f("in_Color", Vec4(0.0f, 0.8f, 0.8f, 0.5f))
+            if (GameHandler.snappedNode == null) {
+                for(n <- game.nodes) {
+                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale((n.getLaneNodes.length - 2) * Vals.LARGE_LANE_WIDTH))
+                    draw(RoadNode.mesh)
+                }
+            }
+            else {
+                for(n <- GameHandler.snappedNode.getLaneNodes) {
+                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(Vals.LARGE_LANE_WIDTH))
+                    draw(RoadNode.mesh)
+                }
+            }
         }
-
 
         glDisable(GL_CULL_FACE)
 
@@ -100,7 +109,7 @@ object GameRenderer {
     def draw(va: VertexArray, ib: IndexBuffer): Unit = {
         va.bind()
         ib.bind()
-        glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, 0)
+        glDrawElements(GL_TRIANGLES, ib.getCount, GL_UNSIGNED_INT, 0)
         va.unbind()
     }
 

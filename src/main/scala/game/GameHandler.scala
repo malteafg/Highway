@@ -5,6 +5,7 @@ import game.terrain.TerrainLine
 import input.{Feedback, InputEvent, InputHandler, Mouse}
 import rendering.{Camera, GameRenderer}
 import utils.Vals
+import utils.graphics.Mesh
 import utils.math.{Vec2, Vec3, Vec4}
 
 import scala.collection.mutable
@@ -24,7 +25,7 @@ object GameHandler {
     }
 
     def update(): Unit = {
-        camera.update
+        camera.update()
     }
     
     def render(): Unit = {
@@ -46,25 +47,16 @@ object GameHandler {
             event match {
                 case InputEvent(Mouse.LEFT, Mouse.PRESSED, _) =>
                     if (selectedPos == null) {
-                        if (snappedNode == null) startRoadPreview()
+                        if (snappedNode == null) startRoadBuild()
                         else selectSnapNode(snappedNode)
                     }
-                    else {
-                        val currentPos = if (selectedDirection == null) terrainCollisionFunc() else selectedPos.add(selectedDirection.scale(selectedPos.subtract(terrainCollisionFunc()).length))
-                        val newNode = new RoadNode(currentPos, currentPos.subtract(selectedPos), null)
-                        game.buildRoad(
-                            if (selectedNode == null) new RoadNode(selectedPos, currentPos.subtract(selectedPos), null) else selectedNode,
-                            newNode,
-                            RoadSegment.generateStraightMesh(selectedPos, newNode.position, noOfLanes)
-                        )
-                        selectSnapNode(newNode)
-                    }
+                    else createRoad()
                     Feedback.Block
                 case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) =>
-                    if (selectedNode != null) resetPreview()
+                    if (selectedNode != null) stopPreview()
                     else {
                         if (selectedPos == null) freeMode()
-                        else resetPreview()
+                        else stopPreview()
                     }
                     Feedback.Block
                 case _ => Feedback.Passive
@@ -73,27 +65,17 @@ object GameHandler {
             event match {
                 case InputEvent(Mouse.LEFT, Mouse.PRESSED, _) =>
                     if (selectedPos == null) {
-                        if (snappedNode == null) startRoadPreview()
+                        if (snappedNode == null) startRoadBuild()
                         else selectSnapNode(snappedNode)
                     }
-                    else if (selectedDirection == null) selectedDirection = terrainCollisionFunc().subtract(selectedPos)
-                    else {
-                        val currentPos = terrainCollisionFunc()
-                        val segment = RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, currentPos, noOfLanes)
-                        val newNode = new RoadNode(currentPos, segment._2, null)
-                        game.buildRoad(
-                            if (selectedNode == null) new RoadNode(selectedPos, selectedDirection, null) else selectedNode,
-                            newNode,
-                            segment._1
-                        )
-                        selectSnapNode(newNode)
-                    }
+                    else if (selectedDirection == null) selectedDirection = newNodePos.subtract(selectedPos)
+                    else createRoad()
                     Feedback.Block
                 case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) =>
-                    if (selectedNode != null) resetPreview()
+                    if (selectedNode != null) stopPreview()
                     else {
                         if (selectedPos == null) freeMode()
-                        else if (selectedDirection == null) resetPreview()
+                        else if (selectedDirection == null) stopPreview()
                         else selectedDirection = null
                     }
                     Feedback.Block
@@ -102,40 +84,115 @@ object GameHandler {
         case _ => Feedback.Passive
     })
 
+    InputHandler.addMouseMoveSub(_ => {
+        move()
+        Feedback.Passive
+    })
+
+    /**
+     * Create road
+     */
+    private def createRoad(): Unit = {
+        if (mode == StraightRoad) selectedDirection = null
+
+        var (mesh, controlPoints): (Mesh, Array[Vec3]) =
+            if (selectedDirection == null) RoadSegment.generateStraightMesh(selectedPos, newNodePos, noOfLanes)
+            else RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, newNodePos, noOfLanes)
+
+        var startNode: RoadNode = null
+        var endNode: RoadNode = null
+        var end = true
+
+        if (selectedNode == null) {
+            startNode = new RoadNode(selectedPos, if (selectedDirection == null) newNodePos.subtract(selectedPos) else selectedDirection, noOfLanes)
+            endNode = new RoadNode(newNodePos, controlPoints(3).subtract(controlPoints(2)).normalize, noOfLanes)
+            game.addNode(startNode)
+            game.addNode(endNode)
+        }
+        else {
+            if (!opposite) {
+                startNode = selectedNode
+                endNode = new RoadNode(newNodePos, controlPoints(3).subtract(controlPoints(2)).normalize, noOfLanes)
+                game.addNode(endNode)
+            }
+            else {
+                controlPoints = controlPoints.reverse
+                startNode = new RoadNode(newNodePos, controlPoints(1).subtract(controlPoints(0)).normalize, noOfLanes)
+                endNode = selectedNode
+                game.addNode(startNode)
+                end = false
+            }
+        }
+
+        val segment = new RoadSegment(startNode, endNode, null, controlPoints, mesh)
+        startNode.addOutgoingSegment(segment)
+        endNode.addIncomingSegment(segment)
+        selectSnapNode(if (end) endNode else startNode)
+        game.addSegment(segment)
+    }
+
     /**
      * Road preview
      */
     var selectedPos: Vec3 = _
     var selectedDirection: Vec3 = _
     var previewRoad: RoadSegment = _
+    var previewRoadPos: Vec3 = _
     var selectedNode: RoadNode = _
     var snappedNode: RoadNode = _
+    var newNodePos: Vec3 = _
+    var cursorPos: Vec3 = Vec3()
+    var opposite: Boolean = false
+    var allowed: Boolean = true
 
-    private def startRoadPreview(): Unit = startRoadPreview(terrainCollisionFunc())
-    private def startRoadPreview(startPos: Vec3): Unit = {
+    private def startRoadBuild(): Unit = startRoadBuild(newNodePos)
+    private def startRoadBuild(startPos: Vec3): Unit = {
         selectedPos = startPos
-        previewRoad = new RoadSegment(selectedPos)
+        startRoadPreview(selectedPos)
     }
 
-    InputHandler.addMouseMoveSub(_ => {
+    private def startRoadPreview(startPos: Vec3): Unit = {
+        previewRoadPos = startPos
+        previewRoad = new RoadSegment(previewRoadPos)
+    }
+
+    def move(): Unit = {
+        cursorMarker.setWidth(Vals.LARGE_LANE_WIDTH * noOfLanes)
+        newNodePos = terrainCollisionFunc()
+        cursorPos = newNodePos
+
         updateRoadPreview()
-        Feedback.Passive
-    })
+        if (selectedPos != null) cursorMarker.setPosAsPoint(Vec2(newNodePos.x, newNodePos.z))
+    }
 
     private def updateRoadPreview(): Unit = {
-        val cursorPos = terrainCollisionFunc()
         if (previewRoad != null) {
-            if (mode == StraightRoad || selectedDirection == null) previewRoad.updateMesh(RoadSegment.generateStraightMesh(selectedPos,
-                if (selectedDirection == null) cursorPos else selectedPos.add(cursorPos.subtract(selectedPos).proj(selectedDirection).thisOrThat(v => v.dot(selectedDirection) > 0, Vec3())), noOfLanes))
-            else previewRoad.updateMesh(RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, terrainCollisionFunc(), noOfLanes)._1)
+            if (mode == StraightRoad || selectedDirection == null) {
+                newNodePos =
+                    if (selectedDirection == null) cursorPos
+                    else selectedPos.add(cursorPos.subtract(selectedPos).proj(selectedDirection)
+                        .thisOrThat(v => v.dot(selectedDirection) > 0, selectedDirection.normalize.scale(Vals.MIN_SEGMENT_LENGTH)))
+                if (newNodePos.subtract(selectedPos).length < Vals.MIN_SEGMENT_LENGTH)
+                    newNodePos = selectedPos.add(newNodePos.subtract(selectedPos).normalize.scale(Vals.MIN_SEGMENT_LENGTH))
+                previewRoad.updateMesh(RoadSegment.generateStraightMesh(selectedPos, newNodePos, noOfLanes)._1)
+            }
+            else {
+                newNodePos =
+                    if (selectedDirection.dot(newNodePos.subtract(selectedPos)) >= 0) newNodePos
+                    else newNodePos.subtract(newNodePos.subtract(selectedPos).proj(selectedDirection))
+                previewRoad.updateMesh(RoadSegment.generateCurvedMesh(selectedPos, selectedDirection, newNodePos, noOfLanes)._1)
+            }
         }
     }
 
-    private def resetPreview(): Unit = {
+    private def stopPreview(): Unit = {
         selectedPos = null
         selectedDirection = null
         previewRoad = null
         selectedNode = null
+        opposite = false
+        allowed = true
+        snappedNode = null
         turnOnSnap()
     }
 
@@ -144,18 +201,25 @@ object GameHandler {
      */
     var noOfLanes: Int = 3
 
-    InputHandler.addKeyPressSub(e => {
-        e match {
-            case InputEvent(49, _, _) => noOfLanes = 1
-            case InputEvent(50, _, _) => noOfLanes = 2
-            case InputEvent(51, _, _) => noOfLanes = 3
-            case InputEvent(52, _, _) => noOfLanes = 4
-            case _ =>
-        }
-        cursorMarker.setWidth(Vals.LARGE_LANE_WIDTH * noOfLanes)
-        updateRoadPreview()
-        Feedback.Passive
-    })
+    InputHandler.addKeyPressSub {
+        case InputEvent(49, _, _) =>
+            noOfLanes = 1
+            updateRoadPreview()
+            Feedback.Block
+        case InputEvent(50, _, _) =>
+            noOfLanes = 2
+            updateRoadPreview()
+            Feedback.Block
+        case InputEvent(51, _, _) =>
+            noOfLanes = 3
+            updateRoadPreview()
+            Feedback.Block
+        case InputEvent(52, _, _) =>
+            noOfLanes = 4
+            updateRoadPreview()
+            Feedback.Block
+        case _ => Feedback.Passive
+    }
 
     /**
      * Node Snapping
@@ -165,23 +229,30 @@ object GameHandler {
     private def selectSnapNode(node: RoadNode): Unit = {
         selectedNode = node
         snappedNode = null
-        startRoadPreview(selectedNode.position)
-        selectedDirection = selectedNode.direction.normalize
+        startRoadBuild(selectedNode.position)
+        move()
+        if (node.isEndNode) selectedDirection = selectedNode.direction.normalize
+        else {
+            selectedDirection = selectedNode.direction.normalize.negate
+            opposite = true
+        }
     }
 
     private def nodeSnapper(event: InputEvent): Feedback = {
-        val cursorPos = terrainCollisionFunc()
         if (mode == Free || selectedNode != null) Feedback.Unsubscribe
         else {
             game.nodes.foreach(n => {
-                if (n.position.subtract(cursorPos).length < Vals.LARGE_LANE_WIDTH) {
+                if (n.position.subtract(newNodePos).length < Vals.LARGE_LANE_WIDTH) {
                     snappedNode = n
                     cursorMarker.setPosAsPoint(Vec2(n.position.x, n.position.z))
+
+
+
                     return Feedback.Passive
                 }
             })
             snappedNode = null
-            cursorMarker.setPosAsPoint(Vec2(cursorPos.x, cursorPos.z))
+            cursorMarker.setPosAsPoint(Vec2(newNodePos.x, newNodePos.z))
             Feedback.Passive
         }
     }
@@ -208,18 +279,18 @@ object GameHandler {
     def straightRoad(): Unit = {
         mode = StraightRoad
         selectedDirection = null
-        resetPreview()
+        stopPreview()
         turnOnSnap()
     }
 
     def curvedRoad(): Unit = {
         mode = CurveRoad
-        resetPreview()
+        stopPreview()
         turnOnSnap()
     }
 
     def freeMode(): Unit = {
-        resetPreview()
+        stopPreview()
         mode = Free
     }
 

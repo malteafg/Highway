@@ -102,11 +102,11 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
      * @param target The other vector
      * @return The projection of this vector
      */
-    def proj(target: Vec3) = {
-        target.scale(dot(target)/target.dot(target))
+    def proj(target: Vec3): Vec3 = {
+        target.scale(dot(target) / target.dot(target))
     }
 
-    def thisOrThat(func: Vec3 => Boolean, replacement: Vec3) = if(func(this)) this else replacement
+    def thisOrThat(func: Vec3 => Boolean, replacement: Vec3): Vec3 = if(func(this)) this else replacement
 
     /**
      * Calculates a linear interpolation between this vector with another

@@ -351,6 +351,14 @@ case class Mat4(
     /**
      * Multiplies this matrix with a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
      *
+     * @param s Scale factor along all axis
+     * @return Scaling matrix
+     */
+    def scale(s: Float): Mat4 = this.multiply(Mat4.scale(s, s, s))
+
+    /**
+     * Multiplies this matrix with a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
+     *
      * @param x Scale factor along the x coordinate
      * @param y Scale factor along the y coordinate
      * @param z Scale factor along the z coordinate
@@ -510,6 +518,14 @@ object Mat4 {
             m22 = z * z * (1f - c) + c
         )
     }
+
+    /**
+     * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
+     *
+     * @param s Scale factor along the all axis
+     * @return Scaling matrix
+     */
+    def scale(s: Float): Mat4 = scale(s, s, s)
 
     /**
      * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
