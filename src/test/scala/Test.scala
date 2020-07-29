@@ -1,17 +1,17 @@
 import org.scalatest.funsuite.AnyFunSuite
+import utils.math.Vec3
 
 
 class Test extends AnyFunSuite {
 
-    test("1 times 0 should be 0") {
-        assert(Syntax.func(0, 1.0f) == 0)
+    test("Rays should intersect") {
+        val v = Vec3().intersection(Vec3(1, 0, 1), Vec3(2), Vec3(-1, 0, 1))
+        assert(v.x == 1 && v.z == 1)
     }
 
-    test("10 times 20 should be 200") {
-        assert(Syntax.func(10, 20.0f) == 200)
+    test("Rays should not intersect") {
+        val v = Vec3().intersection(Vec3(0, 0, 1), Vec3(2), Vec3(-1, 0, -1))
+        assert(v.x == 0 && v.z == -2)
     }
 
-    test("1 times 20 should be 20") {
-        assert(Syntax.func(1, 20.0f) == 20)
-    }
 }

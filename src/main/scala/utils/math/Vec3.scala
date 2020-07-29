@@ -152,6 +152,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
         Vec3(tx, ty, tz)
     }
 
+    def intersection(d1: Vec3, v2: Vec3, d2: Vec3): Vec3 = v2.add(d2.scale(((v2.z - z) * d1.x - (v2.x - x) * d1.z) / (d2.x * d1.z - d2.z * d1.x)))
+
     def x(newX: Float): Vec3 = Vec3(newX, y, z)
     def y(newY: Float): Vec3 = Vec3(x, newY, z)
     def z(newZ: Float): Vec3 = Vec3(x, y, newZ)
