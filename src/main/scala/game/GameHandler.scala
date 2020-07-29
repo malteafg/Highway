@@ -150,10 +150,11 @@ object GameHandler {
             case InputEvent(50, _, _) => noOfLanes = 2
             case InputEvent(51, _, _) => noOfLanes = 3
             case InputEvent(52, _, _) => noOfLanes = 4
+            case _ =>
         }
         cursorMarker.setWidth(Vals.LARGE_LANE_WIDTH * noOfLanes)
         updateRoadPreview()
-        Feedback.Block
+        Feedback.Passive
     })
 
     /**
