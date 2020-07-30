@@ -80,7 +80,7 @@ object GameRenderer {
             Shader.get("node").uniformVec4f("in_Color", Vec4(0.0f, 0.8f, 0.8f, 0.5f))
             if (GameHandler.snappedNode == null) {
                 for(n <- game.nodes) {
-                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale((n.getLaneNodes.length - 2) * Vals.LARGE_LANE_WIDTH))
+                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(n.getWidth))
                     draw(RoadNode.mesh)
                 }
             }

@@ -72,7 +72,7 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
      * @param scalar Scalar to multiply
      * @return Scalar product of this * scalar
      */
-    def reScale(scalar: Float): Vec3 = normalize.scale(scalar)
+    def rescale(scalar: Float): Vec3 = normalize.scale(scalar)
 
     /**
      * Divides a vector by a scalar.

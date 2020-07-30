@@ -102,11 +102,11 @@ object Bezier {
         points(3) = v2
 
         if(b1 && b2) {
-            points(1) = if(f1 < intersection.subtract(v1).length) v1.add(r1.reScale(f1)) else intersection
-            points(2) = if(f2 < intersection.subtract(v2).length) v2.add(r2.reScale(f2)) else intersection
+            points(1) = if(f1 < intersection.subtract(v1).length) v1.add(r1.rescale(f1)) else intersection
+            points(2) = if(f2 < intersection.subtract(v2).length) v2.add(r2.rescale(f2)) else intersection
         } else {
-            points(1) = v1.add(r1.reScale(f1))
-            points(2) = v2.add(r2.reScale(f2))
+            points(1) = v1.add(r1.rescale(f1))
+            points(2) = v2.add(r2.rescale(f2))
         }
 
         points
