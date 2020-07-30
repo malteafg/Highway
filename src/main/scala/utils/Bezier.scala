@@ -94,7 +94,7 @@ object Bezier {
 
         val ab = v2.subtract(v1)
         val dot1 = ab.normalize.dot(r1.normalize)
-        val dot2 = ab.normalize.dot(r2.normalize)
+        val dot2 = ab.negate.normalize.dot(r2.normalize)
         val f1 = 2.0f / 3.0f * ab.length * (1.0f - dot1) / (1.0f - dot1 * dot1)
         val f2 = 2.0f / 3.0f * ab.length * (1.0f - dot2) / (1.0f - dot2 * dot2)
 
