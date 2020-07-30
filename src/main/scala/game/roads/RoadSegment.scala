@@ -39,8 +39,12 @@ object RoadSegment {
         (new Mesh(vertices, indices, Array(3)), Array(startPoint, startPoint.add(dist.scale(1f / 3f)), startPoint.add(dist.scale(2f / 3f)), endPoint))
     }
 
-    def generateCurvedMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Array[Vec3]) = {
+    def generateCircularMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Array[Vec3]) = {
         val controlPoints = Bezier.circleCurve(pos, dir, point)
+        (generateCurveMesh(controlPoints, lanesNo), controlPoints)
+    }
+
+    def generateCurveMesh(controlPoints: Array[Vec3], lanesNo: Int): Mesh = {
         var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
         if (numOfCuts < 2) numOfCuts = 2
         val vertices = new Array[Vec3](numOfCuts * 4)
@@ -55,7 +59,7 @@ object RoadSegment {
         }
 
         val indices = generateIndices(numOfCuts)
-        (new Mesh(vertices, indices, Array(3)), controlPoints)
+        new Mesh(vertices, indices, Array(3))
     }
 
     private def roadCut(pos: Vec3, dir: Vec3, roadWidth: Float): Array[Vec3] = {

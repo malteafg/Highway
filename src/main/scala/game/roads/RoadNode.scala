@@ -27,6 +27,7 @@ class RoadNode(var position: Vec3, var direction: Vec3, noOfLanes: Int) {
     def isEndNode: Boolean = incomingSegments.length >= outgoingSegments.length
 
     def getLaneNodes: Array[LaneNode] = laneNodes
+    def getWidth: Float = (laneNodes.length - 2) * Vals.LARGE_LANE_WIDTH
 
 }
 
