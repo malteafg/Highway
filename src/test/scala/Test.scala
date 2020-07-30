@@ -14,4 +14,9 @@ class Test extends AnyFunSuite {
         assert(v.x == 0 && v.z == -2)
     }
 
+    test("Rays should be parallel") {
+        val v = Vec3().intersection(Vec3(0, 0, 1), Vec3(2), Vec3(0, 0, -1))
+        assert(v == null)
+    }
+
 }
