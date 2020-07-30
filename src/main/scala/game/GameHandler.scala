@@ -141,7 +141,7 @@ object GameHandler {
         val segment = new RoadSegment(startNode, endNode, null, controlPoints, mesh)
         startNode.addOutgoingSegment(segment)
         endNode.addIncomingSegment(segment)
-        selectSnapNode(if (end) endNode else startNode)
+        if (curve) stopPreview() else selectSnapNode(if (end) endNode else startNode)
         game.addSegment(segment)
     }
 
@@ -190,20 +190,22 @@ object GameHandler {
             var currentClosest: RoadNode = null
             var minDist = 1000f
             game.nodes.foreach(n => {
-                val dist = n.position.subtract(cursorPos).length
-                if (dist < n.getWidth / g2) {
-                    if (dist < minDist) {
-                        minDist = dist
-                        currentClosest = n
+                if (selectedNode == null || selectedNode != null && selectedNode.isEndNode != n.isEndNode) {
+                    val dist = n.position.subtract(cursorPos).length
+                    if (dist < n.getWidth / 2) {
+                        if (dist < minDist) {
+                            minDist = dist
+                            currentClosest = n
+                        }
                     }
                 }
             })
-            if (currentClosest != null && selectedNode != snappedNode) {
+            if (currentClosest != null) {
                 snappedNode = currentClosest
                 cursorMarker.setPosAsPoint(Vec2(snappedNode.position.x, snappedNode.position.z))
             } else {
                 snappedNode = null
-                curve = null
+                curve = false
             }
         }
 
@@ -211,7 +213,7 @@ object GameHandler {
         if (previewRoad != null) {
             if (selectedNode != null && snappedNode != null) {
                 val controlPoints =
-                    if (opposite) Bezier.doubleSnapCurve(snappedNode.position, snappedNode.direction.negate, selectedNode.position, selectedNode.direction, noOfLanes)
+                    if (opposite) Bezier.doubleSnapCurve(snappedNode.position, snappedNode.direction, selectedNode.position, selectedNode.direction.negate, noOfLanes)
                     else Bezier.doubleSnapCurve(selectedNode.position, selectedNode.direction, snappedNode.position, snappedNode.direction.negate, noOfLanes)
                 if (controlPoints == null) {
                     curve = false
