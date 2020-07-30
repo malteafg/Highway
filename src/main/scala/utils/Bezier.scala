@@ -23,6 +23,23 @@ object Bezier {
         v
     }
 
+    def getCurvature(points: Array[Vec3]): Float = {
+        var c = 1f
+        for(p <- 1 until points.length - 1) c *= points(p-1).subtract(points(p)).normalize.
+                                                dot(points(p+1).subtract(points(p)).normalize)
+        1f - Math.abs(c)
+    }
+
+    def getLanePaths(laneCount: Int, points: Array[Vec3]): Array[Array[Vec3]] = {
+        val pointsPrLane = 3 + (getCurvature(points) * points.last.subtract(points(0)).length).toInt
+        val paths = Array.ofDim[Vec3](laneCount, pointsPrLane)
+
+        for(p <- 0 until pointsPrLane) {
+
+        }
+        paths
+    }
+
     def getDirection(t: Float, points: Array[Vec3]): Vec3 = {
         var v = Vec3()
         var r = Math.pow(1 - t, points.length - 1).toFloat
@@ -71,8 +88,8 @@ object Bezier {
 
         if(b1 && b2) {
             val minLength = r1.antiDot(r2) * Vals.LARGE_LANE_WIDTH * laneCount
-            if(intersection.subtract(v1).length > minLength ||
-                intersection.subtract(v2).length > minLength) return null
+            if(intersection.subtract(v1).length < minLength ||
+                intersection.subtract(v2).length < minLength) return null
         }
 
         val ab = v2.subtract(v1)
