@@ -67,12 +67,14 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
     }
 
     /**
-     * Multiplies a vector by a scalar.
+     * Multiplies a normalized vector by a scalar.
      *
      * @param scalar Scalar to multiply
      * @return Scalar product of this * scalar
      */
     def rescale(scalar: Float): Vec3 = normalize.scale(scalar)
+
+    def superScale(scalar: Float): Vec3 = scale(scalar * length)
 
     /**
      * Divides a vector by a scalar.
@@ -163,6 +165,15 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
     }
 
     def intersection(d1: Vec3, v2: Vec3, d2: Vec3): Vec3 = if(d2.x * d1.z - d2.z * d1.x == 0) null else v2.add(d2.scale(((v2.z - z) * d1.x - (v2.x - x) * d1.z) / (d2.x * d1.z - d2.z * d1.x)))
+
+    def arcinator(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3): (Float, Float) = {
+        val s = ((v1.z - v2.z) * (r1.x + x) + (v2.x - v1.x) * (r1.z + z)) /
+                ((r2.z - z) * (r1.x + x) - (r2.x - x) * (r1.z + z))
+        val t = ((v2.x - v1.x) + s * (r2.x - x)) / (r1.x + x)
+        (t, s)
+    }
+
+    def distTo(v: Vec3): Float = subtract(v).length
 
     def x(newX: Float): Vec3 = Vec3(newX, y, z)
     def y(newY: Float): Vec3 = Vec3(x, newY, z)

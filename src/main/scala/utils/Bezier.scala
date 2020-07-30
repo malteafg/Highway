@@ -76,7 +76,75 @@ object Bezier {
     }
 
     def doubleSnapCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Vec3] = {
+        var points: Array[Vec3] = null
+
+        if(r1.dot(v2.subtract(v1)) <= 0 || r2.dot(v1.subtract(v2)) <= 0) return null
+
+        val intersection = v1.intersection(r1, v2, r2)
+        if(intersection == null) return null
+
+        val b1 = r1.dot(intersection.subtract(v1)) > 0
+        val b2 = r2.dot(intersection.subtract(v2)) > 0
+
+        if (!b1 && !b2) return null
+
+        var mcqueenCurve = false
+        var scales = (0f , 0f)
+
+        if(r1.dot(r2) > 0) {
+            // sharp angle and therefore two separate curves
+            scales = v2.subtract(v1).normalize.arcinator(v1, r1.normalize, v2, r2.normalize)
+            val center = v1.add(r1.normalize.add(v2.subtract(v1).normalize).scale(scales._1))
+            mcqueenCurve =  v1.distTo(center) < Vals.minRoadLength(r1, center.subtract(v1), laneCount) ||
+                            v2.distTo(center) < Vals.minRoadLength(r2, center.subtract(v2), laneCount)
+
+            if(!mcqueenCurve) {
+                points = new Array[Vec3](3)
+                points(2) = v2
+                points(1) = v2.add(r2.rescale(scales._2))
+                points(0) = points(1).add(v1.subtract(v2).rescale(scales._2))
+            }
+        } else {
+            // obtuse angle and a single curve
+            val minLength = Vals.minRoadLength(intersection.subtract(v1), intersection.subtract(v2) , laneCount)
+            mcqueenCurve  = intersection.subtract(v1).length < minLength ||
+                            intersection.subtract(v2).length < minLength
+            if(!mcqueenCurve) {
+                points = new Array[Vec3](4)
+                val sum = intersection.subtract(v1).length + intersection.subtract(v2).length
+                val rel = Vals.rel(intersection.subtract(v1).length, intersection.subtract(v2).length)
+
+                val ab = v2.subtract(v1)
+                val dot1 = ab.normalize.dot(r1.normalize)
+                val dot2 = ab.negate.normalize.dot(r2.normalize)
+                val f1 = v1.distTo(intersection) - 2.0f / 3.0f * ab.length * (1.0f - dot1) / (1.0f - dot1 * dot1)
+                val f2 = v2.distTo(intersection) - 2.0f / 3.0f * ab.length * (1.0f - dot2) / (1.0f - dot2 * dot2)
+
+                points(0) = v1
+                points(1) = intersection.add(v1.subtract(intersection).rescale(f1 * rel * rel))
+                points(2) = intersection.add(v2.subtract(intersection).rescale(f1 * rel * rel))
+                points(3) = v2
+            }
+        }
+
+
+
+
+
+//        points(0) = v1
+//        points(1) = v1.add(r1.rescale(t))
+//        points(2) = points(1).add(v2.subtract(v1).rescale(t))
+
+
+//        points(3) = v2
+
+        points
+    }
+
+    def oldDoubleSnapCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Vec3] = {
         val points = new Array[Vec3](4)
+
+        if(r1.dot(v2.subtract(v1)) <= 0 || r2.dot(v1.subtract(v2)) <= 0) return null
 
         val intersection = v1.intersection(r1, v2, r2)
         if(intersection == null) return null
@@ -99,15 +167,9 @@ object Bezier {
         val f2 = 2.0f / 3.0f * ab.length * (1.0f - dot2) / (1.0f - dot2 * dot2)
 
         points(0) = v1
+        points(1) = v1.add(r1.rescale(f1))
+        points(2) = v2.add(r2.rescale(f2))
         points(3) = v2
-
-        if(b1 && b2) {
-            points(1) = if(f1 < intersection.subtract(v1).length) v1.add(r1.rescale(f1)) else intersection
-            points(2) = if(f2 < intersection.subtract(v2).length) v2.add(r2.rescale(f2)) else intersection
-        } else {
-            points(1) = v1.add(r1.rescale(f1))
-            points(2) = v2.add(r2.rescale(f2))
-        }
 
         points
     }

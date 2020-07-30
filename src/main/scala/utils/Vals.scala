@@ -18,12 +18,12 @@ object Vals {
     final val MAX_CAMERA_HEIGHT: Float = 1000
     final val CAMERA_MOVE_SPEED: Float = 0.005f
     final val CAMERA_MOVE_SMOOTH_FACTOR: Int = 10
-    
+
     final val MAX_RAY_DISTANCE: Float = 500
-    
+
     final val CAMERA_STANDARD_ORIENTATION: Vec3 = Vec3(Vals.MIN_CAMERA_PITCH, 0f, 100.0f)
 
-    final val CAMERA_TOPDOWN_ORIENTATION: Vec3 = Vec3(Vals.MAX_CAMERA_PITCH, 0f, 100.0f)
+    final val CAMERA_TOPDOWN_ORIENTATION: Vec3 = Vec3(Vals.MAX_CAMERA_PITCH, 0f, 500.0f)
 
     final val CONTROL_POINT_COLOR: Vec4 = Vec4(0, 0.4f, 0.8f, 1)
 
@@ -39,46 +39,50 @@ object Vals {
         case GL_UNSIGNED_BYTE => 1
     }
 
-    def restrain(value: Float, min: Float, max: Float): Float = if(value < min) min else if(value > max) max else value
-    
+    def restrain(value: Float, min: Float, max: Float): Float = if (value < min) min else if (value > max) max else value
+
     def square(value: Float): Float = value * value
-    
+
     def center(v: Float, r: Float): Float = {
         val f = v % (2 * r)
-        if(f > r) f - 2 * r else if(f < -r) f + 2 * r else f
+        if (f > r) f - 2 * r else if (f < -r) f + 2 * r else f
     }
-    
-    def toRadians(deg: Float) = deg * Math.PI.toFloat / 180
-    
-    def getRay(vec: Vec2) = {
+
+    def rel(a: Float, b: Float): Float = Math.min(a, b) / Math.max(a, b)
+
+    def toRadians(deg: Float): Float = deg * Math.PI.toFloat / 180
+
+    def minRoadLength(d1: Vec3, d2: Vec3, laneCount: Int): Float = Vals.LARGE_LANE_WIDTH * laneCount * 3 * d1.antiDot(d2)
+
+    def getRay(vec: Vec2): Vec3 = {
         val eyeVector = perspectiveMatrix.invert.multiply(vec.toScreenVector.fill(1.0f, 1.0f))
-        val worldVector = GameHandler.camera.getViewMatrix.invert.multiply(new Vec4(eyeVector.x, eyeVector.y, -1f, 0))
+        val worldVector = GameHandler.camera.getViewMatrix.invert.multiply(Vec4(eyeVector.x, eyeVector.y, -1f))
         worldVector.xyz.normalize.negate
     }
-    
+
     // heightMap should return positive infinity outside its borders
-    def terrainRayCollision(ray: Vec3, heightMap: (Float, Float) => Float, accuracy: Float) = {
+    def terrainRayCollision(ray: Vec3, heightMap: (Float, Float) => Float, accuracy: Float): Vec3 = {
         val camPos = GameHandler.camera.getCameraPos
         var v: Vec3 = new Vec3
         var f = -camPos.y / ray.y
         var g = 0.0f
-        
-        if(f > g) {
-            while(ray.scale(f-g).length > accuracy) {
-                val a = (f+g)/2.0f
+
+        if (f > g) {
+            while (ray.scale(f - g).length > accuracy) {
+                val a = (f + g) / 2.0f
                 v = camPos.add(ray.scale(a))
-                if(v.y > heightMap(v.x, v.z)) g = a
+                if (v.y > heightMap(v.x, v.z)) g = a
                 else f = a
             }
-            new Vec3(v.x, heightMap(v.x, v.z), v.z)
+            Vec3(v.x, heightMap(v.x, v.z), v.z)
         } else {
             camPos.add(ray.scale(Vals.MAX_RAY_DISTANCE))
         }
     }
-    
-    val perspectiveMatrix = Mat4.perspective(30, 1f, 5000f)
-    val UIProjMatrix = Mat4.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
 
-    val defaultTerrainLineColor = Vec4(1.0f, 0.0f, 0.2f, 0.8f)
-    
+    val perspectiveMatrix: Mat4 = Mat4.perspective(30, 1f, 5000f)
+    val UIProjMatrix: Mat4 = Mat4.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
+
+    val defaultTerrainLineColor: Vec4 = Vec4(1.0f, 0.0f, 0.2f, 0.8f)
+
 }
