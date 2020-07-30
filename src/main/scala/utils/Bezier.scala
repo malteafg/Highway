@@ -59,4 +59,22 @@ object Bezier {
         points
     }
 
+    def circleCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3): Array[Vec3] = {
+        val points = new Array[Vec3](4)
+
+        val ab = v2.subtract(v1)
+        val dot1 = ab.normalize.dot(r1.normalize)
+        val dot2 = ab.normalize.dot(r2.normalize)
+        val f1 = 2.0f / 3.0f * ab.length * (1.0f - dot1) / (1.0f - dot1 * dot1)
+        val f2 = 2.0f / 3.0f * ab.length * (1.0f - dot2) / (1.0f - dot2 * dot2)
+        //val u = ab.normalize.add(r.normalize).divide(2.0f)
+
+        points(0) = v1
+        points(1) = v1.add(r1.reScale(f1))
+        points(2) = v2.add(R).subtract(ab.scale(2.0f * ab.dot(R) / ab.dot(ab)))
+        points(3) = v2
+
+        points
+    }
+
 }

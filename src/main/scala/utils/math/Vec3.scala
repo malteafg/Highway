@@ -67,6 +67,14 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
     }
 
     /**
+     * Multiplies a vector by a scalar.
+     *
+     * @param scalar Scalar to multiply
+     * @return Scalar product of this * scalar
+     */
+    def reScale(scalar: Float): Vec3 = normalize.scale(scalar)
+
+    /**
      * Divides a vector by a scalar.
      *
      * @param scalar Scalar to multiply
@@ -81,6 +89,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
      * @return Dot product of this * other
      */
     def dot(other: Vec3): Float = this.x * other.x + this.y * other.y + this.z * other.z
+
+    def antiDot(other: Vec3): Float = cross(other).length / length / other.length
 
     /**
      * Calculates the dot product of this vector with another vector.
