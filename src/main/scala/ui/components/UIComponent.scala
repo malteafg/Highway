@@ -11,9 +11,9 @@ import scala.collection.mutable.ListBuffer
 
 class UIComponent(protected val parent: UIComponent, protected var pos: Vec2, protected var size: Vec2, protected val color: Vec4) {
 
-    var tex: Texture = null
+    var tex: Texture = _
 
-    val children = mutable.ListBuffer.empty[UIComponent]
+    private val children = mutable.ListBuffer.empty[UIComponent]
 
     if(parent != null) parent.children.addOne(this)
     pos = pos.scale(Vals.UNIT)

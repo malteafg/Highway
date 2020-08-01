@@ -2,7 +2,8 @@ package rendering
 
 import game.roads.RoadNode
 import game.terrain.TerrainLine
-import game.{Game, GameHandler, Sphere}
+import game.tools.{NodeSnapper, State, Tools}
+import game.{Game, Sphere}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL13._
 import org.lwjgl.opengl.GL15._
@@ -11,8 +12,6 @@ import utils.Vals
 import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray}
 import utils.math.{Mat4, Vec2, Vec4, VecUtils}
 
-import scala.collection.mutable
-
 object GameRenderer {
 
     var darkEdges = false
@@ -20,7 +19,7 @@ object GameRenderer {
     private val terrainShader = Shader.get("terrain")
     private val skybox = new Skybox
 
-    def render(game: Game, camera: Camera): Unit = {
+    def render(game: Game, camera: Camera, tool: State): Unit = {
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
 
@@ -38,9 +37,7 @@ object GameRenderer {
         terrainShader.uniformMat4f("viewMatrix", camera.getViewMatrix)
 
         // load lines for terrain
-        val lines = mutable.ListBuffer[TerrainLine]()
-        lines.addAll(game.terrain.lines ++ GameHandler.guidelines)
-        if (GameHandler.mode != GameHandler.Free) lines.addOne(GameHandler.cursorMarker)
+        val lines = if (Tools.isFree) List[TerrainLine]() else tool.getGuidelinesToRender
         val pos1 = new Array[Vec2](lines.length)
         val pos2 = new Array[Vec2](lines.length)
         val width = new Array[Float](lines.length)
@@ -70,22 +67,25 @@ object GameRenderer {
         for(r <- game.roads) {
             draw(r.mesh.va, r.mesh.ib)
         }
-        Shader.get("road").uniformVec4f("in_Color", if (GameHandler.allowed) Vec4(0.3f, 0.3f, 0.9f, 0.8f) else Vec4(0.9f, 0.2f, 0.2f, 0.8f))
-        if (GameHandler.previewRoad != null) draw(GameHandler.previewRoad.getMesh)
 
-        // render nodes
-        if (GameHandler.mode != GameHandler.Free && GameHandler.selectedNode == null) {
+        if (!Tools.isFree) {
+            if (Tools.current.getRoadMeshToRender != null) {
+                Shader.get("road").uniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.8f))
+                draw(Tools.current.getRoadMeshToRender)
+            }
+
+            // render nodes
             Shader.get("node").bind()
             Shader.get("node").uniformMat4f("viewMatrix", camera.getViewMatrix)
             Shader.get("node").uniformVec4f("in_Color", Vec4(0.0f, 0.8f, 0.8f, 0.5f))
-            if (GameHandler.snappedNode == null) {
+            if (NodeSnapper.getSnappedNode == null) {
                 for(n <- game.nodes) {
                     Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(n.getWidth))
                     draw(RoadNode.mesh)
                 }
             }
             else {
-                for(n <- GameHandler.snappedNode.getLaneNodes) {
+                for(n <- NodeSnapper.getSnappedNode.getLaneNodes) {
                     Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(Vals.LARGE_LANE_WIDTH))
                     draw(RoadNode.mesh)
                 }

@@ -10,7 +10,7 @@ class RadioButton(val par: UIComponent, val p: Vec2, val s: Vec2, val c: Vec4,
     val id = (Math.random() * Int.MaxValue).toInt
 
     override def click(event: InputEvent): Boolean = {
-        if(isInside(InputHandler.mousePos) && event.isPressed()) {
+        if(isInside(InputHandler.mousePos) && event.isPressed) {
             pressed = !pressed
             func(pressed)
             parent.click(InputEvent(-series - 10, 0, id))

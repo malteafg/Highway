@@ -44,7 +44,7 @@ class Camera {
             if(input(3)) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed))
             if(input(4)) orientation = orientation.y(Vals.center(orientation.y + 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat))
             if(input(5)) orientation = orientation.y(Vals.center(orientation.y - 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat))
-            GameHandler.move()
+            GameHandler.onMovement()
         }
     }
 
@@ -67,12 +67,12 @@ class Camera {
     def step(a: Float, b: Float, V: Vec3, T: Vec3): Vec3 = T.scale(b).add(V.subtract(T.scale(a)).scale((1.0f - b)/(1.0f - a)))
 
     def click(event: InputEvent): Feedback = {
-        if(event.isPressed() && event.isWheelClick()) {
+        if(event.isPressed && event.isWheelClick) {
             InputHandler.addMouseMoveSub(drag)
             dragging = true
             stop()
             Feedback.Block
-        } else if(event.isReleased() && event.isWheelClick()) {
+        } else if(event.isReleased && event.isWheelClick) {
             dragging = false
             stop()
             Feedback.Block
@@ -80,8 +80,8 @@ class Camera {
     }
 
     def keyPress(event: InputEvent): Feedback = {
-        if(!event.isContinued() && event.isUnAltered()) {
-            var a = !event.isReleased()
+        if(!event.isContinued && event.isUnAltered) {
+            var a = !event.isReleased
             var b = true
             event.key match {
                 case 87 => input(0) = a

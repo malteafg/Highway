@@ -23,13 +23,13 @@ class Slider(val par: UIComponent, p: Vec2, s: Vec2, c: Vec4,
      * Functions
      */
     override def click(event: InputEvent): Boolean = {
-        if(bar.isInside(InputHandler.mousePos) && event.isPressed()) {
-            InputHandler.addMousePressSub((event: InputEvent) => { val b = event.isReleased(); sliding = !b; Feedback.custom(b, b)})
+        if(bar.isInside(InputHandler.mousePos) && event.isPressed) {
+            InputHandler.addMousePressSub((event: InputEvent) => { val b = event.isReleased; sliding = !b; Feedback.custom(b, b)})
             InputHandler.addMouseMoveSub(slide)
             sliding = true
             calcValue(InputHandler.mousePos)
             true
-        } else if(isInside(InputHandler.mousePos) && event.isScrolling()) {
+        } else if(isInside(InputHandler.mousePos) && event.isScrolling) {
             value = Vals.restrain(value - event.mods * 0.1f, 0, 1)
             func(value)
             true

@@ -2,21 +2,21 @@ package input
 
 case class InputEvent(key: Int, action: Int, mods: Int) {
 
-    def isShiftDown()   = mods == 1
-    def isControlDown() = mods == 2
-    def isAltDown()     = mods == 3
+    def isShiftDown: Boolean = mods == 1
+    def isControlDown: Boolean = mods == 2
+    def isAltDown: Boolean = mods == 3
 
-    def isCodePoint()   = mods == -1
-    def isUnAltered()   = mods == 0
+    def isCodePoint: Boolean = mods == -1
+    def isUnAltered: Boolean = mods == 0
 
-    def isReleased()    = key != -1 && action == 0
-    def isPressed()     = key != -1 && action == 1
-    def isContinued()   = action == 2
+    def isReleased: Boolean = key != -1 && action == 0
+    def isPressed: Boolean = key != -1 && action == 1
+    def isContinued: Boolean = action == 2
 
-    def isLeftClick()   = key == 0
-    def isRightClick()  = key == 1
-    def isWheelClick()  = key == 2
+    def isLeftClick: Boolean = key == 0
+    def isRightClick: Boolean = key == 1
+    def isWheelClick: Boolean = key == 2
 
-    def isScrolling()   = key == -1
+    def isScrolling: Boolean = key == -1
 
 }
