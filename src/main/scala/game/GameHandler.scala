@@ -31,7 +31,7 @@ object GameHandler {
      */
     InputHandler.addMousePressSub(event => {
         Tools.onMousePress(event)
-        Feedback.Block
+        Feedback.Passive
     })
 
     InputHandler.addMouseMoveSub(_ => {

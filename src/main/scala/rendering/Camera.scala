@@ -45,8 +45,8 @@ class Camera {
             if(velocity(1) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed * velocity(1) / Vals.MAX_CAMERA_SPEED))
             if(velocity(2) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed * velocity(2) / Vals.MAX_CAMERA_SPEED))
             if(velocity(3) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed * velocity(3) / Vals.MAX_CAMERA_SPEED))
-            if(velocity(4) > 0) orientation = orientation.y(Vals.center(orientation.y + velocity(4) * 5 * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
-            if(velocity(5) > 0) orientation = orientation.y(Vals.center(orientation.y - velocity(5) * 5 * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
+            if(velocity(4) > 0) orientation = orientation.y(Vals.center(orientation.y + velocity(4) * 5f * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
+            if(velocity(5) > 0) orientation = orientation.y(Vals.center(orientation.y - velocity(5) * 5f * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
             if(velocity.foldLeft[Boolean](false)((b, i) => b || i > 0)) GameHandler.onMovement()
         }
     }
