@@ -45,11 +45,14 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
         game().addSegment(segment)
 
         val nodeToSnap = if (end) endNode else startNode
-        Tools.remove()
         Tools.replace(Preview(nodeToSnap.position, () => nodeToSnap.direction, opposite, nodeToSnap))
     }
 
-    override def onRightClick(): Unit = Tools.back()
+    override def onRightClick(): Unit = {
+        Tools.back()
+        if (selectedNode != null) Tools.back()
+        Tools.current.onModeSwitch(Tools.getMode)
+    }
 
     // update preview
     override def onMovement(cursorPos: Vec3): Unit = {
@@ -78,7 +81,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
         Tools.updateAllowedPos(newPos)
     }
 
-    override def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = Tools.push(SnapCurve(selectedPos, selectedDir))
+    override def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = ()/*Tools.push(SnapCurve(selectedPos, selectedDir))*/
 
     override def onModeSwitch(mode: Tools.Mode): Unit = mode match {
         case Tools.Straight => guidelines.clear()
