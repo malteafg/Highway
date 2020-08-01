@@ -5,13 +5,13 @@ import game.tools.Tools
 import rendering.{GameRenderer, UIRenderer}
 import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Vec2, Vec4}
-import ui.components.{Button, RadioButton, UIComponent}
+import ui.components.{Button, RadioButton, TextField, UIComponent}
 import utils.graphics.Texture
 import utils.{Options, Vals}
 
 object Interface {
 
-    val screen: UIComponent = new UIComponent(null, new Vec2(), Vec2(16, 9), Vec4(1, 0, 1, 0))
+    val screen: UIComponent = new UIComponent(parent = null, Vec2(), Vec2(16, 9), Vec4(1, 0, 1))
     val panel: UIComponent = new UIComponent(screen, Vec2(1, 8), Vec2(14, 1), Vals.UI_COLOR)
 
     val button1: RadioButton = new RadioButton(panel, Vec2(0.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(1, 0, 1, 1),
@@ -52,13 +52,14 @@ object Interface {
             GameHandler.camera.orientation.y = f - 0.5f
         })
 
-    val textField = new TextField(screen, new Vector2f(4, 0), new Vector2f(8, 1), Vals.UI_COLOR, "",
+     */
+    val textField = new TextField(panel, Vec2(4.1f, 0.1f), Vec2(4, 0.8f), Vec4(0.0f, 0.4f, 0.5f, 1.0f), "",
         (text: String) => {
             Options.log(s"You entered: '$text'", Options.TextField)
-            if(text.toLowerCase() == "open panel") panel.activate
+            if(text.toLowerCase() == "open panel") panel.activate()
             if(text.toLowerCase() == "close all") screen.deactivate()
         })
-     */
+
 
     def init(): Unit = {
         InputHandler.addMousePressSub(mousePressed)
@@ -68,6 +69,6 @@ object Interface {
 
     def render(): Unit = UIRenderer.render(screen)
 
-    def mousePressed(event: InputEvent): Feedback = Feedback.custom(false, block = screen.click(event))
+    def mousePressed(event: InputEvent): Feedback = Feedback.custom(unsubscribe = false, block = screen.click(event))
 
 }

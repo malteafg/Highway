@@ -16,6 +16,7 @@ object Vals {
     final val MAX_CAMERA_PITCH: Float = 1.5f
     final val MIN_CAMERA_HEIGHT: Float = 10
     final val MAX_CAMERA_HEIGHT: Float = 1000
+    final val MAX_CAMERA_SPEED: Int = 10
     final val CAMERA_MOVE_SPEED: Float = 0.005f
     final val CAMERA_MOVE_SMOOTH_FACTOR: Int = 10
 

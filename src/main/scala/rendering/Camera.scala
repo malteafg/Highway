@@ -3,7 +3,7 @@ package rendering
 import game.GameHandler
 import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Mat4, Vec2, Vec3}
-import utils.Vals
+import utils.{Options, Vals}
 
 class Camera {
 
@@ -11,7 +11,8 @@ class Camera {
     var orientation: Vec3 = Vals.CAMERA_STANDARD_ORIENTATION
     var targetPos: Vec3 = Vec3()
 
-    var input: Array[Boolean] = new Array[Boolean](6)
+    var input: Array[Boolean] = new Array(6)
+    var velocity: Array[Int] = new Array(6)
 
     var dragging: Boolean = false
 
@@ -37,14 +38,16 @@ class Camera {
 
             if(progress == 1.0f) stop()
         } else {
+            for(i <- velocity.indices) velocity(i) = Vals.restrain(velocity(i) + (if(input(i)) 1 else -1) , 0, Vals.MAX_CAMERA_SPEED).toInt
+
             val speed = Vals.CAMERA_MOVE_SPEED * orientation.z
-            if(input(0)) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat).scale(speed))
-            if(input(1)) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed))
-            if(input(2)) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed))
-            if(input(3)) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed))
-            if(input(4)) orientation = orientation.y(Vals.center(orientation.y + 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat))
-            if(input(5)) orientation = orientation.y(Vals.center(orientation.y - 5 * Vals.CAMERA_MOVE_SPEED, Math.PI.toFloat))
-            GameHandler.onMovement()
+            if(velocity(0) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat).scale(speed * velocity(0) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(1) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed * velocity(1) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(2) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed * velocity(2) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(3) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed * velocity(3) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(4) > 0) orientation = orientation.y(Vals.center(orientation.y + velocity(4) * 5 * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
+            if(velocity(5) > 0) orientation = orientation.y(Vals.center(orientation.y - velocity(5) * 5 * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
+            if(velocity.foldLeft[Boolean](false)((b, i) => b || i > 0)) GameHandler.onMovement()
         }
     }
 
@@ -67,6 +70,7 @@ class Camera {
     def step(a: Float, b: Float, V: Vec3, T: Vec3): Vec3 = T.scale(b).add(V.subtract(T.scale(a)).scale((1.0f - b)/(1.0f - a)))
 
     def click(event: InputEvent): Feedback = {
+        Options.log("Clicked camera", Options.Camera)
         if(event.isPressed && event.isWheelClick) {
             InputHandler.addMouseMoveSub(drag)
             dragging = true
