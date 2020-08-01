@@ -80,7 +80,9 @@ object Bezier {
 
         val t = Vals.sCurveSegmentLength(v1, r1.normalize, v2, r2.normalize)
         val center = v1.add(v2).add(r1.rescale(t)).add(r2.rescale(t)).divide(2f)
-        if(Vals.isCurveTooSmall(r1, center.subtract(v1), laneCount) || Vals.isCurveTooSmall(r2, center.subtract(v2), laneCount)) return null
+        if(Vals.isCurveTooSmall(r1, center.subtract(v1), laneCount) || Vals.isCurveTooSmall(r2, center.subtract(v2), laneCount) ) return null
+        if(r1.dot(center.subtract(v1)) < 0 || r2.dot(center.subtract(v2)) < 0) return null
+        if(v2.subtract(v1).dot(center.subtract(v1)) < 0 || v1.subtract(v2).dot(center.subtract(v2)) < 0) return null
         circleCurve(v1, r1, center).foldLeft[Int](0)((b, a) => {points(b) = a; b+1})
         circleCurve(v2, r2, center).foldLeft[Int](0)((b, a) => {points(6 - b) = a; b+1})
 
