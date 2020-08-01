@@ -37,14 +37,18 @@ object Tools {
      */
     def straightRoad(): Unit = {
         if (stack.isEmpty) push(SelectPos())
-        if (mode != Straight) current.onModeSwitch(Straight)
+        var callswitch = false
+        if (mode != Straight) callswitch = true
         mode = Straight
+        if (callswitch) current.onModeSwitch(Straight)
     }
 
     def curvedRoad(): Unit = {
         if (stack.isEmpty) push(SelectPos())
-        if (mode != Curved) current.onModeSwitch(Curved)
+        var callswitch = false
+        if (mode != Curved) callswitch = true
         mode = Curved
+        if (callswitch) current.onModeSwitch(Curved)
     }
 
     def freeMode(): Unit = {
@@ -58,7 +62,6 @@ object Tools {
      * Stack
      */
     def clearStack(): Unit = stack.clear()
-    def back(): Unit = pop()
 
     def current: State = try stack.top catch {
         case _: IndexOutOfBoundsException | _: NoSuchElementException => null
@@ -69,14 +72,14 @@ object Tools {
         Options.log(s"State pushed on tool stack: $state \n  $stack\n", Options.State)
     }
 
-    def pop(): Unit = {
+    def back(): Unit = {
         val state = current
         stack.pop()
         Options.log(s"State removed from tool stack: $state \n  $stack\n", Options.State)
     }
 
     def replace(state: State): Unit = {
-        pop()
+        back()
         push(state)
     }
 
@@ -99,8 +102,8 @@ object Tools {
         case InputEvent(50, Keys.PRESSED, _) => noOfLanes = 2
         case InputEvent(51, Keys.PRESSED, _) => noOfLanes = 3
         case InputEvent(52, Keys.PRESSED, _) => noOfLanes = 4
-        case InputEvent(170, Keys.PRESSED, _) => straightRoad()
-        case InputEvent(143, Keys.PRESSED, _) => curvedRoad()
+        case InputEvent(88, Keys.PRESSED, _) => straightRoad()
+        case InputEvent(67, Keys.PRESSED, _) => curvedRoad()
         case _ =>
     }
 

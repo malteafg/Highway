@@ -69,9 +69,9 @@ object GameRenderer {
         }
 
         if (!Tools.isFree) {
-            if (Tools.current.getRoadMeshToRender != null) {
+            if (Tools.current.getRoadMeshesToRender.nonEmpty) {
                 Shader.get("road").uniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.8f))
-                draw(Tools.current.getRoadMeshToRender)
+                Tools.current.getRoadMeshesToRender.foreach(m => draw(m))
             }
 
             // render nodes

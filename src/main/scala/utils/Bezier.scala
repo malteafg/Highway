@@ -98,7 +98,7 @@ object Bezier {
         if(r1.dot(center.subtract(v1)) < 0 || r2.dot(center.subtract(v2)) < 0) return null
         if(v2.subtract(v1).dot(center.subtract(v1)) < 0 || v1.subtract(v2).dot(center.subtract(v2)) < 0) return null
         points(0) = circleCurve(v1, r1, center)
-        points(1) = circleCurve(v2, r2, center)
+        points(1) = circleCurve(v2, r2, center).reverse
 
         points
     }

@@ -2,16 +2,17 @@ package game.tools
 
 import game.roads.{RoadNode, RoadSegment}
 import game.terrain.TerrainLine
-import utils.Vals
+import input.InputHandler
+import utils.{Bezier, Vals}
 import utils.math.Vec3
 
 case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean, selectedNode: RoadNode) extends State {
 
     private var controlPoints: Array[Vec3] = _
 
-    onMovement(selectedPos.add(selectedDir().normalize))
+    onMovement(Vals.terrainRayCollision(Vals.getRay(InputHandler.mousePos), (_, _) => 0, 0.1f))
 
-    if (Tools.getMode == Tools.Curved) addGuidelines() else guidelines.clear()
+    if (Tools.getMode == Tools.Curved) addGuidelines()
 
     // place road
     override def onLeftClick(cursorPos: Vec3): Unit = {
@@ -39,7 +40,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
             }
         }
 
-        val segment = new RoadSegment(startNode, endNode, null, controlPoints, roadMesh)
+        val segment = new RoadSegment(startNode, endNode, null, controlPoints, roadMeshes.head)
         startNode.addOutgoingSegment(segment)
         endNode.addIncomingSegment(segment)
         game().addSegment(segment)
@@ -56,6 +57,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
 
     // update preview
     override def onMovement(cursorPos: Vec3): Unit = {
+        roadMeshes.clear()
         val dir = selectedDir()
         var newPos: Vec3 = null
         Tools.getMode match {
@@ -65,7 +67,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                 if (newPos.subtract(selectedPos).length < Vals.MIN_SEGMENT_LENGTH)
                     newPos = selectedPos.add(newPos.subtract(selectedPos).normalize.scale(Vals.MIN_SEGMENT_LENGTH))
                 val mesh = RoadSegment.generateStraightMesh(selectedPos, newPos, Tools.getNoOfLanes)
-                roadMesh = mesh._1
+                roadMeshes.addOne(mesh._1)
                 controlPoints = if (opposite) mesh._2.reverse else mesh._2
             case Tools.Curved =>
                 newPos =
@@ -74,18 +76,34 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                 val minDist = Math.max(Vals.MIN_SEGMENT_LENGTH, Vals.minRoadLength(dir, newPos.subtract(selectedPos), Tools.getNoOfLanes))
                 if (newPos.subtract(selectedPos).length < minDist) newPos = selectedPos.add(newPos.subtract(selectedPos).rescale(minDist))
                 val mesh = RoadSegment.generateCircularMesh(selectedPos, dir, newPos, Tools.getNoOfLanes)
-                roadMesh = mesh._1
+                roadMeshes.addOne(mesh._1)
                 controlPoints = if (opposite) mesh._2.reverse else mesh._2
             case _ =>
         }
         Tools.updateAllowedPos(newPos)
     }
 
-    override def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = ()/*Tools.push(SnapCurve(selectedPos, selectedDir))*/
+    override def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = if (selectedNode != null) {
 
-    override def onModeSwitch(mode: Tools.Mode): Unit = mode match {
-        case Tools.Straight => guidelines.clear()
-        case Tools.Curved => addGuidelines()
+
+        if (snappedNode.isEndNode != selectedNode.isEndNode) {
+            val doubleCtrPts =
+                if (opposite) Bezier.doubleSnapCurve(snappedNode.position, snappedNode.direction.negate, selectedNode.position, selectedNode.direction, Tools.getNoOfLanes)
+                else Bezier.doubleSnapCurve(selectedNode.position, selectedNode.direction, snappedNode.position, snappedNode.direction.negate, Tools.getNoOfLanes)
+            if (doubleCtrPts != null) Tools.push(SnapCurve(selectedNode, snappedNode, this.opposite, doubleCtrPts))
+        }
+    }
+
+    override def onModeSwitch(mode: Tools.Mode): Unit = {
+        mode match {
+            case Tools.Straight => Tools.replace(Preview(selectedPos,
+                if (selectedNode == null) () => Tools.getAllowedPos.subtract(selectedPos).normalize
+                else selectedDir, opposite, selectedNode))
+            case Tools.Curved =>
+                if (selectedNode == null) Tools.back()
+                else Tools.replace(Preview(selectedPos, selectedDir, opposite, selectedNode))
+        }
+        onMovement(Tools.getCursorPos)
     }
 
     def addGuidelines(): Unit = for (i <- controlPoints.indices.dropRight(1))

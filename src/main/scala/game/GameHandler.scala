@@ -29,6 +29,11 @@ object GameHandler {
     /**
      * Input
      */
+    InputHandler.addKeyPressSub(event => {
+        Tools.onKeyPress(event)
+        Feedback.Passive
+    })
+
     InputHandler.addMousePressSub(event => {
         Tools.onMousePress(event)
         Feedback.Passive

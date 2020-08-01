@@ -24,7 +24,10 @@ class RoadNode(var position: Vec3, var direction: Vec3, noOfLanes: Int) {
     def addOutgoingSegment(segment: RoadSegment): Unit = outgoingSegments.addOne(segment)
 
     // TODO make smarter
-    def isEndNode: Boolean = incomingSegments.length >= outgoingSegments.length
+    def isEndNode: Boolean = {
+        println(s"${incomingSegments.length} ,    ${outgoingSegments.length}")
+        incomingSegments.length > outgoingSegments.length
+    }
 
     def getLaneNodes: Array[LaneNode] = laneNodes
     def getWidth: Float = (laneNodes.length - 2) * Vals.LARGE_LANE_WIDTH
