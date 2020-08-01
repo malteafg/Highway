@@ -15,14 +15,14 @@ object InputHandler {
 
     def keyPressed(window: Long, key: Int, scancode: Int, action: Int, mods: Int): Unit = {
         val event = InputEvent(key, action, mods)
-        Options.log(s"Key '${key.toChar}'/$key was ${if(event.isPressed()) "pressed" else if(event.isReleased()) "released" else if(event.isContinued()) "held down" else "interacted with"}", Options.Keys)
+        Options.log(s"Key '${key.toChar}'/$key was ${if(event.isPressed) "pressed" else if(event.isReleased) "released" /*else if(event.isContinued) "held down" else "interacted with"*/}", Options.Keys)
 //        Options.log(s"Scancode: \'${scancode}\', action: ${action} and mods: ${mods}", Options.Keys)
-        Options.log(s"Ctrl: ${event.isControlDown()}, Alt: ${event.isAltDown()}, Shift: ${event.isShiftDown()}, none: ${event.isUnAltered()}", Options.Keys)
+//        Options.log(s"Ctrl: ${event.isControlDown}, Alt: ${event.isAltDown}, Shift: ${event.isShiftDown}, none: ${event.isUnAltered}", Options.Keys)
         Options.log("", Options.Keys)
 
-        Keys.CONTROL_DOWN = event.isControlDown()
-        Keys.SHIFT_DOWN = event.isShiftDown()
-        Keys.ALT_DOWN = event.isAltDown()
+        Keys.CONTROL_DOWN = event.isControlDown
+        Keys.SHIFT_DOWN = event.isShiftDown
+        Keys.ALT_DOWN = event.isAltDown
 
         if(charSubs.next == null) keyPressSubs.iterate(event)
         else charSubs.iterate(event)
@@ -37,9 +37,9 @@ object InputHandler {
 
     def mousePressed(window: Long, button: Int, action: Int, mods: Int): Unit = {
         val event = InputEvent(button, action, mods)
-        Options.log(s"Button $button was ${if(event.isPressed()) "pressed" else if(event.isReleased()) "released" else if(event.isContinued()) "held down" else "interacted with"} on (${mousePos.x}, ${mousePos.y})", Options.MousePressed)
+        Options.log(s"Button $button was ${if(event.isPressed) "pressed" else if(event.isReleased) "released" else if(event.isContinued) "held down" else "interacted with"} on (${mousePos.x}, ${mousePos.y})", Options.MousePressed)
 //        Options.log(s"Action: ${action} and mods: ${mods}", Options.MousePressed)
-        Options.log(s"Ctrl: ${event.isControlDown()}, Alt: ${event.isAltDown()}, Shift: ${event.isShiftDown()}, none: ${event.isUnAltered()}", Options.MousePressed)
+        Options.log(s"Ctrl: ${event.isControlDown}, Alt: ${event.isAltDown}, Shift: ${event.isShiftDown}, none: ${event.isUnAltered}", Options.MousePressed)
         Options.log("", Options.MousePressed)
 
         mousePressSubs.iterate(event)

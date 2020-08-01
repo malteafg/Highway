@@ -177,6 +177,10 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
         (t, s)
     }
 
+    def xy: Vec2 = Vec2(x, y)
+    def xz: Vec2 = Vec2(x, z)
+    def yz: Vec2 = Vec2(y, z)
+
     def distTo(v: Vec3): Float = subtract(v).length
 
     def x(newX: Float): Vec3 = Vec3(newX, y, z)

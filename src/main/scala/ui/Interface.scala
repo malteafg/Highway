@@ -1,6 +1,7 @@
 package ui
 
 import game.GameHandler
+import game.tools.Tools
 import rendering.{GameRenderer, UIRenderer}
 import input.{Feedback, InputEvent, InputHandler}
 import utils.math.{Vec2, Vec4}
@@ -30,13 +31,13 @@ object Interface {
     val straight: Button = new Button(panel, Vec2(2.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(0, 1, 1, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
-            GameHandler.straightRoad()
+            Tools.straightRoad()
         })
 
     val curved: Button = new Button(panel, Vec2(3.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(0, 1, 0, 1),
         () => "Bottom button", () => {
             Options.log(s"Bottom button says click!", Options.Button)
-            GameHandler.curvedRoad()
+            Tools.curvedRoad()
         })
 
     /*
