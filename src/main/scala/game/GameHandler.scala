@@ -143,6 +143,9 @@ object GameHandler {
         endNode.addIncomingSegment(segment)
         if (curve) stopPreview() else selectSnapNode(if (end) endNode else startNode)
         game.addSegment(segment)
+
+        // Sphere control points
+        controlPoints.foreach(c => game.spheres.addOne(new Sphere(c)))
     }
 
     /**
@@ -241,7 +244,7 @@ object GameHandler {
                 newNodePos =
                     if (selectedDir.dot(newNodePos.subtract(selectedPos)) >= 0) newNodePos
                     else newNodePos.subtract(newNodePos.subtract(selectedPos).proj(selectedDir))
-                val minDist = Math.max(Vals.MIN_SEGMENT_LENGTH, Vals.minRoadLength(selectedDir, newNodePos.subtract(selectedPos), noOfLanes))
+                val minDist = Vals.minRoadLength(selectedDir, newNodePos.subtract(selectedPos), noOfLanes)
                 if (newNodePos.subtract(selectedPos).length < minDist) newNodePos = selectedPos.add(newNodePos.subtract(selectedPos).rescale(minDist))
                 previewRoad.updateMesh(RoadSegment.generateCircularMesh(selectedPos, selectedDir, newNodePos, noOfLanes)._1)
             }

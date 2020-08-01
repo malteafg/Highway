@@ -43,6 +43,9 @@ object Vals {
 
     def square(value: Float): Float = value * value
 
+    def max(f: Float*): Float = f.fold[Float](0f)((a: Float, b: Float) => Math.max(a, b))
+    def min(f: Float*): Float = f.fold[Float](0f)((a: Float, b: Float) => Math.min(a, b))
+
     def center(v: Float, r: Float): Float = {
         val f = v % (2 * r)
         if (f > r) f - 2 * r else if (f < -r) f + 2 * r else f
@@ -50,9 +53,24 @@ object Vals {
 
     def rel(a: Float, b: Float): Float = Math.min(a, b) / Math.max(a, b)
 
+    def sCurveSegmentLength(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3): Float = {
+        val v = v2.subtract(v1)
+        val r = r2.subtract(r1)
+        val k = v.dot(r) / (4f - r.lengthSquared)
+        k + Math.sqrt(v.lengthSquared/(4f - r.lengthSquared) + k * k).toFloat
+    }
+
     def toRadians(deg: Float): Float = deg * Math.PI.toFloat / 180
 
-    def minRoadLength(d1: Vec3, d2: Vec3, laneCount: Int): Float = Vals.LARGE_LANE_WIDTH * laneCount * 3 * d1.antiDot(d2)
+    def minRoadLength(d1: Vec3, d2: Vec3, laneCount: Int): Float = Math.max(MIN_SEGMENT_LENGTH, LARGE_LANE_WIDTH * laneCount * 3 * d1.antiDot(d2))
+
+    def isCurveTooSmall(d1: Vec3, d2: Vec3, laneCount: Int): Boolean = d2.length < minRoadLength(d1, d2, laneCount)
+
+    def minCurveCornerLength(d1: Vec3, d2: Vec3, laneCount: Int): Float = {
+        val v = d1.antiDot(d2)
+        val w = d1.normalize.dot(d2.normalize)
+        Math.max(MIN_SEGMENT_LENGTH, LARGE_LANE_WIDTH * laneCount * 3 * Math.min(1, v / (2 - 2 * w)))
+    }
 
     def getRay(vec: Vec2): Vec3 = {
         val eyeVector = perspectiveMatrix.invert.multiply(vec.toScreenVector.fill(1.0f, 1.0f))

@@ -66,6 +66,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
         Vec3(x, y, z)
     }
 
+    def square(): Vec3 = scale(length)
+
     /**
      * Multiplies a normalized vector by a scalar.
      *
@@ -91,6 +93,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
      * @return Dot product of this * other
      */
     def dot(other: Vec3): Float = this.x * other.x + this.y * other.y + this.z * other.z
+
+    def ndot(other: Vec3): Float = normalize.dot(other.normalize)
 
     def antiDot(other: Vec3): Float = cross(other).length / length / other.length
 
