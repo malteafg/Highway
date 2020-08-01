@@ -1,0 +1,35 @@
+ /*
+        if(r1.dot(v2.subtract(v1)) <= 0 || r2.dot(v1.subtract(v2)) <= 0) return null
+
+        val intersection = v1.intersection(r1, v2, r2)
+        if(intersection == null) return null
+
+        val b1 = r1.dot(intersection.subtract(v1)) > 0
+        val b2 = r2.dot(intersection.subtract(v2)) > 0
+
+        if (!b1 && !b2) return null
+
+        if(b1 && b2) {
+            // natural curve
+            val minLength = Vals.minCurveCornerLength(intersection.subtract(v1), intersection.subtract(v2) , laneCount)
+            mcqueenCurve  = intersection.subtract(v1).length < minLength ||
+                            intersection.subtract(v2).length < minLength
+            if(!mcqueenCurve) {
+                points = new Array[Vec3](4)
+                val rel = Vals.rel(intersection.subtract(v1).length, intersection.subtract(v2).length)
+
+                val ab = v2.subtract(v1)
+                val dot1 = ab.normalize.dot(r1.normalize)
+                val dot2 = ab.negate.normalize.dot(r2.normalize)
+                val f1 = v1.distTo(intersection) - 2.0f / 3.0f * ab.length * (1.0f - dot1) / (1.0f - dot1 * dot1)
+                val f2 = v2.distTo(intersection) - 2.0f / 3.0f * ab.length * (1.0f - dot2) / (1.0f - dot2 * dot2)
+
+                val antiSharp = if(r1.dot(r2) > 0) Vals.MIN_SEGMENT_LENGTH / rel / rel else 0
+
+                points(0) = v1
+                points(1) = intersection.add(v1.subtract(intersection).rescale(Vals.max(f2, antiSharp, 0) * rel * rel))
+                points(2) = intersection.add(v2.subtract(intersection).rescale(Vals.max(f1, antiSharp, 0) * rel * rel))
+                points(3) = v2
+            }
+        }
+        */
