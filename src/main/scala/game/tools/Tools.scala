@@ -21,9 +21,10 @@ object Tools {
     private val stack = mutable.Stack[State]()
     private var game: Game = _
 
+    val roadWidth: () => Float = () => noOfLanes * Vals.LARGE_LANE_WIDTH
+
     private var allowedPos = Vec3()
     private var cursorPos = Vec3()
-    val roadWidth: () => Float = () => noOfLanes * Vals.LARGE_LANE_WIDTH
     private val cursorMarker = new TerrainLine(() => getAllowedPos.xz, () => getAllowedPos.xz.add(Vec2(0.01f)), width = roadWidth, color = Vec4(0.0f, 0.6f, 0.9f, 0.8f))
 
     def init(game: Game): Unit = {
@@ -35,13 +36,13 @@ object Tools {
      * Functions
      */
     def straightRoad(): Unit = {
-        if (stack.isEmpty) stack.push(SelectPos())
+        if (stack.isEmpty) push(SelectPos())
         if (mode != Straight) current.onModeSwitch(Straight)
         mode = Straight
     }
 
     def curvedRoad(): Unit = {
-        if (stack.isEmpty) stack.push(SelectPos())
+        if (stack.isEmpty) push(SelectPos())
         if (mode != Curved) current.onModeSwitch(Curved)
         mode = Curved
     }
@@ -57,7 +58,7 @@ object Tools {
      * Stack
      */
     def clearStack(): Unit = stack.clear()
-    def back(): Unit = stack.pop()
+    def back(): Unit = pop()
 
     def current: State = try stack.top catch {
         case _: IndexOutOfBoundsException | _: NoSuchElementException => null
@@ -65,13 +66,17 @@ object Tools {
 
     def push(state: State): Unit = {
         stack.push(state)
-        Options.log(s"State pushed on tool stack: $state", Options.State)
+        Options.log(s"State pushed on tool stack: $state \n  $stack\n", Options.State)
     }
 
-    def remove(): Unit = stack.pop()
+    def pop(): Unit = {
+        val state = current
+        stack.pop()
+        Options.log(s"State removed from tool stack: $state \n  $stack\n", Options.State)
+    }
 
     def replace(state: State): Unit = {
-        remove()
+        pop()
         push(state)
     }
 

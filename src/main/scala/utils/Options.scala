@@ -28,7 +28,7 @@ object Options {
     case object TextField       extends Log { parent = Interface;   name = "TextField" }
 
     // Remember to add new objects to list
-    var commands = List(Log, Camera, Input, Mouse, Keys, Characters, FPS, MousePressed, MouseMoved, MouseScrolled, Interface, Button, TextField)
+    var commands = List(Log, Camera, Input, Mouse, Keys, Characters, FPS, MousePressed, MouseMoved, MouseScrolled, Interface, Button, TextField, State)
 
     def setLogging(args: Array[String]): Unit = {
         for (a <- args; c <- commands) if (a == c.name) c.logging = true
