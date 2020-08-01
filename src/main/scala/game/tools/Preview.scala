@@ -33,7 +33,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                 game().addNode(endNode)
             } else {
                 controlPoints = controlPoints.reverse
-                startNode = new RoadNode(allowedPos, controlPoints(1).subtract(controlPoints(0)).normalize, Tools.getNoOfLanes)
+                startNode = new RoadNode(allowedPos, controlPoints(2).subtract(controlPoints(3)).normalize, Tools.getNoOfLanes)
                 endNode = selectedNode
                 game().addNode(startNode)
                 end = false
