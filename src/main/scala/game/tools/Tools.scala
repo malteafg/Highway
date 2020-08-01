@@ -63,6 +63,11 @@ object Tools {
      */
     def clearStack(): Unit = stack.clear()
 
+    def resetStack(): Unit = {
+        clearStack()
+        push(SelectPos())
+    }
+
     def current: State = try stack.top catch {
         case _: IndexOutOfBoundsException | _: NoSuchElementException => null
     }

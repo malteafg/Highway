@@ -28,7 +28,10 @@ case class SnapCurve(selectedNode: RoadNode, snappedNode: RoadNode, opposite: Bo
             game().addSegment(segment1)
             game().addSegment(segment2)
         }
+        Tools.resetStack()
     }
+
+    override def onRightClick(): Unit = Tools.resetStack()
 
     override def onNodeUnsnap(): Unit = Tools.back()
 

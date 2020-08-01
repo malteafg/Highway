@@ -58,7 +58,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
     // update preview
     override def onMovement(cursorPos: Vec3): Unit = {
         roadMeshes.clear()
-        val dir = selectedDir()
+        val dir = if (opposite) selectedDir().negate else selectedDir()
         var newPos: Vec3 = null
         Tools.getMode match {
             case Tools.Straight =>
@@ -84,12 +84,10 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
     }
 
     override def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = if (selectedNode != null) {
-
-
         if (snappedNode.isEndNode != selectedNode.isEndNode) {
             val doubleCtrPts =
                 if (opposite) Bezier.doubleSnapCurve(snappedNode.position, snappedNode.direction.negate, selectedNode.position, selectedNode.direction, Tools.getNoOfLanes)
-                else Bezier.doubleSnapCurve(selectedNode.position, selectedNode.direction, snappedNode.position, snappedNode.direction.negate, Tools.getNoOfLanes)
+                else Bezier.doubleSnapCurve(selectedNode.position, selectedNode.direction.negate, snappedNode.position, snappedNode.direction, Tools.getNoOfLanes)
             if (doubleCtrPts != null) Tools.push(SnapCurve(selectedNode, snappedNode, this.opposite, doubleCtrPts))
         }
     }
