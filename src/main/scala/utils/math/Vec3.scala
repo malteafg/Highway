@@ -122,6 +122,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
         target.scale(dot(target) / target.dot(target))
     }
 
+    def mirror(mirrorNormal: Vec3): Vec3 = subtract(proj(mirrorNormal).scale(2f))
+
     def thisOrThat(func: Vec3 => Boolean, replacement: Vec3): Vec3 = if(func(this)) this else replacement
 
     /**

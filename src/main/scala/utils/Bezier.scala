@@ -75,30 +75,23 @@ object Bezier {
         points
     }
 
-    def doubleSnapCurveOld(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Vec3] = {
-        val points: Array[Vec3] = new Array[Vec3](7)
-
-        val t = Vals.sCurveSegmentLength(v1, r1.normalize, v2, r2.normalize)
-        val center = v1.add(v2).add(r1.rescale(t)).add(r2.rescale(t)).divide(2f)
-        if(Vals.isCurveTooSmall(r1, center.subtract(v1), laneCount) || Vals.isCurveTooSmall(r2, center.subtract(v2), laneCount) ) return null
-        if(r1.dot(center.subtract(v1)) < 0 || r2.dot(center.subtract(v2)) < 0) return null
-        if(v2.subtract(v1).dot(center.subtract(v1)) < 0 || v1.subtract(v2).dot(center.subtract(v2)) < 0) return null
-        circleCurve(v1, r1, center).foldLeft[Int](0)((b, a) => {points(b) = a; b+1})
-        circleCurve(v2, r2, center).foldLeft[Int](0)((b, a) => {points(6 - b) = a; b+1})
-
-        points
-    }
-
     def doubleSnapCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
-        val points: Array[Array[Vec3]] = new Array(2)
+        var points: Array[Array[Vec3]] = null
 
-        val t = Vals.sCurveSegmentLength(v1, r1.normalize, v2, r2.normalize)
-        val center = v1.add(v2).add(r1.rescale(t)).add(r2.rescale(t)).divide(2f)
-        if(Vals.isCurveTooSmall(r1, center.subtract(v1), laneCount) || Vals.isCurveTooSmall(r2, center.subtract(v2), laneCount) ) return null
-        if(r1.dot(center.subtract(v1)) < 0 || r2.dot(center.subtract(v2)) < 0) return null
-        if(v2.subtract(v1).dot(center.subtract(v1)) < 0 || v1.subtract(v2).dot(center.subtract(v2)) < 0) return null
-        points(0) = circleCurve(v1, r1, center)
-        points(1) = circleCurve(v2, r2, center).reverse
+        if(r1.mirror(v2.subtract(v1)).ndot(r2) > Vals.PRETTY_CLOSE) {
+            points = new Array(1)
+            points(0) = circleCurve(v1, r1, v2)
+            points(0)(2) = v2.add(r2.scale(points(0)(1).distTo(points(0)(0))))
+        } else {
+            points = new Array(2)
+            val t = Vals.sCurveSegmentLength(v1, r1.normalize, v2, r2.normalize)
+            val center = v1.add(v2).add(r1.rescale(t)).add(r2.rescale(t)).divide(2f)
+            if(Vals.isCurveTooSmall(r1, center.subtract(v1), laneCount) || Vals.isCurveTooSmall(r2, center.subtract(v2), laneCount) ) return null
+            if(r1.dot(center.subtract(v1)) < 0 || r2.dot(center.subtract(v2)) < 0) return null
+            if(v2.subtract(v1).dot(center.subtract(v1)) < 0 || v1.subtract(v2).dot(center.subtract(v2)) < 0) return null
+            points(0) = circleCurve(v1, r1, center)
+            points(1) = circleCurve(v2, r2, center).reverse
+        }
 
         points
     }

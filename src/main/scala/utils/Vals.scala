@@ -12,6 +12,8 @@ object Vals {
 
     final val UI_COLOR: Vec4 = Vec4(0.3f, 0.4f, 0.5f, 1.0f)
 
+    final val PRETTY_CLOSE: Float = 0.95f
+
     final val MIN_CAMERA_PITCH: Float = 0.1f
     final val MAX_CAMERA_PITCH: Float = 1.5f
     final val MIN_CAMERA_HEIGHT: Float = 10
