@@ -46,6 +46,8 @@ object Vals {
 
     def square(value: Float): Float = value * value
 
+    def stepSum(value: Int): Int = value * (Math.abs(value) + 1) / 2
+
     def max(f: Float*): Float = f.fold[Float](0f)((a: Float, b: Float) => Math.max(a, b))
     def min(f: Float*): Float = f.fold[Float](0f)((a: Float, b: Float) => Math.min(a, b))
 

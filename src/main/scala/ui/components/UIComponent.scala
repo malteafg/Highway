@@ -13,6 +13,7 @@ class UIComponent(protected val parent: UIComponent, protected var pos: Vec2, pr
 
     var tex: Texture = _
 
+    private val inFocus = false
     private val children = mutable.ListBuffer.empty[UIComponent]
 
     if(parent != null) parent.children.addOne(this)

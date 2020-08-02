@@ -78,7 +78,7 @@ object Bezier {
     def doubleSnapCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
         var points: Array[Array[Vec3]] = null
 
-        if(r1.mirror(v2.subtract(v1)).ndot(r2) > Vals.PRETTY_CLOSE) {
+        if(r1.mirror(v2.subtract(v1)).ndot(r2) > Vals.PRETTY_CLOSE && v1.subtract(v2).dot(r2) >= Vals.PRETTY_CLOSE - 1 && v2.subtract(v1).dot(r1) >= Vals.PRETTY_CLOSE - 1) {
             points = new Array(1)
             points(0) = circleCurve(v1, r1, v2)
             points(0)(2) = v2.add(r2.scale(points(0)(1).distTo(points(0)(0))))

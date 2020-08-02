@@ -12,7 +12,7 @@ class Camera {
     var targetPos: Vec3 = Vec3()
 
     var input: Array[Boolean] = new Array(6)
-    var velocity: Array[Int] = new Array(6)
+    var velocity: Array[Int] = new Array(8)
 
     var dragging: Boolean = false
 
@@ -38,18 +38,26 @@ class Camera {
 
             if(progress == 1.0f) stop()
         } else {
-            for(i <- velocity.indices) velocity(i) = Vals.restrain(velocity(i) + (if(input(i)) 1 else -1) , 0, Vals.MAX_CAMERA_SPEED).toInt
+            for(i <- 0 until velocity.length - 2) velocity(i) = Vals.restrain(velocity(i) + (if(input(i)) 1 else -1) , 0, Vals.MAX_CAMERA_SPEED).toInt
 
             val speed = Vals.CAMERA_MOVE_SPEED * orientation.z
-            if(velocity(0) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat).scale(speed * velocity(0) / Vals.MAX_CAMERA_SPEED))
-            if(velocity(1) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed * velocity(1) / Vals.MAX_CAMERA_SPEED))
-            if(velocity(2) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed * velocity(2) / Vals.MAX_CAMERA_SPEED))
-            if(velocity(3) > 0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed * velocity(3) / Vals.MAX_CAMERA_SPEED))
-            if(velocity(4) > 0) orientation = orientation.y(Vals.center(orientation.y + velocity(4) * 5f * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
-            if(velocity(5) > 0) orientation = orientation.y(Vals.center(orientation.y - velocity(5) * 5f * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
-            if(velocity.foldLeft[Boolean](false)((b, i) => b || i > 0)) GameHandler.onMovement()
+            if(velocity(0) >  0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat).scale(speed * velocity(0) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(1) >  0) targetPos = targetPos.add(getDirectionVector(orientation.y - Math.PI.toFloat / 2.0f).scale(speed * velocity(1) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(2) >  0) targetPos = targetPos.add(getDirectionVector(orientation.y).scale(speed * velocity(2) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(3) >  0) targetPos = targetPos.add(getDirectionVector(orientation.y + Math.PI.toFloat / 2.0f).scale(speed * velocity(3) / Vals.MAX_CAMERA_SPEED))
+            if(velocity(4) >  0) orientation = orientation.y(Vals.center(orientation.y + velocity(4) * 5f * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
+            if(velocity(5) >  0) orientation = orientation.y(Vals.center(orientation.y - velocity(5) * 5f * Vals.CAMERA_MOVE_SPEED / Vals.MAX_CAMERA_SPEED, Math.PI.toFloat))
+            if(velocity(6) != 0 || velocity(7) != 0) {
+                velocity(6) += (if(velocity(7) > 0 || (velocity(7) == 0 && velocity(6) < 0)) 1 else -1)
+                val dist = newDist(Vals.stepSum(velocity(6)))
+                if(Math.abs(velocity(6)) >= Math.sqrt(Math.abs(velocity(7))) * Vals.MAX_CAMERA_SPEED || dist < Vals.MIN_CAMERA_HEIGHT || dist > Vals.MAX_CAMERA_HEIGHT) velocity(7) = 0
+                orientation = orientation.z(Vals.restrain(newDist(velocity(6)), Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT))
+            }
+            if(velocity.foldLeft[Boolean](false)((b, i) => b || i != 0)) GameHandler.onMovement()
         }
     }
+
+    def newDist(velocity: Int): Float = orientation.z * Math.pow(1.03f, 1f * velocity / Vals.MAX_CAMERA_SPEED).toFloat
 
     def move(pos: Vec3, direction: Vec3, speed: Float, func: Float => Float): Unit = {
         nextTargetPos = pos
@@ -109,7 +117,7 @@ class Camera {
     }
 
     def scroll(event: InputEvent): Feedback = {
-        orientation = orientation.z(Vals.restrain(orientation.z * Math.pow(1.1f, -event.mods).toFloat, Vals.MIN_CAMERA_HEIGHT, Vals.MAX_CAMERA_HEIGHT))
+        if((event.mods > 0 && orientation.z > Vals.MIN_CAMERA_HEIGHT) || (event.mods < 0 && orientation.z < Vals.MAX_CAMERA_HEIGHT)) velocity(7) -= event.mods
         stop()
         Feedback.Block
     }
