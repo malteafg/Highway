@@ -7,7 +7,9 @@ import javax.imageio.ImageIO
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL12._
 import org.lwjgl.opengl.GL13._
-import org.lwjgl.opengl.GL45.glCreateTextures
+import org.lwjgl.opengl.GL14._
+import org.lwjgl.opengl.GL30._
+import org.lwjgl.opengl.GL45._
 import utils.graphics.Texture
 
 object TextureLoader {
@@ -24,12 +26,15 @@ object TextureLoader {
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, result)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1f)
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texData._1, texData._2, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData._3)
+
+        glGenerateMipmap(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, 0)
         Texture.put(file, new Texture(texData._1, texData._2, result))
     }

@@ -14,7 +14,7 @@ object Vals {
 
     final val PRETTY_CLOSE: Float = 0.95f
 
-    final val MIN_CAMERA_PITCH: Float = 0.1f
+    final val MIN_CAMERA_PITCH: Float = 0.15f
     final val MAX_CAMERA_PITCH: Float = 1.5f
     final val MIN_CAMERA_HEIGHT: Float = 10
     final val MAX_CAMERA_HEIGHT: Float = 1000
@@ -103,7 +103,7 @@ object Vals {
         }
     }
 
-    val perspectiveMatrix: Mat4 = Mat4.perspective(30, 1f, 5000f)
+    val perspectiveMatrix: Mat4 = Mat4.perspective(30, 2f, 4000f)
     val UIProjMatrix: Mat4 = Mat4.orthographic(0, Vals.WIDTH, Vals.HEIGHT, 0, -1.0f, 1.0f)
 
     val defaultTerrainLineColor: Vec4 = Vec4(0.2f, 0.3f, 0.9f, 0.3f)

@@ -9,7 +9,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
 void main() {
-    v_TexCoord = a_Position.xz / 10;
+    v_TexCoord = a_Position.xz / 3;
 
     vec4 worldPos = vec4(a_Position, 1.0);
     gl_Position = projMatrix * viewMatrix * worldPos;
@@ -29,5 +29,5 @@ uniform sampler2D u_Texture;
 void main() {
     vec4 texColor = texture(u_Texture, v_TexCoord);
     // TODO better blending
-    o_Color = in_Color == 1f ? texColor : vec4((in_Color.xyz + texColor.xyz) / 2, in_Color.w);
+    o_Color = in_Color.w == 1f ? texColor : vec4((in_Color.xyz + texColor.xyz) / 2, in_Color.w);
 }
