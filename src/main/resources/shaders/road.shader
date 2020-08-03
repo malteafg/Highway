@@ -9,7 +9,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
 void main() {
-    v_TexCoord = a_Position.xz / 3;
+    v_TexCoord = a_Position.xz / 9;
 
     vec4 worldPos = vec4(a_Position, 1.0);
     gl_Position = projMatrix * viewMatrix * worldPos;
