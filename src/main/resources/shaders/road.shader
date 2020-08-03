@@ -29,5 +29,5 @@ uniform sampler2D u_Texture;
 void main() {
     vec4 texColor = texture(u_Texture, v_TexCoord);
     // TODO better blending
-    o_Color = in_Color == 1f ? texColor : vec4(in_Color.xyz + texColor.xyz / 2, in_Color.w);
+    o_Color = in_Color == 1f ? texColor : vec4((in_Color.xyz + texColor.xyz) / 2, in_Color.w);
 }
