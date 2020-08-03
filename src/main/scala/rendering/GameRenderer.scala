@@ -66,13 +66,13 @@ object GameRenderer {
         Shader.get("road").uniformVec4f("in_Color", Vec4(0.4f, 0.4f, 0.4f, 1.0f))
         Texture.get("cleanRoad").bind()
         for(r <- game.roads) {
-            draw(r.mesh.va, r.mesh.ib)
+            draw(r.mesh, Tools.roadMode)
         }
 
         if (!Tools.isFree) {
             if (Tools.current.getRoadMeshesToRender.nonEmpty) {
                 Shader.get("road").uniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.8f))
-                Tools.current.getRoadMeshesToRender.foreach(m => draw(m))
+                Tools.current.getRoadMeshesToRender.foreach(m => draw(m, Tools.roadMode))
             }
 
             // render nodes
@@ -105,12 +105,14 @@ object GameRenderer {
         glActiveTexture(0)
     }
 
-    def draw(mesh: Mesh): Unit = draw(mesh.va, mesh.ib)
+    def draw(mesh: Mesh): Unit = draw(mesh.va, mesh.ib, GL_TRIANGLES)
+    def draw(mesh: Mesh, mode: Int): Unit = draw(mesh.va, mesh.ib, mode)
+    def draw(va: VertexArray, ib: IndexBuffer): Unit = draw(va, ib, GL_TRIANGLES)
 
-    def draw(va: VertexArray, ib: IndexBuffer): Unit = {
+    def draw(va: VertexArray, ib: IndexBuffer, mode: Int): Unit = {
         va.bind()
         ib.bind()
-        glDrawElements(GL_TRIANGLES, ib.getCount, GL_UNSIGNED_INT, 0)
+        glDrawElements(mode, ib.getCount, GL_UNSIGNED_INT, 0)
         va.unbind()
     }
 

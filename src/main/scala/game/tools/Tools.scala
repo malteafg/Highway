@@ -3,6 +3,7 @@ package game.tools
 import game.Game
 import game.terrain.TerrainLine
 import input.{InputEvent, InputHandler, Keys, Mouse}
+import org.lwjgl.opengl.GL11
 import utils.{Options, Vals}
 import utils.math.{Vec2, Vec3, Vec4}
 
@@ -22,6 +23,7 @@ object Tools {
     private var game: Game = _
 
     val roadWidth: () => Float = () => noOfLanes * Vals.LARGE_LANE_WIDTH
+    var roadMode: Int = GL11.GL_TRIANGLES
 
     private var allowedPos = Vec3()
     private var cursorPos = Vec3()
@@ -109,6 +111,8 @@ object Tools {
         case InputEvent(52, Keys.PRESSED, _) => noOfLanes = 4
         case InputEvent(88, Keys.PRESSED, _) => straightRoad()
         case InputEvent(67, Keys.PRESSED, _) => curvedRoad()
+        case InputEvent(75, Keys.PRESSED, _) => roadMode = GL11.GL_TRIANGLES
+        case InputEvent(76, Keys.PRESSED, _) => roadMode = GL11.GL_LINES
         case _ =>
     }
 
