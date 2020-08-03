@@ -14,6 +14,8 @@ object TextureLoader {
 
     def loadAll(): Unit = {
         load("logo")
+        load("threeLane")
+        load("cleanRoad")
     }
 
     private def load(file: String): Unit = {
@@ -24,8 +26,8 @@ object TextureLoader {
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texData._1, texData._2, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData._3)
         glBindTexture(GL_TEXTURE_2D, 0)

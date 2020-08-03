@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL13._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL43._
 import utils.Vals
-import utils.graphics.{IndexBuffer, Mesh, Shader, VertexArray}
+import utils.graphics.{IndexBuffer, Mesh, Shader, Texture, VertexArray}
 import utils.math.{Mat4, Vec2, Vec4, VecUtils}
 
 object GameRenderer {
@@ -64,6 +64,7 @@ object GameRenderer {
         Shader.get("road").bind()
         Shader.get("road").uniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("road").uniformVec4f("in_Color", Vec4(0.4f, 0.4f, 0.4f, 1.0f))
+        Texture.get("cleanRoad").bind()
         for(r <- game.roads) {
             draw(r.mesh.va, r.mesh.ib)
         }
