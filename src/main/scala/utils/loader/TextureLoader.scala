@@ -18,12 +18,13 @@ object TextureLoader {
         load("logo")
         load("threeLane")
         load("cleanRoad")
+        load("normalMap", 1)
     }
 
-    private def load(file: String): Unit = {
+    private def load(file: String, location: Int = 0): Unit = {
         val texData = loadImage(s"src/main/resources/textures/$file.png")
         val result = glGenTextures()
-        glActiveTexture(GL_TEXTURE0)
+        glActiveTexture(GL_TEXTURE0 + location)
         glBindTexture(GL_TEXTURE_2D, result)
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)

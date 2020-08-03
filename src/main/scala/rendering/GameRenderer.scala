@@ -65,6 +65,7 @@ object GameRenderer {
         Shader.get("road").uniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("road").uniformVec4f("in_Color", Vec4(0.4f, 0.4f, 0.4f, 1.0f))
         Texture.get("cleanRoad").bind()
+        Texture.get("normalMap").bind(1)
         for(r <- game.roads) {
             draw(r.mesh, Tools.roadMode)
         }
