@@ -39,26 +39,26 @@ void main() {
     float avgDot = dot(normal, normalize(cameraPos - (worldPosition[0] + worldPosition[1] + worldPosition[2]) / 3.0f));
 
     faceNormal = normal;
+
     gl_Position = gl_in[0].gl_Position;
     cameraDirection = normalize(cameraPos - worldPosition[0]);
     lightDirection = normalize(vec3(0, 30, 0) - worldPosition[0]);
     borderValue = calcBorder(normal, cameraDirection, avgDot);
     EmitVertex();
 
-    faceNormal = normal;
     gl_Position = gl_in[1].gl_Position;
     cameraDirection = normalize(cameraPos - worldPosition[1]);
     lightDirection = normalize(vec3(0, 30, 0) - worldPosition[1]);
     borderValue = calcBorder(normal, cameraDirection, avgDot);
     EmitVertex();
 
-    faceNormal = normal;
     gl_Position = gl_in[2].gl_Position;
     cameraDirection = normalize(cameraPos - worldPosition[2]);
     lightDirection = normalize(vec3(0, 30, 0) - worldPosition[2]);
     borderValue = calcBorder(normal, cameraDirection, avgDot);
     EmitVertex();
 
+    EndPrimitive();
 }
 
 #fragment
