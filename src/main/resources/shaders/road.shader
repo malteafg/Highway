@@ -91,11 +91,10 @@ in vec3 lightDirection;
 
 void main() {
     vec4 texColor = texture(u_Texture, v_TexCoord);
-    vec3 fragnormal = texture(u_NormalMap, v_TexCoord).xyz * normalMatrix;
-    float highLight = pow(dot(cameraDirection, reflect(-lightDirection, fragnormal)) / 2 + 0.5f, 20);
-    float light = (dot(fragnormal, lightDirection) / 2 + 0.5f) * 0.4f;
+    vec3 fragnormal = normalize(texture(u_NormalMap, v_TexCoord).xyz * normalMatrix);
+    float highLight = pow(dot(cameraDirection, reflect(-lightDirection, fragnormal)) / 2 + 0.5f, 10) * 0.5f;
+    float light = sqrt(dot(fragnormal, lightDirection) / 2 + 0.5f) * 0.3f;
 
-    // TODO better blending
+//    // TODO better blending
     o_Color = in_Color.w == 1f ? max(min(vec4(texColor.x + light + highLight, texColor.y + light + highLight, texColor.z + light + highLight, texColor.w), 1), 0) : vec4((in_Color.xyz + texColor.xyz) / 2, in_Color.w);
-    //o_Color = in_Color.w == 1f ? vec4(texColor.xyz, 1f) : in_Color;
 }

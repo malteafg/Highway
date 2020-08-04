@@ -519,6 +519,8 @@ object Mat4 {
         )
     }
 
+    def direction(dir: Vec3): Mat4 = new Mat4(new Vec4(dir, 0), new Vec4(dir.leftHand(), 0), new Vec4(dir.cross(dir.leftHand()), 0), Vec4())
+
     /**
      * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
      *
