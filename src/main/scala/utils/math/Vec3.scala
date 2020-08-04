@@ -98,6 +98,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
 
     def antiDot(other: Vec3): Float = cross(other).length / length / other.length
 
+//    def bisector(other: Vec3): Float = normalize.add(other).
+
     /**
      * Calculates the dot product of this vector with another vector.
      *
