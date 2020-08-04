@@ -10,26 +10,24 @@ case class SnapCurve(selectedNode: RoadNode, snappedNode: RoadNode, opposite: Bo
     override def onLeftClick(cursorPos: Vec3): Unit = {
         val startNode: RoadNode = if (opposite) snappedNode else selectedNode
         val endNode: RoadNode = if (opposite) selectedNode else snappedNode
+        var firstNode: RoadNode = startNode
+        var secondNode: RoadNode = null
 
-        if (doubleCtrPts.length == 1) {
-            val segment = new RoadSegment(startNode, endNode, null, doubleCtrPts(0), roadMeshes.head)
-            startNode.addOutgoingSegment(segment)
-            endNode.addIncomingSegment(segment)
+        for(s <- 0 until doubleCtrPts.length) {
+            if(s == doubleCtrPts.length - 1) secondNode = endNode
+            else {
+                secondNode = new RoadNode(doubleCtrPts(s)(2), doubleCtrPts(s)(1).subtract(doubleCtrPts(s)(2)).normalize, Tools.getNoOfLanes)
+                game().addNode(secondNode)
+            }
+            val segment = new RoadSegment(firstNode, secondNode, null, doubleCtrPts(s), roadMeshes(s))
+            firstNode.addOutgoingSegment(segment)
+            secondNode.addIncomingSegment(segment)
             game().addSegment(segment)
-        } else {
-            val newNode = new RoadNode(doubleCtrPts(0)(3), doubleCtrPts(0)(2).subtract(doubleCtrPts(0)(3)).normalize, Tools.getNoOfLanes)
-            game().addNode(newNode)
-            val segment1 = new RoadSegment(startNode, newNode, null, doubleCtrPts(0), roadMeshes.head)
-            val segment2 = new RoadSegment(newNode, endNode, null, doubleCtrPts(1), roadMeshes.last)
-            newNode.addIncomingSegment(segment1)
-            newNode.addOutgoingSegment(segment2)
-            startNode.addOutgoingSegment(segment1)
-            endNode.addIncomingSegment(segment2)
-            game().addSegment(segment1)
-            game().addSegment(segment2)
+            firstNode = secondNode
         }
-        Tools.resetStack()
     }
+    Tools.resetStack()
+
 
     override def onRightClick(): Unit = Tools.resetStack()
 

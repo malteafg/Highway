@@ -77,28 +77,77 @@ object Bezier {
 
     def curveCornerPoint(pos1: Vec3, dir: Vec3, pos2: Vec3): Vec3 = pos1.intersection(dir, pos2, dir.mirror(pos2.subtract(pos1)));
 
+    def shortCurvePoints(pos1: Vec3, dir: Vec3, pos2: Vec3): Array[Vec3] = Array(pos1, curveCornerPoint(pos1, dir, pos2), pos2)
+
+    def shortCurvePoints(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3): Array[Vec3] = Array(pos1, pos1.intersection(dir1, pos2, dir2), pos2)
+
     def curveMidPoint(pos1: Vec3, dir: Vec3, pos2: Vec3): Vec3 = {
-        val dir2 = dir.bisector(pos1.subtract(pos1))
         val deltaPos = pos2.subtract(pos1)
+        val dir2 = dir.bisector(deltaPos)
         pos1.add(dir2.scale(deltaPos.dot(deltaPos) / 2.0f / dir2.dot(deltaPos)))
     }
 
-    def doubleSnapCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
+    def arcSplit(pos1: Vec3, dir: Vec3, pos2: Vec3): Array[Array[Vec3]] = {
         var points: Array[Array[Vec3]] = null
-
-        if(r1.mirror(v2.subtract(v1)).ndot(r2) > Vals.PRETTY_CLOSE && v1.subtract(v2).dot(r2) >= Vals.PRETTY_CLOSE - 1 && v2.subtract(v1).dot(r1) >= Vals.PRETTY_CLOSE - 1) {
+        if(dir.ndot(pos2.subtract(pos1)) > Vals.COS_45) {
             points = new Array(1)
-            points(0) = circleCurve(v1, r1, v2)
-            points(0)(2) = v2.add(r2.scale(points(0)(1).distTo(points(0)(0))))
+            points(0) = shortCurvePoints(pos1, dir, pos2)
         } else {
             points = new Array(2)
-            val t = Vals.sCurveSegmentLength(v1, r1.normalize, v2, r2.normalize)
-            val center = v1.add(v2).add(r1.rescale(t)).add(r2.rescale(t)).divide(2f)
-            if(Vals.isCurveTooSmall(r1, center.subtract(v1), laneCount) || Vals.isCurveTooSmall(r2, center.subtract(v2), laneCount) ) return null
-            if(r1.dot(center.subtract(v1)) < 0 || r2.dot(center.subtract(v2)) < 0) return null
-            if(v2.subtract(v1).dot(center.subtract(v1)) < 0 || v1.subtract(v2).dot(center.subtract(v2)) < 0) return null
-            points(0) = circleCurve(v1, r1, center)
-            points(1) = circleCurve(v2, r2, center).reverse
+            val midPoint = curveMidPoint(pos1, dir, pos2)
+            points(0) = shortCurvePoints(pos1, dir, midPoint)
+            points(1) = shortCurvePoints(midPoint, pos2.subtract(pos1), pos2)
+        }
+        points
+    }
+
+    def arcSplit(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3): Array[Array[Vec3]] = {
+        var points: Array[Array[Vec3]] = null
+        if(dir1.ndot(pos2.subtract(pos1)) > Vals.COS_45) {
+            points = new Array(1)
+            points(0) = shortCurvePoints(pos1, dir1, pos2, dir2)
+        } else {
+            points = new Array(2)
+            val midPoint = curveMidPoint(pos1, dir1, pos2)
+            points(0) = shortCurvePoints(pos1, dir1, midPoint)
+            points(1) = shortCurvePoints(midPoint, pos2.subtract(pos1), pos2, dir2)
+        }
+        points
+    }
+
+    def doubleSnapCurve(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
+        var points: Array[Array[Vec3]] = null
+
+        if(dir1.mirror(pos2.subtract(pos1)).ndot(dir2) > Vals.PRETTY_CLOSE &&
+            pos1.subtract(pos2).dot(dir2) >= Vals.PRETTY_CLOSE - 1 &&
+            pos2.subtract(pos1).dot(dir1) >= Vals.PRETTY_CLOSE - 1) {
+            points = arcSplit(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3)
+        } else {
+            val t = Vals.sCurveSegmentLength(pos1, dir1.normalize, pos2, dir2.normalize)
+            val center = pos1.add(pos2).add(dir1.rescale(t)).add(dir2.rescale(t)).divide(2f)
+            if(Vals.isCurveTooSmall(dir1, center.subtract(pos1), laneCount) || Vals.isCurveTooSmall(dir2, center.subtract(pos2), laneCount) ) return null
+            if(dir1.dot(center.subtract(pos1)) < 0 || dir2.dot(center.subtract(pos2)) < 0) return null
+            if(pos2.subtract(pos1).dot(center.subtract(pos1)) < 0 || pos1.subtract(pos2).dot(center.subtract(pos2)) < 0) return null
+            val curve1 = arcSplit(pos1, dir1, center)
+            val curve2 = arcSplit(pos2, dir2, center)
+            points = new Array(curve1.length + curve2.length)
+            points(0) = curve1(0)
+            if(curve1.length == 1) {
+                if(curve2.length == 1) {
+                    points(1) = curve2(0).reverse
+                } else {
+                    points(1) = curve2(1).reverse
+                    points(2) = curve2(0).reverse
+                }
+            } else {
+                points(1) = curve1(1)
+                if(curve2.length == 1) {
+                    points(2) = curve2(0).reverse
+                } else {
+                    points(2) = curve2(1).reverse
+                    points(3) = curve2(0).reverse
+                }
+            }
         }
 
         points
