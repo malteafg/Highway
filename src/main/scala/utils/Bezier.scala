@@ -75,6 +75,13 @@ object Bezier {
         points
     }
 
+    def curveCornerPoint(pos1: Vec3, dir: Vec3, pos2: Vec3): Vec3 = pos1.intersection(dir, pos2, dir.mirror(pos2.subtract(pos1)));
+
+    def curveMidPoint(pos1: Vec3, dir: Vec3, pos2: Vec3): Vec3 = {
+        val dir2 = dir.normalize.add(pos1.subtract(pos1).normalize)
+        dir2
+    }
+
     def doubleSnapCurve(v1: Vec3, r1: Vec3, v2: Vec3, r2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
         var points: Array[Array[Vec3]] = null
 
