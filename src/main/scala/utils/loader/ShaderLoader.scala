@@ -15,6 +15,7 @@ object ShaderLoader {
 
     def loadAll(): Unit = {
         loadShader("UI", Vals.UIProjMatrix)
+        loadShader("basic", Vals.perspectiveMatrix)
         loadShader("sphere", Vals.perspectiveMatrix)
         loadShader("road", Vals.perspectiveMatrix)
         loadShader("skybox", Vals.perspectiveMatrix)

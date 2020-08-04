@@ -338,7 +338,7 @@ case class Mat4(
      * Multiplies this matrix with a rotation matrix. Similar to
      * <code>glRotate(angle, x, y, z)</code>.
      *
-     * @param angle Angle of rotation in degrees
+     * @param angle  Angle of rotation in radians
      * @param nx     x coordinate of the rotation vector
      * @param ny     y coordinate of the rotation vector
      * @param nz     z coordinate of the rotation vector
@@ -519,7 +519,7 @@ object Mat4 {
         )
     }
 
-    def direction(dir: Vec3): Mat4 = new Mat4(new Vec4(dir, 0), new Vec4(dir.leftHand(), 0), new Vec4(dir.cross(dir.leftHand()), 0), Vec4())
+    def direction(dir: Vec3): Mat4 = new Mat4(new Vec4(dir, 0), new Vec4(dir.leftHand(), 0), new Vec4(dir.cross(dir.leftHand()), 0), Vec4(0, 0, 0, 1))
 
     /**
      * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.

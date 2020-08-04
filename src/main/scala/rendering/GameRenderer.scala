@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL43._
 import utils.Vals
 import utils.graphics.{IndexBuffer, Mesh, Shader, Texture, VertexArray}
+import utils.loader.OBJLoader
 import utils.math.{Mat4, Vec2, Vec4, VecUtils}
 
 object GameRenderer {
@@ -18,6 +19,7 @@ object GameRenderer {
 
     private val terrainShader = Shader.get("terrain")
     private val skybox = new Skybox
+    private val arrow = OBJLoader.loadModel("arrow")
 
     def render(game: Game, camera: Camera, tool: State): Unit = {
         glEnable(GL_CULL_FACE)
@@ -27,11 +29,16 @@ object GameRenderer {
         Shader.get("sphere").uniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("sphere").uniformVec3f("cameraPos", camera.getCameraPos)
         Shader.get("sphere").uniform1b("darkEdge", darkEdges)
-        game.spheres.foreach(s => {
-            Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(s.position))
-            Shader.get("sphere").uniformVec4f("color", s.color)
-            draw(Sphere.mesh.va, Sphere.mesh.ib)
+        /*
+        game.roads.foreach(r => {
+            r.controlPoints.forEach(c => {
+                Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.position))
+                Shader.get("sphere").uniformVec4f("color", s.color)
+                draw(Sphere.mesh.va, Sphere.mesh.ib)
+            })
         })
+
+         */
 
         terrainShader.bind()
         terrainShader.uniformMat4f("viewMatrix", camera.getViewMatrix)
@@ -89,8 +96,26 @@ object GameRenderer {
             }
             else {
                 for(n <- NodeSnapper.getSnappedNode.getLaneNodes) {
-                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(Vals.LARGE_LANE_WIDTH))
+                    Shader.get("node").uniformMat4f("transformationMatrix",
+                        Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(Vals.LARGE_LANE_WIDTH))
                     draw(RoadNode.mesh)
+                }
+            }
+            Shader.get("basic").bind()
+            Shader.get("basic").uniformMat4f("viewMatrix", camera.getViewMatrix)
+            Shader.get("basic").uniformVec4f("in_Color", Vec4(0.8f, 0.2f, 0.3f, 0.6f))
+            if (NodeSnapper.getSnappedNode == null) {
+                for(n <- game.nodes) {
+                    Shader.get("basic").uniformMat4f("transformationMatrix",
+                        Mat4.translate(n.position.y(5)).rotate(Vals.toRadians(90), 0, 1, 0).scale(n.getWidth / 4))
+                    draw(arrow)
+                }
+            }
+            else {
+                for(n <- NodeSnapper.getSnappedNode.getLaneNodes) {
+                    Shader.get("basic").uniformMat4f("transformationMatrix",
+                        Mat4.direction(n.direction).translate(n.position.y(5)).scale(Vals.LARGE_LANE_WIDTH / 4))
+                    draw(arrow)
                 }
             }
         }

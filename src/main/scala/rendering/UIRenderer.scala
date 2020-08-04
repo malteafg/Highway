@@ -221,14 +221,14 @@ object UIRenderer {
         quadCount += 1
     }
 
-    def render(screen: UIComponent) = {
+    def render(screen: UIComponent): Unit = {
         glDisable(GL_DEPTH_TEST)
 
         Shader.get("UI").bind()
 
         val elements = new mutable.Queue[UIComponent]()
         elements.enqueue(screen)
-        while (!elements.isEmpty) {
+        while (elements.nonEmpty) {
             val e = elements.dequeue()
             if (e.isActive) {
                 if (e.tex == null) UIRenderer.drawQuad(e.getPos, e.getSize, e.getColor)
