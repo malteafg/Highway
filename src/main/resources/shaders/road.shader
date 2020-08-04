@@ -22,8 +22,6 @@ void main() {
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-uniform vec3 cameraPos;
-
 in vec3 worldPosition[];
 in vec2 texCoord[];
 
@@ -54,20 +52,17 @@ void main() {
 
     gl_Position = gl_in[0].gl_Position;
     v_TexCoord = texCoord[0];
-    cameraDirection = normalize(cameraPos - worldPosition[0]);
-    lightDirection = normalize(vec3(0, 1000, 0) - worldPosition[0]);
+    lightDirection = normalize(vec3(0, 10000, 0) - worldPosition[0]);
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position;
     v_TexCoord = texCoord[1];
-    cameraDirection = normalize(cameraPos - worldPosition[1]);
-    lightDirection = normalize(vec3(0, 1000, 0) - worldPosition[1]);
+    lightDirection = normalize(vec3(0, 10000, 0) - worldPosition[1]);
     EmitVertex();
 
     gl_Position = gl_in[2].gl_Position;
     v_TexCoord = texCoord[2];
-    cameraDirection = normalize(cameraPos - worldPosition[2]);
-    lightDirection = normalize(vec3(0, 1000, 0) - worldPosition[2]);
+    lightDirection = normalize(vec3(0, 10000, 0) - worldPosition[2]);
     EmitVertex();
 
     EndPrimitive();
@@ -86,7 +81,6 @@ uniform vec4 in_Color;
 in vec2 v_TexCoord;
 
 in mat3 normalMatrix;
-in vec3 cameraDirection;
 in vec3 lightDirection;
 
 void main() {
@@ -102,5 +96,4 @@ void main() {
     vec3 diffuse = diff * vec3(1, 1, 1);
     vec3 result = (ambient + diffuse) * texColor.xyz;
     o_Color = vec4(result, in_Color.w);
-
 }
