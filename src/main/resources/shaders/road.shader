@@ -92,7 +92,7 @@ in vec3 lightDirection;
 void main() {
     vec4 texColor = texture(u_Texture, v_TexCoord);
     vec3 fragnormal = normalize(texture(u_NormalMap, v_TexCoord).xyz * normalMatrix);
-    float highLight = pow(dot(cameraDirection, reflect(-lightDirection, fragnormal)) / 2 + 0.5f, 10) * 0.5f;
+    float highLight = pow(dot(cameraDirection, reflect(-lightDirection, fragnormal)) / 2 + 0.5f, 10) * 0.3f;
     float light = sqrt(dot(fragnormal, lightDirection) / 2 + 0.5f) * 0.3f;
 
 //    // TODO better blending
