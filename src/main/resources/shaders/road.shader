@@ -55,19 +55,19 @@ void main() {
     gl_Position = gl_in[0].gl_Position;
     v_TexCoord = texCoord[0];
     cameraDirection = normalize(cameraPos - worldPosition[0]);
-    lightDirection = normalize(vec3(0, 100, 0) - worldPosition[0]);
+    lightDirection = normalize(vec3(0, 1000, 0) - worldPosition[0]);
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position;
     v_TexCoord = texCoord[1];
     cameraDirection = normalize(cameraPos - worldPosition[1]);
-    lightDirection = normalize(vec3(0, 100, 0) - worldPosition[1]);
+    lightDirection = normalize(vec3(0, 1000, 0) - worldPosition[1]);
     EmitVertex();
 
     gl_Position = gl_in[2].gl_Position;
     v_TexCoord = texCoord[2];
     cameraDirection = normalize(cameraPos - worldPosition[2]);
-    lightDirection = normalize(vec3(0, 100, 0) - worldPosition[2]);
+    lightDirection = normalize(vec3(0, 1000, 0) - worldPosition[2]);
     EmitVertex();
 
     EndPrimitive();
@@ -92,9 +92,15 @@ in vec3 lightDirection;
 void main() {
     vec4 texColor = texture(u_Texture, v_TexCoord);
     vec3 fragnormal = normalize(texture(u_NormalMap, v_TexCoord).xyz * normalMatrix);
-    float highLight = pow(dot(cameraDirection, reflect(-lightDirection, fragnormal)) / 2 + 0.5f, 500) * 0.1f;
-    float light = (dot(fragnormal, lightDirection) / 2 + 0.5f) * 0.5f - 0.2f;
 
-//    // TODO better blending
-    o_Color = in_Color.w == 1f ? max(min(vec4(texColor.x + light + highLight, texColor.y + light + highLight, texColor.z + light + highLight, texColor.w), 1), 0) : vec4((in_Color.xyz + texColor.xyz) / 2, in_Color.w);
+    //float highLight = pow(dot(cameraDirection, reflect(-lightDirection, fragnormal)) / 2 + 0.5f, 500) * 0.1f;
+    //float light = (dot(fragnormal, lightDirection) / 2 + 0.5f) * 0.5f - 0.2f;
+    //o_Color = in_Color.w == 1f ? max(min(vec4(texColor.x + light + highLight, texColor.y + light + highLight, texColor.z + light + highLight, texColor.w), 1), 0) : vec4((in_Color.xyz + texColor.xyz) / 2, in_Color.w);
+
+    vec3 ambient = 0.5 * vec3(1, 1, 1);
+    float diff = max(dot(fragnormal, lightDirection), 0.0);
+    vec3 diffuse = diff * vec3(1, 1, 1);
+    vec3 result = (ambient + diffuse) * texColor.xyz;
+    o_Color = vec4(result, in_Color.w);
+
 }

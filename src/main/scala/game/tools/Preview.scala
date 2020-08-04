@@ -1,6 +1,6 @@
 package game.tools
 
-import game.roads.{RoadNode, RoadSegment}
+import game.roads.{RoadGenerator, RoadNode, RoadSegment}
 import game.terrain.TerrainLine
 import input.InputHandler
 import utils.{Bezier, Vals}
@@ -66,7 +66,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                     .thisOrThat(v => v.dot(dir) > 0, dir.normalize.scale(Vals.MIN_SEGMENT_LENGTH)))
                 if (newPos.subtract(selectedPos).length < Vals.MIN_SEGMENT_LENGTH)
                     newPos = selectedPos.add(newPos.subtract(selectedPos).normalize.scale(Vals.MIN_SEGMENT_LENGTH))
-                val mesh = RoadSegment.generateStraightMesh(selectedPos, newPos, Tools.getNoOfLanes)
+                val mesh = RoadGenerator.generateStraightMesh(selectedPos, newPos, Tools.getNoOfLanes)
                 roadMeshes.addOne(mesh._1)
                 controlPoints = if (opposite) mesh._2.reverse else mesh._2
             case Tools.Curved =>
@@ -75,7 +75,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                     else cursorPos.subtract(cursorPos.subtract(selectedPos).proj(dir))
                 val minDist = Math.max(Vals.MIN_SEGMENT_LENGTH, Vals.minRoadLength(dir, newPos.subtract(selectedPos), Tools.getNoOfLanes))
                 if (newPos.subtract(selectedPos).length < minDist) newPos = selectedPos.add(newPos.subtract(selectedPos).rescale(minDist))
-                val mesh = RoadSegment.generateCircularMesh(selectedPos, dir, newPos, Tools.getNoOfLanes)
+                val mesh = RoadGenerator.generateCircularMesh(selectedPos, dir, newPos, Tools.getNoOfLanes)
                 roadMeshes.addOne(mesh._1)
                 controlPoints = if (opposite) mesh._2.reverse else mesh._2
             case _ =>
