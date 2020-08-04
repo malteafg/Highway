@@ -6,7 +6,7 @@ import utils.math.Vec3
 
 import scala.collection.mutable
 
-class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: Array[Lane], controlPoints: Array[Vec3], var mesh: Mesh) {
+case class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: Array[Lane], controlPoints: Array[Vec3], var mesh: Mesh) {
 
     /**
      * Constructors
