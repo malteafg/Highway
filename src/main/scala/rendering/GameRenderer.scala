@@ -29,16 +29,13 @@ object GameRenderer {
         Shader.get("sphere").uniformMat4f("viewMatrix", camera.getViewMatrix)
         Shader.get("sphere").uniformVec3f("cameraPos", camera.getCameraPos)
         Shader.get("sphere").uniform1b("darkEdge", darkEdges)
-        /*
         game.roads.foreach(r => {
-            r.controlPoints.forEach(c => {
-                Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.position))
-                Shader.get("sphere").uniformVec4f("color", s.color)
+            r.controlPoints.foreach(c => {
+                Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.y(2)).scale(4))
+                Shader.get("sphere").uniformVec4f("color", Vec4(0.7f, 0.2f, 0.9f, 1f))
                 draw(Sphere.mesh.va, Sphere.mesh.ib)
             })
         })
-
-         */
 
         terrainShader.bind()
         terrainShader.uniformMat4f("viewMatrix", camera.getViewMatrix)
