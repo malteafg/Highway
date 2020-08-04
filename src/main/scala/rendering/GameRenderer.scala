@@ -107,14 +107,14 @@ object GameRenderer {
             if (NodeSnapper.getSnappedNode == null) {
                 for(n <- game.nodes) {
                     Shader.get("basic").uniformMat4f("transformationMatrix",
-                        Mat4.translate(n.position.y(5)).rotate(Vals.toRadians(90), 0, 1, 0).scale(n.getWidth / 4))
+                        Mat4.translate(n.position.y(5)).multiply(Mat4.direction(n.direction)).scale(n.getWidth / 4))
                     draw(arrow)
                 }
             }
             else {
                 for(n <- NodeSnapper.getSnappedNode.getLaneNodes) {
                     Shader.get("basic").uniformMat4f("transformationMatrix",
-                        Mat4.direction(n.direction).translate(n.position.y(5)).scale(Vals.LARGE_LANE_WIDTH / 4))
+                        Mat4.translate(n.position.y(5)).multiply(Mat4.direction(n.direction)).scale(Vals.LARGE_LANE_WIDTH / 4))
                     draw(arrow)
                 }
             }
