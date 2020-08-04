@@ -19,6 +19,7 @@ object TextureLoader {
         load("threeLane")
         load("cleanRoad")
         load("normalMap", 1)
+        load("sphereNormalMap", 1)
     }
 
     private def load(file: String, location: Int = 0): Unit = {

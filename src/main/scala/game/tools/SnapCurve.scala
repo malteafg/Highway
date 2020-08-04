@@ -1,11 +1,11 @@
 package game.tools
 
-import game.roads.{RoadNode, RoadSegment}
+import game.roads.{RoadGenerator, RoadNode, RoadSegment}
 import utils.math.Vec3
 
 case class SnapCurve(selectedNode: RoadNode, snappedNode: RoadNode, opposite: Boolean, doubleCtrPts: Array[Array[Vec3]]) extends State {
 
-    doubleCtrPts.foreach(ctrPts => roadMeshes.addOne(RoadSegment.generateCurveMesh(ctrPts, Tools.getNoOfLanes)))
+    doubleCtrPts.foreach(ctrPts => roadMeshes.addOne(RoadGenerator.generateCurveMesh(ctrPts, Tools.getNoOfLanes)))
 
     override def onLeftClick(cursorPos: Vec3): Unit = {
         val startNode: RoadNode = if (opposite) snappedNode else selectedNode
