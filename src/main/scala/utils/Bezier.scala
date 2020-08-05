@@ -23,6 +23,24 @@ object Bezier {
         v
     }
 
+    def getDirection(t: Float, points: Array[Vec3]): Vec3 = {
+        var v = Vec3()
+        var r = Math.pow(1 - t, points.length - 2).toFloat
+        var l = 1.0f
+        var i = 0
+        for (p <- 0 to (points.length - 2)) {
+            v = v.add(points(p + 1).subtract(points(p)).scale(l * r))
+            if (t == 1.0f) {
+                if (i == points.length - 3) r = 1
+                else r = 0
+            }
+            else r *= t / (1 - t)
+            l *= (points.length - 1) / (1.0f + i) - 1.0f
+            i += 1
+        }
+        v.scale(points.length)
+    }
+
     def getCurvature(points: Array[Vec3]): Float = {
         var c = 1f
         for(p <- 1 until points.length - 1) c *= points(p-1).subtract(points(p)).normalize.
@@ -40,37 +58,34 @@ object Bezier {
         paths
     }
 
-    def getDirection(t: Float, points: Array[Vec3]): Vec3 = {
-        var v = Vec3()
-        var r = Math.pow(1 - t, points.length - 1).toFloat
-        var l = 1.0f
-        var i = 0
-        for (p <- 0 to (points.length - 2)) {
-            val f = l * r
-            v = v.add(points(p + 1).subtract(points(p)).scale(f))
-            if (t == 1.0f) {
-                if (i == points.length - 3) r = 1
-                else r = 0
-            }
-            else r *= t / (1 - t)
-            l *= points.length / (1.0f + i) - 1.0f
-            i += 1
-        }
-        v.scale(points.length)
-    }
-
-    def circleCurve(v1: Vec3, r: Vec3, v2: Vec3): Array[Vec3] = {
+    def circleCurve(pos1: Vec3, dir1: Vec3, pos2: Vec3): Array[Vec3] = {
         val points = new Array[Vec3](4)
 
-        val ab = v2.subtract(v1)
-        val d = ab.normalize.dot(r.normalize)
-        val f = 2.0f / 3.0f * ab.length * (1.0f - d) / (r.length * (1.0f - d * d))
-        val R = r.scale(f)
+        val ab = pos2.subtract(pos1)
+        val d = ab.normalize.dot(dir1.normalize)
+        val f = 2.0f / 3.0f * ab.length * (1.0f - d) / (dir1.length * (1.0f - d * d))
+        val R = dir1.scale(f)
 
-        points(0) = v1
-        points(1) = v1.add(R)
-        points(2) = v2.add(R).subtract(ab.scale(2.0f * ab.dot(R) / ab.dot(ab)))
-        points(3) = v2
+        points(0) = pos1
+        points(1) = pos1.add(R)
+        points(2) = pos2.add(R).subtract(ab.scale(2.0f * ab.dot(R) / ab.dot(ab)))
+        points(3) = pos2
+
+        points
+    }
+
+    def circleCurve(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3): Array[Vec3] = {
+        val points = new Array[Vec3](4)
+
+        val ab = pos2.subtract(pos1)
+        val d = ab.normalize.dot(dir1.normalize)
+        val f = 2.0f / 3.0f * ab.length * (1.0f - d) / (dir1.length * (1.0f - d * d))
+        val R = dir1.scale(f)
+
+        points(0) = pos1
+        points(1) = pos1.add(R)
+        points(2) = pos2.add(dir2.rescale(R.length))
+        points(3) = pos2
 
         points
     }
@@ -101,53 +116,24 @@ object Bezier {
         points
     }
 
-    def arcSplit(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3): Array[Array[Vec3]] = {
-        var points: Array[Array[Vec3]] = null
-        if(dir1.ndot(pos2.subtract(pos1)) > Vals.COS_45) {
-            points = new Array(1)
-            points(0) = shortCurvePoints(pos1, dir1, pos2, dir2)
-        } else {
-            points = new Array(2)
-            val midPoint = curveMidPoint(pos1, dir1, pos2)
-            points(0) = shortCurvePoints(pos1, dir1, midPoint)
-            points(1) = shortCurvePoints(midPoint, pos2.subtract(pos1), pos2, dir2)
-        }
-        points
-    }
-
     def doubleSnapCurve(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
         var points: Array[Array[Vec3]] = null
 
         if(dir1.mirror(pos2.subtract(pos1)).ndot(dir2) > Vals.PRETTY_CLOSE &&
             pos1.subtract(pos2).dot(dir2) >= Vals.PRETTY_CLOSE - 1 &&
             pos2.subtract(pos1).dot(dir1) >= Vals.PRETTY_CLOSE - 1) {
-            points = arcSplit(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3)
+            points = new Array(1)
+            if(dir1.ndot(pos2.subtract(pos1)) > Vals.COS_45) points(0) = shortCurvePoints(pos1, dir1, pos2, dir2)
+            else points(0) = circleCurve(pos1, dir1, pos2, dir2)
         } else {
             val t = Vals.sCurveSegmentLength(pos1, dir1.normalize, pos2, dir2.normalize)
             val center = pos1.add(pos2).add(dir1.rescale(t)).add(dir2.rescale(t)).divide(2f)
             if(Vals.isCurveTooSmall(dir1, center.subtract(pos1), laneCount) || Vals.isCurveTooSmall(dir2, center.subtract(pos2), laneCount) ) return null
             if(dir1.dot(center.subtract(pos1)) < 0 || dir2.dot(center.subtract(pos2)) < 0) return null
             if(pos2.subtract(pos1).dot(center.subtract(pos1)) < 0 || pos1.subtract(pos2).dot(center.subtract(pos2)) < 0) return null
-            val curve1 = arcSplit(pos1, dir1, center)
-            val curve2 = arcSplit(pos2, dir2, center)
-            points = new Array(curve1.length + curve2.length)
-            points(0) = curve1(0)
-            if(curve1.length == 1) {
-                if(curve2.length == 1) {
-                    points(1) = curve2(0).reverse
-                } else {
-                    points(1) = curve2(1).reverse
-                    points(2) = curve2(0).reverse
-                }
-            } else {
-                points(1) = curve1(1)
-                if(curve2.length == 1) {
-                    points(2) = curve2(0).reverse
-                } else {
-                    points(2) = curve2(1).reverse
-                    points(3) = curve2(0).reverse
-                }
-            }
+            points = new Array(2)
+            points(0) = circleCurve(pos1, dir1, center)
+            points(1) = circleCurve(pos2, dir2, center).reverse
         }
 
         points

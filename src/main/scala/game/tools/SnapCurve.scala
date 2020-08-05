@@ -13,20 +13,21 @@ case class SnapCurve(selectedNode: RoadNode, snappedNode: RoadNode, opposite: Bo
         var firstNode: RoadNode = startNode
         var secondNode: RoadNode = null
 
-        for(s <- 0 until doubleCtrPts.length) {
+        for(s <- doubleCtrPts.indices) {
             if(s == doubleCtrPts.length - 1) secondNode = endNode
             else {
-                secondNode = new RoadNode(doubleCtrPts(s)(2), doubleCtrPts(s)(1).subtract(doubleCtrPts(s)(2)).normalize, Tools.getNoOfLanes)
+                secondNode = new RoadNode(doubleCtrPts(s)(3), doubleCtrPts(s)(2).subtract(doubleCtrPts(s)(3)).normalize, Tools.getNoOfLanes)
                 game().addNode(secondNode)
             }
-            val segment = new RoadSegment(firstNode, secondNode, null, doubleCtrPts(s), roadMeshes(s))
+            val segment = RoadSegment(firstNode, secondNode, null, doubleCtrPts(s), roadMeshes(s))
             firstNode.addOutgoingSegment(segment)
             secondNode.addIncomingSegment(segment)
             game().addSegment(segment)
             firstNode = secondNode
         }
+        Tools.resetStack()
     }
-    Tools.resetStack()
+
 
 
     override def onRightClick(): Unit = Tools.resetStack()

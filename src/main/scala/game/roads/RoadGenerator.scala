@@ -45,12 +45,12 @@ object RoadGenerator {
 
     private def roadCut(pos: Vec3, dir: Vec3, roadWidth: Float): Array[Vec3] = {
         val points = new Array[Vec3](4)
-        dir.normalize
+        val normDir = dir.normalize
         val heightVector = Vec3(0, Vals.ROAD_HEIGHT)
-        val left    = pos.add(dir.leftHand().scale(roadWidth / 2.0f))
-        val right   = pos.add(dir.rightHand().scale(roadWidth / 2.0f))
-        points(0)   = left.add(dir.leftHand().scale(Vals.ROAD_HEIGHT))
-        points(1)   = right.add(dir.rightHand().scale(Vals.ROAD_HEIGHT))
+        val left    = pos.add(normDir.leftHand().scale(roadWidth / 2.0f))
+        val right   = pos.add(normDir.rightHand().scale(roadWidth / 2.0f))
+        points(0)   = left.add(normDir.leftHand().scale(Vals.ROAD_HEIGHT))
+        points(1)   = right.add(normDir.rightHand().scale(Vals.ROAD_HEIGHT))
         points(2)   = right.add(heightVector)
         points(3)   = left.add(heightVector)
         points

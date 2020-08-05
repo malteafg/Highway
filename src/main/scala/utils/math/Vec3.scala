@@ -120,8 +120,11 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
      * @param target The other vector
      * @return The projection of this vector
      */
-    def proj(target: Vec3): Vec3 = {
-        target.scale(dot(target) / target.dot(target))
+    def proj(target: Vec3): Vec3 = target.scale(dot(target) / target.dot(target))
+
+    def equalComponents(other: Vec3): Vec3 = {
+        val projection = proj(other)
+        projection.add(subtract(projection).rescale(projection.length))
     }
 
     def mirror(mirrorNormal: Vec3): Vec3 = subtract(proj(mirrorNormal).scale(2f))
