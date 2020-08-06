@@ -122,6 +122,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
      */
     def proj(target: Vec3): Vec3 = target.scale(dot(target) / target.dot(target))
 
+    def ortho(target: Vec3): Vec3 = subtract(proj(target))
+
     def equalComponents(other: Vec3): Vec3 = {
         val projection = proj(other)
         projection.add(subtract(projection).rescale(projection.length))

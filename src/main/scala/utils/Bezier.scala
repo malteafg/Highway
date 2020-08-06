@@ -90,7 +90,7 @@ object Bezier {
         points
     }
 
-    def curveCornerPoint(pos1: Vec3, dir: Vec3, pos2: Vec3): Vec3 = pos1.intersection(dir, pos2, dir.mirror(pos2.subtract(pos1)));
+    def curveCornerPoint(pos1: Vec3, dir: Vec3, pos2: Vec3): Vec3 = pos1.intersection(dir, pos2, dir.mirror(pos2.subtract(pos1)))
 
     def shortCurvePoints(pos1: Vec3, dir: Vec3, pos2: Vec3): Array[Vec3] = Array(pos1, curveCornerPoint(pos1, dir, pos2), pos2)
 
@@ -116,26 +116,96 @@ object Bezier {
         points
     }
 
+    def arcSplit(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3): Array[Array[Vec3]] = {
+        var points: Array[Array[Vec3]] = null
+        if(dir1.ndot(pos2.subtract(pos1)) > Vals.COS_45) {
+            points = new Array(1)
+            points(0) = shortCurvePoints(pos1, dir1, pos2, dir2)
+        } else {
+            points = new Array(2)
+            val midPoint = curveMidPoint(pos1, dir1, pos2)
+            points(0) = shortCurvePoints(pos1, dir1, midPoint)
+            points(1) = shortCurvePoints(midPoint, pos2.subtract(pos1), pos2, dir2)
+        }
+        points
+    }
+
+    def isEliptical(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3): Boolean = {
+        val deltaPos = pos2.subtract(pos1)
+        if(dir1.dot(dir2) > 0) return false
+        if(deltaPos.negate.ndot(dir2) < Vals.PRETTY_CLOSE - 1 ||
+           deltaPos.ndot(dir1) < Vals.PRETTY_CLOSE - 1) return false
+        if(dir1.ortho(deltaPos).dot(dir2.ortho(deltaPos)) < 0) return false
+        val intersection = pos1.intersection(dir1, pos2, dir2)
+        val f1 = intersection.subtract(pos1).length
+        val f2 = intersection.subtract(pos2).length
+        val rel = Vals.rel(f1, f2)
+        if(f1 * rel < Vals.MIN_SEGMENT_LENGTH || f2 * rel < Vals.MIN_SEGMENT_LENGTH) return false
+        if(rel > Vals.CLOSE_ENOUGH) false
+        else true
+    }
+
     def doubleSnapCurve(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
         var points: Array[Array[Vec3]] = null
 
         if(dir1.mirror(pos2.subtract(pos1)).ndot(dir2) > Vals.PRETTY_CLOSE &&
-            pos1.subtract(pos2).dot(dir2) >= Vals.PRETTY_CLOSE - 1 &&
-            pos2.subtract(pos1).dot(dir1) >= Vals.PRETTY_CLOSE - 1) {
+          pos1.subtract(pos2).dot(dir2) >= Vals.PRETTY_CLOSE - 1 &&
+          pos2.subtract(pos1).dot(dir1) >= Vals.PRETTY_CLOSE - 1) {
             points = new Array(1)
-            if(dir1.ndot(pos2.subtract(pos1)) > Vals.COS_45) points(0) = shortCurvePoints(pos1, dir1, pos2, dir2)
-            else points(0) = circleCurve(pos1, dir1, pos2, dir2)
+            points(0) = circleCurve(pos1, dir1, pos2, dir2)
         } else {
             val t = Vals.sCurveSegmentLength(pos1, dir1.normalize, pos2, dir2.normalize)
             val center = pos1.add(pos2).add(dir1.rescale(t)).add(dir2.rescale(t)).divide(2f)
             if(Vals.isCurveTooSmall(dir1, center.subtract(pos1), laneCount) || Vals.isCurveTooSmall(dir2, center.subtract(pos2), laneCount) ) return null
             if(dir1.dot(center.subtract(pos1)) < 0 || dir2.dot(center.subtract(pos2)) < 0) return null
             if(pos2.subtract(pos1).dot(center.subtract(pos1)) < 0 || pos1.subtract(pos2).dot(center.subtract(pos2)) < 0) return null
-            points = new Array(2)
-            points(0) = circleCurve(pos1, dir1, center)
-            points(1) = circleCurve(pos2, dir2, center).reverse
+            if(isEliptical(pos1, dir1, pos2, dir2)) {
+                points = new Array(1)
+                points(0) = shortCurvePoints(pos1, dir1, pos2, dir2)
+            } else {
+                points = new Array(2)
+                points(0) = circleCurve(pos1, dir1, center)
+                points(1) = circleCurve(pos2, dir2, center).reverse
+            }
         }
 
+        points
+    }
+
+    def doubleSnapCurveAlternate(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3, laneCount: Int): Array[Array[Vec3]] = {
+        var points: Array[Array[Vec3]] = null
+
+        if (dir1.mirror(pos2.subtract(pos1)).ndot(dir2) > Vals.PRETTY_CLOSE &&
+          pos1.subtract(pos2).dot(dir2) >= Vals.PRETTY_CLOSE - 1 &&
+          pos2.subtract(pos1).dot(dir1) >= Vals.PRETTY_CLOSE - 1) {
+            points = arcSplit(pos1: Vec3, dir1: Vec3, pos2: Vec3, dir2: Vec3)
+        } else {
+            val t = Vals.sCurveSegmentLength(pos1, dir1.normalize, pos2, dir2.normalize)
+            val center = pos1.add(pos2).add(dir1.rescale(t)).add(dir2.rescale(t)).divide(2f)
+            if (Vals.isCurveTooSmall(dir1, center.subtract(pos1), laneCount) || Vals.isCurveTooSmall(dir2, center.subtract(pos2), laneCount)) return null
+            if (dir1.dot(center.subtract(pos1)) < 0 || dir2.dot(center.subtract(pos2)) < 0) return null
+            if (pos2.subtract(pos1).dot(center.subtract(pos1)) < 0 || pos1.subtract(pos2).dot(center.subtract(pos2)) < 0) return null
+            val curve1 = arcSplit(pos1, dir1, center)
+            val curve2 = arcSplit(pos2, dir2, center)
+            points = new Array(curve1.length + curve2.length)
+            points(0) = curve1(0)
+            if (curve1.length == 1) {
+                if (curve2.length == 1) {
+                    points(1) = curve2(0).reverse
+                } else {
+                    points(1) = curve2(1).reverse
+                    points(2) = curve2(0).reverse
+                }
+            } else {
+                points(1) = curve1(1)
+                if (curve2.length == 1) {
+                    points(2) = curve2(0).reverse
+                } else {
+                    points(2) = curve2(1).reverse
+                    points(3) = curve2(0).reverse
+                }
+            }
+        }
         points
     }
 

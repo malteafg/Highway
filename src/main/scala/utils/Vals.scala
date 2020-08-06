@@ -13,6 +13,7 @@ object Vals {
     final val UI_COLOR: Vec4 = Vec4(0.3f, 0.4f, 0.5f, 1.0f)
 
     final val PRETTY_CLOSE: Float = 0.97f
+    final val CLOSE_ENOUGH: Float = 0.95f
     final val COS_45: Float = Math.sqrt(2f).toFloat / 2f;
 
     final val MIN_CAMERA_PITCH: Float = 0.15f

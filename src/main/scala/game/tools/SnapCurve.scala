@@ -16,7 +16,7 @@ case class SnapCurve(selectedNode: RoadNode, snappedNode: RoadNode, opposite: Bo
         for(s <- doubleCtrPts.indices) {
             if(s == doubleCtrPts.length - 1) secondNode = endNode
             else {
-                secondNode = new RoadNode(doubleCtrPts(s)(3), doubleCtrPts(s)(2).subtract(doubleCtrPts(s)(3)).normalize, Tools.getNoOfLanes)
+                secondNode = new RoadNode(doubleCtrPts(s)(doubleCtrPts(s).length - 1), doubleCtrPts(s)(doubleCtrPts(s).length - 2).subtract(doubleCtrPts(s)(doubleCtrPts(s).length - 1)).normalize, Tools.getNoOfLanes)
                 game().addNode(secondNode)
             }
             val segment = RoadSegment(firstNode, secondNode, null, doubleCtrPts(s), roadMeshes(s))

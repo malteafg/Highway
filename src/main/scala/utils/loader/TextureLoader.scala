@@ -18,10 +18,13 @@ object TextureLoader {
         load("logo")
         load("threeLane")
         load("cleanRoad")
+        load("straightIcon")
+        load("curveIcon")
         load("normalMap", 1)
         load("sphereNormalMap", 1)
         load("internetNormalMap", 1)
         load("smoothNormalMap", 1)
+
     }
 
     private def load(file: String, location: Int = 0): Unit = {
