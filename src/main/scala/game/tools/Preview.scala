@@ -129,6 +129,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
             case Tools.Curved =>
                 if (selectedNode == null) Tools.back()
                 else Tools.replace(Preview(selectedPos, selectedDir, opposite, selectedNode))
+            case _ =>
         }
         onMovement(Tools.getCursorPos)
     }

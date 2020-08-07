@@ -116,6 +116,9 @@ object GameRenderer {
             }
         }
 
+        Texture.get("cleanRoad").unbind()
+        Texture.get("normalMap").unbind(1)
+
         glDisable(GL_CULL_FACE)
 
         // render skybox

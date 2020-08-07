@@ -34,7 +34,7 @@ object Interface {
             Tools.straightRoad()
         })
 
-//    straight.addTexture(Texture.get("straightIcon"))
+    straight.addTexture(Texture.get("straightIcon"))
 
     val curved: Button = new Button(panel, Vec2(3.1f, 0.1f), Vec2(0.8f, 0.8f), Vec4(0, 1, 0, 1),
         () => "Bottom button", () => {
@@ -42,7 +42,7 @@ object Interface {
             Tools.curvedRoad()
         })
 
-//    curved.addTexture(Texture.get("curveIcon"))
+    curved.addTexture(Texture.get("curveIcon"))
 
     /*
     val slider = new Slider(screen, new Vector2f(15.5f, 0), new Vector2f(0.5f, 9), Vals.UI_COLOR, false, false, 0.5f, 0.5f,

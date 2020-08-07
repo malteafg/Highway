@@ -1,5 +1,7 @@
 package game.roads
 
-class Lane(startNode: LaneNode, endNode: LaneNode, offset: Float) {
+import utils.math.Vec3
+
+case class Lane(startNode: LaneNode, endNode: LaneNode, var path: Array[Vec3]) {
 
 }
