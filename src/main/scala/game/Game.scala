@@ -13,6 +13,7 @@ class Game {
     val nodes = new ListBuffer[RoadNode]()
 
     def addSegment(s: RoadSegment): Unit = roads.addOne(s)
+    def getSegments(): ListBuffer[RoadSegment] = roads
     def addNode(n: RoadNode): Unit = nodes.addOne(n)
 
     def addLineToTerrain(line: TerrainLine): Unit = terrain.addLine(line)

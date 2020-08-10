@@ -1,5 +1,6 @@
 package game.tools
 
+import game.Sphere
 import game.roads.{RoadGenerator, RoadNode, RoadSegment}
 import game.terrain.TerrainLine
 import input.InputHandler
@@ -42,8 +43,16 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
             val segment = RoadSegment(firstNode, secondNode, null, controlPoints(s), roadMeshes(s))
             firstNode.addOutgoingSegment(segment)
             secondNode.addIncomingSegment(segment)
-            game().addSegment(segment)
+
             firstNode = secondNode
+            game().getSegments().foreach(s => {
+                val pos = Bezier.roadCollision(f => Bezier.getPoint(f, segment.getControlPoints), f => Bezier.getPoint(f, s.getControlPoints), Tools.getNoOfLanes * Vals.LARGE_LANE_WIDTH)
+                if (pos != null) {
+                    game().spheres.addOne(new Sphere(pos))
+                    println(pos)
+                }
+            })
+            game().addSegment(segment)
         }
 
         val nodeToSnap = if (!opposite) endNode else startNode

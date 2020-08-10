@@ -37,6 +37,12 @@ object GameRenderer {
             })
         })
 
+        Shader.get("sphere").uniformVec4f("color", Vec4(0.3f, 0.0f, 0.4f, 1f))
+        game.spheres.foreach(s => {
+            Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(s.position).scale(2f))
+            draw(Sphere.mesh.va, Sphere.mesh.ib)
+        })
+
         terrainShader.bind()
         terrainShader.uniformMat4f("viewMatrix", camera.getViewMatrix)
 

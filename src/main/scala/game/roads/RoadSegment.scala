@@ -10,5 +10,6 @@ case class RoadSegment(startNode: RoadNode, endNode: RoadNode, lanes: Array[Lane
         mesh = newMesh
     }
     def getMesh: Mesh = mesh
+    def getControlPoints: Array[Vec3] = controlPoints
 
 }

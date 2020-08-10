@@ -242,4 +242,71 @@ object Bezier {
         points
     }
 
+    def roadCollision(road1: Float => Vec3, road2: Float => Vec3, laneWidth: Float): Vec3 = {
+        val values = Array(0f, 0.2f, 0.4f, 0.6f, 0.8f, 1f)
+        val points1 = values.map[Vec3](f => road1(f))
+        val points2 = values.map[Vec3](f => road2(f))
+        val (center1a, radius1a) = circleAround(points1)
+        val (center2a, radius2a) = circleAround(points2)
+        if(center1a.distTo(center2a) > radius1a + radius2a) return null
+        for(p1 <- points1.indices.drop(1)) {
+            for(p2 <- points2.indices.drop(1)) {
+                if(points1(p1 - 1).isIntersecting(points1(p1), points2(p2 - 1), points2(p2)))
+                    return points1(p1 - 1).intersection(points1(p1).subtract(points1(p1 - 1)), points2(p2 - 1), points2(p2).subtract(points2(p2 - 1)))
+            }
+        }
+        null
+    }
+
+    def oldCollision(): Unit = {
+//        var shortDist = Float.MaxValue
+//        var n = 10
+//        while(shortDist > laneWidth / 5f) {
+//            val lastDist = shortDist
+//            var dist = points(0).distTo(points(2))
+//            var option = 0
+//            if(dist < shortDist) shortDist = dist
+//            dist = points(0).distTo(points(3))
+//            if(dist < shortDist) {
+//                shortDist = dist
+//                option = 1
+//            }
+//            dist = points(1).distTo(points(2))
+//            if(dist < shortDist) {
+//                shortDist = dist
+//                option = 2
+//            }
+//            dist = points(1).distTo(points(3))
+//            if(dist < shortDist) {
+//                shortDist = dist
+//                option = 3
+//            }
+//            if(shortDist >= lastDist) n -= 0
+//            else n = 10
+//            if(n <= 0) return null
+//            if(option <= 1) {
+//                values(1) = (values(0) + values(1)) / 2f
+//                points(1) = road1(values(1))
+//            } else {
+//                values(0) = (values(0) + values(1)) / 2f
+//                points(0) = road1(values(0))
+//            }
+//            if(option % 2 == 0) {
+//                values(3) = (values(2) + values(3)) / 2f
+//                points(3) = road2(values(3))
+//            } else {
+//                values(2) = (values(2) + values(3)) / 2f
+//                points(2) = road2(values(2))
+//            }
+//            println("loop")
+//        }
+    }
+
+    def avg(f: Array[Vec3]): Vec3 = f.fold[Vec3](Vec3())((a: Vec3, b: Vec3) => a.add(b)).divide(1f * f.length)
+
+    def circleAround(f: Array[Vec3]): (Vec3, Float) = {
+        val center = avg(f)
+        (center, f.foldLeft[Float](0.0f)((a: Float, b: Vec3) => Math.max(center.distTo(b), a)))
+    }
+
 }
