@@ -105,4 +105,10 @@ object RoadGenerator {
 
     private val indicesMap = mutable.Map[Int, Array[Int]]()
 
+    def laneMapping(noOfLanes: Int): Array[Int] = {
+        val r = new Array[Int](noOfLanes)
+        for (i <- 0 until noOfLanes) r(i) = i + 1
+        r
+    }
+
 }

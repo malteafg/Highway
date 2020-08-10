@@ -3,6 +3,7 @@ package game.tools
 import game.Game
 import game.roads.RoadNode
 import game.terrain.TerrainLine
+import game.tools.NodeSnapper.SnapPoint
 import utils.graphics.Mesh
 import utils.math.Vec3
 
@@ -18,7 +19,7 @@ trait State {
     def onLeftClick(cursorPos: Vec3): Unit = ()
     def onRightClick(): Unit = ()
     def onMovement(cursorPos: Vec3): Unit = ()
-    def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = ()
+    def onNodeSnap(snappedPoint: SnapPoint): Unit = ()
     def onNodeUnsnap(): Unit = ()
     def onModeSwitch(mode: Tools.Mode): Unit = ()
 
