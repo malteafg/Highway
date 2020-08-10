@@ -30,7 +30,7 @@ object GameRenderer {
         Shader.get("sphere").uniformVec3f("cameraPos", camera.getCameraPos)
         Shader.get("sphere").uniform1b("darkEdge", darkEdges)
         game.roads.foreach(r => {
-            r.controlPoints.foreach(c => {
+            r.getControlPoints.foreach(c => {
                 Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.y(2)).scale(4))
                 Shader.get("sphere").uniformVec4f("color", Vec4(0.7f, 0.2f, 0.9f, 1f))
                 draw(Sphere.mesh.va, Sphere.mesh.ib)
@@ -92,14 +92,14 @@ object GameRenderer {
             Shader.get("node").uniformVec4f("in_Color", Vec4(0.0f, 0.8f, 0.8f, 0.5f))
             if (NodeSnapper.getSnappedNode == null) {
                 for(n <- game.nodes) {
-                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(n.getWidth))
+                    Shader.get("node").uniformMat4f("transformationMatrix", Mat4.translate(n.pos.y(Vals.ROAD_HEIGHT * 1.5f)).scale(n.getWidth))
                     draw(RoadNode.mesh)
                 }
             }
             else {
                 for(n <- NodeSnapper.getSnappedNode.getLaneNodes) {
                     Shader.get("node").uniformMat4f("transformationMatrix",
-                        Mat4.translate(n.position.y(Vals.ROAD_HEIGHT * 1.5f)).scale(Vals.LARGE_LANE_WIDTH))
+                        Mat4.translate(n.pos.y(Vals.ROAD_HEIGHT * 1.5f)).scale(Vals.LARGE_LANE_WIDTH))
                     draw(RoadNode.mesh)
                 }
             }
@@ -109,21 +109,18 @@ object GameRenderer {
             if (NodeSnapper.getSnappedNode == null) {
                 for(n <- game.nodes) {
                     Shader.get("basic").uniformMat4f("transformationMatrix",
-                        Mat4.translate(n.position.y(5)).multiply(Mat4.direction(n.direction)).scale(n.getWidth / 4))
+                        Mat4.translate(n.pos.y(5)).multiply(Mat4.direction(n.dir)).scale(n.getWidth / 4))
                     draw(arrow)
                 }
             }
             else {
                 for(n <- NodeSnapper.getSnappedNode.getLaneNodes) {
                     Shader.get("basic").uniformMat4f("transformationMatrix",
-                        Mat4.translate(n.position.y(5)).multiply(Mat4.direction(n.direction)).scale(Vals.LARGE_LANE_WIDTH / 4))
+                        Mat4.translate(n.pos.y(5)).multiply(Mat4.direction(n.dir)).scale(Vals.LARGE_LANE_WIDTH / 4))
                     draw(arrow)
                 }
             }
         }
-
-        Texture.get("cleanRoad").unbind()
-        Texture.get("normalMap").unbind(1)
 
         glDisable(GL_CULL_FACE)
 

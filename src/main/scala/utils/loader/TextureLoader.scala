@@ -16,21 +16,35 @@ object TextureLoader {
 
     def loadAll(): Unit = {
         load("logo")
-        load("threeLane")
-        load("cleanRoad")
         load("straightIcon")
         load("curveIcon")
-        load("normalMap", 1)
-        load("sphereNormalMap", 1)
-        load("internetNormalMap", 1)
-        load("smoothNormalMap", 1)
-
+        loadWithMipMap("cleanRoad")
+        loadWithMipMap("normalMap")
+        loadWithMipMap("sphereNormalMap")
+        loadWithMipMap("internetNormalMap")
+        loadWithMipMap("smoothNormalMap")
     }
 
-    private def load(file: String, location: Int = 0): Unit = {
+    private def load(file: String): Unit = {
         val texData = loadImage(s"src/main/resources/textures/$file.png")
         val result = glGenTextures()
-        glActiveTexture(GL_TEXTURE0 + location)
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, result)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texData._1, texData._2, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData._3)
+        glBindTexture(GL_TEXTURE_2D, 0)
+        Texture.put(file, new Texture(texData._1, texData._2, result))
+    }
+
+    private def loadWithMipMap(file: String): Unit = {
+        val texData = loadImage(s"src/main/resources/textures/$file.png")
+        val result = glGenTextures()
+        glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, result)
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)

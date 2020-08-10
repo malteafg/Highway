@@ -47,10 +47,10 @@ object RoadGenerator {
         val points = new Array[Vec3](4)
         val normDir = dir.normalize
         val heightVector = Vec3(0, Vals.ROAD_HEIGHT)
-        val left    = pos.add(normDir.leftHand().scale(roadWidth / 2.0f))
-        val right   = pos.add(normDir.rightHand().scale(roadWidth / 2.0f))
-        points(0)   = left.add(normDir.leftHand().scale(Vals.ROAD_HEIGHT))
-        points(1)   = right.add(normDir.rightHand().scale(Vals.ROAD_HEIGHT))
+        val left    = pos.add(normDir.leftHand.scale(roadWidth / 2.0f))
+        val right   = pos.add(normDir.rightHand.scale(roadWidth / 2.0f))
+        points(0)   = left.add(normDir.leftHand.scale(Vals.ROAD_HEIGHT))
+        points(1)   = right.add(normDir.rightHand.scale(Vals.ROAD_HEIGHT))
         points(2)   = right.add(heightVector)
         points(3)   = left.add(heightVector)
         points
@@ -104,5 +104,11 @@ object RoadGenerator {
     }
 
     private val indicesMap = mutable.Map[Int, Array[Int]]()
+
+    def laneMapping(noOfLanes: Int): Array[Int] = {
+        val r = new Array[Int](noOfLanes)
+        for (i <- 0 until noOfLanes) r(i) = i + 1
+        r
+    }
 
 }

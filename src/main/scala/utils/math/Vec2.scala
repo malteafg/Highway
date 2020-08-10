@@ -94,6 +94,14 @@ case class Vec2(x: Float = 0, y: Float = 0) {
     def lerp(other: Vec2, alpha: Float): Vec2 = this.scale(1f - alpha).add(other.scale(alpha))
 
     /**
+     * Returns the angle between this and another vector in radians
+     *
+     * @param other The other vector
+     * @return The angle between this and the other vector in radians
+     */
+    def angle(other: Vec2): Float = Math.acos(this.dot(other) / (this.length * other.length)).toFloat
+
+    /**
      * Stores the vector in a given Buffer.
      *
      * @param buffer The buffer to store the vector data

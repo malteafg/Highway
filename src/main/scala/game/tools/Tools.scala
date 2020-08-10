@@ -2,6 +2,7 @@ package game.tools
 
 import game.Game
 import game.terrain.TerrainLine
+import game.tools.NodeSnapper.SnapPoint
 import input.{InputEvent, InputHandler, Keys, Mouse}
 import org.lwjgl.opengl.GL11
 import utils.{Options, Vals}
@@ -100,15 +101,19 @@ object Tools {
     def getCursorMarker: TerrainLine = cursorMarker
     def getNoOfLanes: Int = noOfLanes
     def getGame: Game = game
+    def building: Boolean = current match {
+        case Preview(_, _, _, SnapPoint(_, _, _, _, _)) | SnapCurve(_, _, _, _) => true
+        case _ => false
+    }
 
     /**
      * Input
      */
     def onKeyPress(e: InputEvent): Unit = e match {
-        case InputEvent(49, Keys.PRESSED, _) => noOfLanes = 1
-        case InputEvent(50, Keys.PRESSED, _) => noOfLanes = 2
-        case InputEvent(51, Keys.PRESSED, _) => noOfLanes = 3
-        case InputEvent(52, Keys.PRESSED, _) => noOfLanes = 4
+        case InputEvent(49, Keys.PRESSED, _) => switchNoOfLanes(1)
+        case InputEvent(50, Keys.PRESSED, _) => switchNoOfLanes(2)
+        case InputEvent(51, Keys.PRESSED, _) => switchNoOfLanes(3)
+        case InputEvent(52, Keys.PRESSED, _) => switchNoOfLanes(4)
         case InputEvent(88, Keys.PRESSED, _) => straightRoad()
         case InputEvent(67, Keys.PRESSED, _) => curvedRoad()
         case InputEvent(75, Keys.PRESSED, _) => roadMode = GL11.GL_TRIANGLES
@@ -128,6 +133,16 @@ object Tools {
         if (mode != Free) {
             NodeSnapper.onMovement(cursorPos)
             current.onMovement(cursorPos)
+        }
+    }
+
+    def switchNoOfLanes(noOfLanes: Int): Unit = {
+        if (this.noOfLanes != noOfLanes && !building) {
+            this.noOfLanes = noOfLanes
+            if (mode != Free) {
+                NodeSnapper.reset(cursorPos)
+                current.onMovement(cursorPos)
+            }
         }
     }
 

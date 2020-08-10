@@ -206,8 +206,8 @@ case class Vec3(x: Float = 0, y: Float = 0, z: Float = 0) {
     def y(newy: Float): Vec3 = Vec3(x, newy, z)
     def z(newZ: Float): Vec3 = Vec3(x, y, newZ)
 
-    def rightHand(): Vec3 = Vec3(z, y, -x)
-    def leftHand(): Vec3 = Vec3(-z, y, x)
+    def rightHand: Vec3 = Vec3(z, y, -x)
+    def leftHand: Vec3 = Vec3(-z, y, x)
 
     override def toString = s"$x, $y, $z"
 

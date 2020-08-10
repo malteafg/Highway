@@ -1,6 +1,6 @@
 package game.tools
 
-import game.roads.RoadNode
+import game.tools.NodeSnapper.SnapPoint
 import utils.math.Vec3
 
 case class SelectPos() extends State {
@@ -14,6 +14,6 @@ case class SelectPos() extends State {
 
     override def onRightClick(): Unit = Tools.freeMode()
 
-    override def onNodeSnap(snappedNode: RoadNode, opposite: Boolean): Unit = Tools.push(SnappedNode(snappedNode, opposite))
+    override def onNodeSnap(snappedPoint: SnapPoint): Unit = Tools.push(SnappedNode(snappedPoint))
 
 }

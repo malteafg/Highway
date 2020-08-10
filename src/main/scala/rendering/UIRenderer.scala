@@ -4,23 +4,23 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL12._
-import org.lwjgl.opengl.GL13._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20.glVertexAttribPointer
 import org.lwjgl.opengl.GL30.glBindVertexArray
 import org.lwjgl.opengl.GL45.{glCreateBuffers, glCreateVertexArrays, glEnableVertexArrayAttrib}
 import ui.components.UIComponent
-import utils.graphics.Shader
+import utils.graphics.{Shader, Texture}
 import utils.math.{Vec2, Vec4}
 
 import scala.collection.mutable
 
 object UIRenderer {
 
-    final val maxQuadCount = 2
+    final val maxQuadCount = 1000
     final val maxVertexCount = maxQuadCount * 4
     final val maxIndexCount = maxQuadCount * 6
-    final val maxTextures = 32
+    // TODO get maxtextures from gpu
+    final val maxTextures = 2
     final val vertexSize = 10
 
     var quadVA = 0
@@ -104,6 +104,9 @@ object UIRenderer {
         glBindVertexArray(0)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
 
+        for(i <- 1 until maxTextures) textures(i) = 0
+        texSlotIndex = 1
+
         quadCount = 0
     }
 
@@ -157,19 +160,18 @@ object UIRenderer {
         quadCount += 1
     }
 
-    def drawQuad(pos: Vec2, size: Vec2, textureID: Int): Unit = {
+    def drawQuad(pos: Vec2, size: Vec2, tex: Texture): Unit = {
         if (quadCount >= maxQuadCount || texSlotIndex >= maxTextures) flush()
 
         var texIndex = 0.0f
-        for (i <- 1 until texSlotIndex) if (textures(i) == textureID) texIndex = i
+        for (i <- 1 until texSlotIndex) if (textures(i) == tex.getTextureID) texIndex = i
 
         if (texIndex == 0.0f) {
             texIndex = texSlotIndex
-            textures(texSlotIndex) = textureID
+            textures(texSlotIndex) = tex.getTextureID
             texSlotIndex += 1
 
-            glActiveTexture(texIndex.toInt)
-            glBindTexture(GL_TEXTURE_2D, textureID)
+            tex.bind(texIndex.toInt)
         }
 
         val color = Vec4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -232,7 +234,7 @@ object UIRenderer {
             val e = elements.dequeue()
             if (e.isActive) {
                 if (e.tex == null) UIRenderer.drawQuad(e.getPos, e.getSize, e.getColor)
-                else UIRenderer.drawQuad(e.getPos, e.getSize, e.tex.getTextureID)
+                else UIRenderer.drawQuad(e.getPos, e.getSize, e.tex)
                 elements.enqueueAll(e.getChildren)
             }
         }

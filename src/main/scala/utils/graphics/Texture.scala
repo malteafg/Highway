@@ -12,7 +12,10 @@ class Texture(width: Int, height: Int, textureID: Int) {
         glBindTexture(GL_TEXTURE_2D, textureID)
     }
 
-    def unbind(slot: Int = 0): Unit = glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0 + slot)
+    def unbind(slot: Int = 0): Unit = {
+        glActiveTexture(GL_TEXTURE0 + slot)
+        glBindTexture(GL_TEXTURE_2D, 0)
+    }
 
     def getTextureID: Int = textureID
 
