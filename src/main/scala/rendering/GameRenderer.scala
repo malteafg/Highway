@@ -33,7 +33,7 @@ object GameRenderer {
             r.getControlPoints.foreach(c => {
                 Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.y(2)).scale(4))
                 Shader.get("sphere").uniformVec4f("color", Vec4(0.7f, 0.2f, 0.9f, 1f))
-                //draw(Sphere.mesh.va, Sphere.mesh.ib)
+                draw(Sphere.mesh.va, Sphere.mesh.ib)
             })
         })
 
@@ -115,9 +115,6 @@ object GameRenderer {
                 }
             }
         }
-
-        Texture.get("cleanRoad").unbind()
-        Texture.get("normalMap").unbind(1)
 
         glDisable(GL_CULL_FACE)
 
