@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 object RoadGenerator {
 
-    def generateStraightMesh(startPoint: Vec3, endPoint: Vec3, lanesNo: Int): (Mesh, Array[Vec3]) = {
+    def generateStraightMesh(startPoint: Vec3, endPoint: Vec3, lanesNo: Int): (Mesh, Array[Vec3], Array[Vec3]) = {
         val dir = endPoint.subtract(startPoint).normalize
 
         val vertices = new Array[Vec3](8)
@@ -17,19 +17,21 @@ object RoadGenerator {
 
         val indices = generateIndices(2)
         val dist = endPoint.subtract(startPoint)
-        (new Mesh(vertices, indices, Array(3)), Array(startPoint, startPoint.add(dist.scale(1f / 3f)), startPoint.add(dist.scale(2f / 3f)), endPoint))
+        (new Mesh(vertices, indices, Array(3)), Array(startPoint, startPoint.add(dist.scale(1f / 3f)), startPoint.add(dist.scale(2f / 3f)), endPoint), Array(startPoint, endPoint))
     }
 
-    def generateCircularMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Array[Vec3]) = {
+    def generateCircularMesh(pos: Vec3, dir: Vec3, point: Vec3, lanesNo: Int): (Mesh, Array[Vec3], Array[Vec3]) = {
         val controlPoints = Bezier.circleCurve(pos, dir, point)
-        (generateCurveMesh(controlPoints, lanesNo), controlPoints)
+        val curveMesh = generateCurveMesh(controlPoints, lanesNo)
+        (curveMesh._1, controlPoints, curveMesh._2)
     }
 
-    def generateCurveMesh(controlPoints: Array[Vec3], lanesNo: Int): Mesh = {
+    def generateCurveMesh(controlPoints: Array[Vec3], lanesNo: Int): (Mesh, Array[Vec3]) = {
         var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
         if (numOfCuts < 2) numOfCuts = 2
         val vertices = new Array[Vec3](numOfCuts * 4)
 
+        val lanePoints = new Array[Vec3](numOfCuts)
         for(p <- vertices.indices by 4) {
             val cut = 1.0f * p / (vertices.length - 4)
             roadCut(
@@ -37,10 +39,11 @@ object RoadGenerator {
                 Bezier.getDirection(cut, controlPoints).normalize,
                 Vals.LARGE_LANE_WIDTH  * lanesNo
             ).foldLeft(p) ((p, c) => {vertices(p) = c; p + 1})
+            lanePoints(p / 4) = Bezier.getPoint(cut, controlPoints)
         }
 
         val indices = generateIndices(numOfCuts)
-        new Mesh(vertices, indices, Array(3))
+        (new Mesh(vertices, indices, Array(3)), lanePoints)
     }
 
     private def roadCut(pos: Vec3, dir: Vec3, roadWidth: Float): Array[Vec3] = {

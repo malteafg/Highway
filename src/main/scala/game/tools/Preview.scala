@@ -45,7 +45,8 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                 secondNode = new RoadNode(controlPoints(s)(3), controlPoints(s)(3).subtract(controlPoints(s)(2)).normalize, Tools.getNoOfLanes)
                 game().addNode(secondNode)
             }
-            val segment = new RoadSegment(firstNode, secondNode, firstLaneMap, secondLaneMap, Tools.getNoOfLanes, controlPoints(s), roadMeshes(s))
+            val segment = new RoadSegment(firstNode, secondNode, firstLaneMap, secondLaneMap, Tools.getNoOfLanes, controlPoints(s),
+                if (opposite) roadMeshes(s)._2.reverse else roadMeshes(s)._2, roadMeshes(s)._1)
 
             firstNode = secondNode
             game().getSegments().foreach(s => {
@@ -77,7 +78,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                 if (newPos.subtract(selectedPos).length < Vals.MIN_SEGMENT_LENGTH)
                     newPos = selectedPos.add(newPos.subtract(selectedPos).normalize.scale(Vals.MIN_SEGMENT_LENGTH))
                 val mesh = RoadGenerator.generateStraightMesh(selectedPos, newPos, Tools.getNoOfLanes)
-                roadMeshes.addOne(mesh._1)
+                roadMeshes.addOne(mesh._1, mesh._3)
                 controlPoints = new Array(1)
                 controlPoints(0) = if (opposite) mesh._2.reverse else mesh._2
             case Tools.Curved =>
@@ -87,7 +88,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                     val minDist = Math.max(Vals.MIN_SEGMENT_LENGTH, Vals.minRoadLength(dir, newPos.subtract(selectedPos), Tools.getNoOfLanes))
                     if (newPos.subtract(selectedPos).length < minDist) newPos = selectedPos.add(newPos.subtract(selectedPos).rescale(minDist))
                     val mesh = RoadGenerator.generateCircularMesh(selectedPos, dir, newPos, Tools.getNoOfLanes)
-                    roadMeshes.addOne(mesh._1)
+                    roadMeshes.addOne(mesh._1, mesh._3)
                     controlPoints = new Array(1)
                     controlPoints(0) = if (opposite) mesh._2.reverse else mesh._2
                 } else {
@@ -102,8 +103,8 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                     }
                     val mesh1 = RoadGenerator.generateCircularMesh(selectedPos, dir, midPoint, Tools.getNoOfLanes)
                     val mesh2 = RoadGenerator.generateCircularMesh(midPoint, newPos.subtract(selectedPos), newPos, Tools.getNoOfLanes)
-                    roadMeshes.addOne(mesh1._1)
-                    roadMeshes.addOne(mesh2._1)
+                    roadMeshes.addOne(mesh1._1, mesh1._3)
+                    roadMeshes.addOne(mesh2._1, mesh2._3)
                     controlPoints = new Array(2)
                     if(opposite) {
                         controlPoints(1) = if (opposite) mesh1._2.reverse else mesh1._2

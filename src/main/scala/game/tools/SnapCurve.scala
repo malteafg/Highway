@@ -24,7 +24,7 @@ case class SnapCurve(selectedPoint: SnapPoint, snappedPoint: SnapPoint, opposite
                 secondNode = new RoadNode(doubleCtrPts(s)(doubleCtrPts(s).length - 1), doubleCtrPts(s)(doubleCtrPts(s).length - 2).subtract(doubleCtrPts(s)(doubleCtrPts(s).length - 1)).normalize, Tools.getNoOfLanes)
                 game().addNode(secondNode)
             }
-            val segment = new RoadSegment(firstNode, secondNode, firstLaneMap, secondLaneMap, Tools.getNoOfLanes, doubleCtrPts(s), roadMeshes(s))
+            val segment = new RoadSegment(firstNode, secondNode, firstLaneMap, secondLaneMap, Tools.getNoOfLanes, doubleCtrPts(s), roadMeshes(s)._2.reverse, roadMeshes(s)._1)
             game().addSegment(segment)
             firstNode = secondNode
             firstLaneMap = RoadGenerator.laneMapping(Tools.getNoOfLanes)

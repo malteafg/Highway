@@ -33,14 +33,21 @@ object GameRenderer {
             r.getControlPoints.foreach(c => {
                 Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.y(2)).scale(4))
                 Shader.get("sphere").uniformVec4f("color", Vec4(0.7f, 0.2f, 0.9f, 1f))
-                draw(Sphere.mesh.va, Sphere.mesh.ib)
+                //draw(Sphere.mesh)
+            })
+            r.getLanes.foreach(l => {
+                l.getPath.foreach(p => {
+                    Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(p))
+                    Shader.get("sphere").uniformVec4f("color", Vec4(0.95f, 0.8f, 0.05f, 0.6f))
+                    draw(Sphere.mesh)
+                })
             })
         })
 
         Shader.get("sphere").uniformVec4f("color", Vec4(0.3f, 0.0f, 0.4f, 1f))
         game.spheres.foreach(s => {
             Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(s.position).scale(2f))
-            draw(Sphere.mesh.va, Sphere.mesh.ib)
+            draw(Sphere.mesh)
         })
 
         terrainShader.bind()
@@ -83,7 +90,7 @@ object GameRenderer {
         if (!Tools.isFree) {
             if (Tools.current.getRoadMeshesToRender.nonEmpty) {
                 Shader.get("road").uniformVec4f("in_Color", Vec4(0.3f, 0.3f, 0.9f, 0.8f))
-                Tools.current.getRoadMeshesToRender.foreach(m => draw(m, Tools.roadMode))
+                Tools.current.getRoadMeshesToRender.foreach(m => draw(m._1, Tools.roadMode))
             }
 
             // render nodes

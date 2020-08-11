@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 trait State {
 
-    protected var roadMeshes = new mutable.ListBuffer[Mesh]()
+    protected var roadMeshes = new mutable.ListBuffer[(Mesh, Array[Vec3])]()
     protected val guidelines = new mutable.ListBuffer[TerrainLine]()
     protected val game: () => Game = () => Tools.getGame
 
@@ -23,7 +23,7 @@ trait State {
     def onNodeUnsnap(): Unit = ()
     def onModeSwitch(mode: Tools.Mode): Unit = ()
 
-    final def getRoadMeshesToRender: mutable.ListBuffer[Mesh] = roadMeshes
+    final def getRoadMeshesToRender: mutable.ListBuffer[(Mesh, Array[Vec3])] = roadMeshes
     final def getGuidelinesToRender: List[TerrainLine] = guidelines.toList.::(Tools.getCursorMarker)
 
 }
