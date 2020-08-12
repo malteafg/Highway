@@ -39,9 +39,16 @@ object GameRenderer {
                 l.getPath.foreach(p => {
                     Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(p))
                     Shader.get("sphere").uniformVec4f("color", Vec4(0.95f, 0.8f, 0.05f, 0.6f))
-                    draw(Sphere.mesh)
+                    //draw(Sphere.mesh)
                 })
             })
+        })
+
+        game.cars.foreach(c => {
+            if (c.traveller == null) println("yikes")
+            Shader.get("sphere").uniformMat4f("transformationMatrix", Mat4.translate(c.traveller.pos))
+            Shader.get("sphere").uniformVec4f("color", Vec4(0.15f, 0.8f, 0.95f, 1.0f))
+            draw(Sphere.mesh)
         })
 
         Shader.get("sphere").uniformVec4f("color", Vec4(0.3f, 0.0f, 0.4f, 1f))

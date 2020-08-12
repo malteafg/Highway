@@ -20,10 +20,11 @@ object GameHandler {
 
     def update(): Unit = {
         camera.update()
+        if (game != null) game.update()
     }
     
     def render(): Unit = {
-        if(game != null) GameRenderer.render(game, camera, Tools.current)
+        if (game != null) GameRenderer.render(game, camera, Tools.current)
     }
 
     /**

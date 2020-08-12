@@ -1,6 +1,7 @@
 package game.tools
 
 import game.Game
+import game.cars.{Car, Traveller}
 import game.terrain.TerrainLine
 import game.tools.NodeSnapper.SnapPoint
 import input.{InputEvent, InputHandler, Keys, Mouse}
@@ -122,7 +123,30 @@ object Tools {
     }
 
     def onMousePress(e: InputEvent): Unit = e match {
-        case InputEvent(Mouse.LEFT, Mouse.PRESSED, _) => if (mode != Free) current.onLeftClick(cursorPos)
+        case InputEvent(Mouse.LEFT, Mouse.PRESSED, _) =>
+            if (mode != Free) current.onLeftClick(cursorPos)
+            else {
+                var currentMinNode = game.nodes.head
+                var minDist = 1000f
+                game.nodes.foreach(n => {
+                    val dist = n.pos.subtract(cursorPos).length
+                    if (dist < minDist) {
+                        minDist = dist
+                        currentMinNode = n
+                    }
+                })
+                var currentMinLaneNode = currentMinNode.getLaneNodes.head
+                minDist = 1000f
+                currentMinNode.getLaneNodes.foreach(n => {
+                    val dist = n.pos.subtract(cursorPos).length
+                    if (dist < minDist) {
+                        minDist = dist
+                        currentMinLaneNode = n
+                    }
+                })
+                if (currentMinLaneNode.getOutgoingLanes.nonEmpty)
+                    game.addCar(new Car(Traveller(currentMinLaneNode.pos, currentMinLaneNode.getOutgoingLanes.head, 0, 1), 100))
+            }
         case InputEvent(Mouse.RIGHT, Mouse.PRESSED, _) => if (mode != Free) current.onRightClick()
         case _ =>
     }

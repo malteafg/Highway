@@ -9,7 +9,6 @@ class RoadSegment(startNode: RoadNode, endNode: RoadNode, startLaneMap: Array[In
     startNode.addOutgoingSegment(this)
     endNode.addIncomingSegment(this)
 
-    println(length)
     // TODO generate lane markings
 
     private val lanes: Array[Lane] = new Array[Lane](noOfLanes)
