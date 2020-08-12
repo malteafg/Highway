@@ -27,7 +27,7 @@ object RoadGenerator {
     }
 
     def generateCurveMesh(controlPoints: Array[Vec3], lanesNo: Int): (Mesh, Array[Vec3]) = {
-        var numOfCuts = (controlPoints(0).subtract(controlPoints.last).length * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
+        var numOfCuts = (Bezier.curveDetail(controlPoints(1).subtract(controlPoints(0)), controlPoints.last.subtract(controlPoints(0))) * Vals.ROAD_VERTEX_DENSITY).toInt + Vals.ROAD_VERTEX_MINIMUM
         if (numOfCuts < 2) numOfCuts = 2
         val vertices = new Array[Vec3](numOfCuts * 4)
 

@@ -33,8 +33,9 @@ object Vals {
     final val CONTROL_POINT_COLOR: Vec4 = Vec4(0, 0.4f, 0.8f, 1)
 
     final val ROAD_HEIGHT: Float = 0.2f
-    final val ROAD_VERTEX_DENSITY: Float = 0.25f
-    final val ROAD_VERTEX_MINIMUM: Int = 10
+    final val ROAD_VERTEX_DENSITY: Float = 0.1f
+//  final val ROAD_VERTEX_DENSITY: Float = 2f
+    final val ROAD_VERTEX_MINIMUM: Int = 5
     final val LARGE_LANE_WIDTH: Float = 3.7f
     final val MIN_SEGMENT_LENGTH: Float = 10f
 

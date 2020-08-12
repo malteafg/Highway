@@ -49,7 +49,7 @@ case class Preview(selectedPos: Vec3, selectedDir: () => Vec3, opposite: Boolean
                 if (opposite) roadMeshes(s)._2.reverse else roadMeshes(s)._2, roadMeshes(s)._1)
 
             firstNode = secondNode
-            game().getSegments().foreach(s => {
+            game().getSegments.foreach(s => {
                 val pos = Bezier.roadCollision(f => Bezier.getPoint(f, segment.getControlPoints), f => Bezier.getPoint(f, s.getControlPoints), Tools.getNoOfLanes * Vals.LARGE_LANE_WIDTH)
                 if (pos != null) game().spheres.addOne(new Sphere(pos))
             })

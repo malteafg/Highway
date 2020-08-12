@@ -309,4 +309,10 @@ object Bezier {
         (center, f.foldLeft[Float](0.0f)((a: Float, b: Vec3) => Math.max(center.distTo(b), a)))
     }
 
+    def arcLength(tangent: Vec3, chord: Vec3): Float = chord.length * Math.acos(tangent.ndot(chord)).toFloat / tangent.antiDot(chord)
+
+    def turnAngle(tangent: Vec3, chord: Vec3): Float = 2 * Math.acos(tangent.ndot(chord)).toFloat
+
+    def curveDetail(tangent: Vec3, chord: Vec3): Float = Math.acos(tangent.ndot(chord)).toFloat * Math.sqrt(2 * chord.length / tangent.antiDot(chord)).toFloat
+
 }
